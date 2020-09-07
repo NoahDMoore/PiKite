@@ -697,7 +697,6 @@ program_state = State("menu")
 socket_thread = threading.Thread(target=start_websocket_client)
 button_thread = threading.Thread(target=button_input)
 
-INCOMING_MESSAGES = set()
 OUTGOING_MESSAGES = set()
 
 if __name__ == "__main__":
