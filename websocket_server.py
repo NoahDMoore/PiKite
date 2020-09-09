@@ -78,13 +78,13 @@ async def handler(websocket, path):
 			password = "03d66e75dfc0b2a9f147dcaac2846c86"
 		if password != "03d66e75dfc0b2a9f147dcaac2846c86":
 			print("{} has entered an incorrect password. Connection Refused!".format(user))
-			await user.send('{"alert": "Incorrect Password - Connection Refused!"}')
+			await user.send('{"alert": "Incorrect Password - Connection Refused!", "handshake": "failure"}')
 			await user.disconnect()
 			await unregister(user)
 			
 		else:
 			print("{} has connected succesfully. Password accepted.".format(user))
-			await user.send('{"alert": "Password accepted. Welcome."}')
+			await user.send('{"alert": "Password accepted. Welcome.", "handshake": "success"}')
 		
 			try:
 				async for message in user.websocket:
