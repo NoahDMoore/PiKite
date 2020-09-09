@@ -9,33 +9,33 @@ class User:
 		self.websocket = websocket
 		self.address = websocket.remote_address[0]
 		self.index = index
-	
+
 	def __repr__(self):
 		return self.name
-	
+
 	def __str__(self):
 		return self.name
-		
+
 	def __contains__(self, param):
 		if param == self.address:
 			return True
 		else:
 			return False
-	
+
 	@property
 	def name(self):
 		if self.index != 0:
 			return self.address + "[" + str(self.index) + "]"
 		else:
 			return self.address
-	
+
 	async def send(self, message):
 		await self.websocket.send(message)
-	
+
 	async def recv(self):
 		message = await self.websocket.recv()
 		return message
-	
+
 	async def disconnect(self):
 		await self.websocket.close()
 
@@ -64,12 +64,12 @@ async def unregister(user):
 
 async def handler(websocket, path):
 	user = await register(websocket)
-	
+
 	print("{} has connected to the server. Waiting for password.".format(user))
-	
+
 	await asyncio.sleep(2)
 	await user.send('{"alert": "Please send the password. 60s timeout.", "request": "password"}')
-	
+
 	try:
 		if websocket.remote_address[0] != get_ip_address():
 			password = await asyncio.wait_for(user.recv(), 60)
@@ -81,11 +81,11 @@ async def handler(websocket, path):
 			await user.send('{"alert": "Incorrect Password - Connection Refused!", "handshake": "failure"}')
 			await user.disconnect()
 			await unregister(user)
-			
+
 		else:
 			print("{} has connected succesfully. Password accepted.".format(user))
 			await user.send('{"alert": "Password accepted. Welcome.", "handshake": "success"}')
-		
+
 			try:
 				async for message in user.websocket:
 					data = json.loads(message)
@@ -97,10 +97,10 @@ async def handler(websocket, path):
 				print("{} has disconnected from the server.".format(user))
 	except asyncio.TimeoutError:
 		print("{} failed to enter a password before timeout. Connection Refused.".format(user))
-		await user.send('{"alert": "Password Timeout - Connection Refused!"}')
+		await user.send('{"alert": "Password Timeout - Connection Refused!", "handshake": "timeout"}')
 		await user.disconnect()
 		await unregister(user)
-	
+
 start_server = websockets.serve(handler, get_ip_address(), 1234, ping_interval=None, ping_timeout=None)
 
 asyncio.get_event_loop().run_until_complete(start_server)

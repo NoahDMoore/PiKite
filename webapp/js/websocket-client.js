@@ -72,7 +72,8 @@ function startWebsocket() {
 
 		if (obj.hasOwnProperty("photo")) {
 			if (obj["photo"] != photo) {
-				document.getElementById("photo").src = "photos/" + obj["photo"];
+				//PiKite saves photos to ~/pikite/output/photos, so you needs an Apache alias to reach it.
+				document.getElementById("pikite-image").src = "photos/" + obj["photo"];
 				photo = obj["photo"];
 			}
 		}
