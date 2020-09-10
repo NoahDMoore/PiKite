@@ -513,7 +513,7 @@ def run_pikite():
 
 						photo_location = folder_name + "/" + timestamp + ".jpg"
 
-						camera.capture("/home/pi/pikite/output/photos/" + photo_location)
+						#camera.capture("/home/pi/pikite/output/photos/" + photo_location)
 						print('photo')
 						pic_flag = True
 
