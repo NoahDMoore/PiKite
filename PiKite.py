@@ -485,7 +485,6 @@ def run_pikite():
 
 		elif settings_dict["cam_take_photos"] == "pic":
 			while program_state == "runningPiKite":
-
 				current_time = time.time()
 				previous_runtime = runtime
 				runtime = current_time - start_time
@@ -498,7 +497,6 @@ def run_pikite():
 				if current_time <= previous_alt_time + alt_interval and alt_flag != True:
 					altitude = read_altitude(baseline)
 					log.write("{0},{1}\n".format(timestamp, altitude))
-					time.sleep(.0125)
 					print('altitude')
 					alt_flag = True
 
@@ -515,8 +513,7 @@ def run_pikite():
 
 						photo_location = folder_name + "/" + timestamp + ".jpg"
 
-						camera.capture("/home/pi/pikite/output/photos/" + folder_name + "/" + timestamp + ".jpg")
-						time.sleep(.0125)
+						camera.capture("/home/pi/pikite/output/photos/" + photo_location)
 						print('photo')
 						pic_flag = True
 
