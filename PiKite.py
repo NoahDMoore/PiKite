@@ -2,7 +2,7 @@ import time
 import configparser as ConfigParser
 import sys
 import subprocess
-import os
+from os import path, mkdir
 import json
 import urllib.request
 import asyncio
@@ -433,8 +433,8 @@ def run_pikite():
 	folder_name = time.strftime("%m-%d-%Y-%H-%M")
 
 	if settings_dict["cam_take_photos"] != "none":
-		if not os.path.exists("/home/pi/pikite/output/photos" + folder_name):
-			os.mkdir("/home/pi/pikite/output/photos/" + folder_name)
+		if not path.exists("/home/pi/pikite/output/photos" + folder_name):
+			mkdir("/home/pi/pikite/output/photos/" + folder_name)
 
 	log_file = "/home/pi/pikite/output/altitude_readings/" + folder_name + ".csv"
 
