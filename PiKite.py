@@ -1,8 +1,8 @@
 import time
 import configparser as ConfigParser
-from sys import executable
+import sys
 import subprocess
-from os import path, mkdir
+import os
 import json
 import urllib.request
 import asyncio
@@ -433,8 +433,8 @@ def run_pikite():
 	folder_name = time.strftime("%m-%d-%Y-%H-%M")
 
 	if settings_dict["cam_take_photos"] != "none":
-		if not path.exists("/home/pi/pikite/output/photos" + folder_name):
-			mkdir("/home/pi/pikite/output/photos/" + folder_name)
+		if not os.path.exists("/home/pi/pikite/output/photos" + folder_name):
+			os.mkdir("/home/pi/pikite/output/photos/" + folder_name)
 
 	log_file = "/home/pi/pikite/output/altitude_readings/" + folder_name + ".csv"
 
@@ -521,6 +521,7 @@ def run_pikite():
 					json_data = {"photo": photo_location, "altitude": altitude, "runtime": runtime_string}
 					json_string = json.dumps(json_data)
 					OUTGOING_MESSAGES.add(json_string)
+					print(current_time)
 					socket_flag = True
 
 				if current_time > previous_alt_time + alt_interval:
@@ -685,7 +686,7 @@ menu_xml = ET.parse('menu.xml').getroot()
 
 get_settings()
 
-p = subprocess.Popen([executable, 'websocket_server.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p = subprocess.Popen([sys.executable, 'websocket_server.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 preload_thread.join()
 

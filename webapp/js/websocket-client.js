@@ -4,12 +4,13 @@ var altitude = " "
 var connected = false
 
 document.getElementById("connect-button").addEventListener("click", connect);
+document.getElementById("retry-button").addEventListener("click", connect);
 
 function connect() {
 	if (connected == false) {
-		connected = true;
 		document.getElementById('connect-button').setAttribute('disabled', 'true');
 		document.getElementById('connect-dialog').style.display = "none";
+		document.getElementById('failure-dialog').style.display = "none";
 		document.getElementById('connect-spinner').style.display = "block";
 		startWebsocket();
 	}
@@ -51,6 +52,7 @@ function startWebsocket() {
 				}
 			} else if (obj.hasOwnProperty("handshake")) {
 				if (obj['handshake'] == "success") {
+					connected = true;
 					document.getElementById('password-dialog').style.display = "none";
 					document.getElementById('success-dialog').style.display = "block";
 					document.getElementById('success-alert').innerHTML = obj["alert"];
@@ -59,6 +61,7 @@ function startWebsocket() {
 						document.getElementById('connection-dialog').style.display = "none";
 					}, 3100);
 				} else {
+					connected = false
 					document.getElementById('password-dialog').style.display = "none";
 					document.getElementById('failure-dialog').style.display = "block";
 					document.getElementById('failure-alert').innerHTML = obj["alert"];
@@ -70,24 +73,26 @@ function startWebsocket() {
 			}
 		}
 
-		if (obj.hasOwnProperty("photo")) {
-			if (obj["photo"] != photo) {
-				//PiKite saves photos to ~/pikite/output/photos, so you needs an Apache alias to reach it.
-				document.getElementById("pikite-image").src = "photos/" + obj["photo"];
-				photo = obj["photo"];
+		if (connected == true) {
+			if (obj.hasOwnProperty("photo")) {
+				if (obj["photo"] != photo) {
+					//PiKite saves photos to ~/pikite/output/photos, so you needs an Apache alias to reach it.
+					document.getElementById("pikite-image").src = "photos/" + obj["photo"];
+					photo = obj["photo"];
+				}
 			}
-		}
 
-		if (obj.hasOwnProperty("runtime")) {
-			if (obj["runtime"] != runtime) {
-				document.getElementById("runtime").innerHTML = "Runtime:</br>" + obj["runtime"];
-				runtime = obj["runtime"];
+			if (obj.hasOwnProperty("runtime")) {
+				if (obj["runtime"] != runtime) {
+					document.getElementById("runtime").innerHTML =  obj["runtime"];
+					runtime = obj["runtime"];
+				}
 			}
-		}
-		if (obj.hasOwnProperty("altitude")) {
-			if (obj["altitude"] != altitude) {
-				document.getElementById("altitude").innerHTML = "Altitude:</br>" + obj["altitude"] + "'";
-				altitude = obj["altitude"];
+			if (obj.hasOwnProperty("altitude")) {
+				if (obj["altitude"] != altitude) {
+					document.getElementById("altitude").innerHTML = obj["altitude"] + "'";
+					altitude = obj["altitude"];
+				}
 			}
 		}
 	};
