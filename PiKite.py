@@ -498,6 +498,8 @@ def run_pikite():
 				if current_time <= previous_alt_time + alt_interval and alt_flag != True:
 					altitude = read_altitude(baseline)
 					log.write("{0},{1}\n".format(timestamp, altitude))
+					time.sleep(.0125)
+					print('altitude')
 					alt_flag = True
 
 				if current_time > start_time + cam_delay_interval:
@@ -514,14 +516,14 @@ def run_pikite():
 						photo_location = folder_name + "/" + timestamp + ".jpg"
 
 						camera.capture("/home/pi/pikite/output/photos/" + folder_name + "/" + timestamp + ".jpg")
-
+						time.sleep(.0125)
+						print('photo')
 						pic_flag = True
 
 				if current_time <= previous_send_time + 1 and socket_flag != True:
 					json_data = {"photo": photo_location, "altitude": altitude, "runtime": runtime_string}
 					json_string = json.dumps(json_data)
 					OUTGOING_MESSAGES.add(json_string)
-					print(current_time)
 					socket_flag = True
 
 				if current_time > previous_alt_time + alt_interval:
