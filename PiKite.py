@@ -1,6 +1,6 @@
 import time
 import configparser as ConfigParser
-import sys
+from sys import executable
 import subprocess
 from os import path, mkdir
 import json
@@ -685,7 +685,7 @@ menu_xml = ET.parse('menu.xml').getroot()
 
 get_settings()
 
-p = subprocess.Popen([sys.executable, 'websocket_server.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+p = subprocess.Popen([executable, 'websocket_server.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 preload_thread.join()
 
