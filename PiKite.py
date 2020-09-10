@@ -497,7 +497,6 @@ def run_pikite():
 				if current_time <= previous_alt_time + alt_interval and alt_flag != True:
 					altitude = read_altitude(baseline)
 					log.write("{0},{1}\n".format(timestamp, altitude))
-					print('altitude')
 					alt_flag = True
 
 				if current_time > start_time + cam_delay_interval:
@@ -512,9 +511,7 @@ def run_pikite():
 							camera.annotate_text = "Altitude: {0}'  |  {1}".format(altitude, timestamp)
 
 						photo_location = folder_name + "/" + timestamp + ".jpg"
-
-						#camera.capture("/home/pi/pikite/output/photos/" + photo_location)
-						print('photo')
+						camera.capture("/home/pi/pikite/output/photos/" + photo_location)
 						pic_flag = True
 
 				if current_time <= previous_send_time + 1 and socket_flag != True:
@@ -675,7 +672,7 @@ config.read('PiKite_Settings.ini')
 #Create bme680 Object
 i2c = I2C(board.SCL, board.SDA)
 bme680 = adafruit_bme680.Adafruit_BME680_I2C(i2c, debug=False)
-bme680.pressure_oversample = 16
+bme680.pressure_oversample = 8
 
 #Create PiCamera Object
 camera = PiCamera()
