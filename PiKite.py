@@ -347,7 +347,7 @@ def display_system_info():
 def shutdown_pikite():
 	subprocess.call("sudo nohup shutdown -h now", shell=True)
 
-def read_altitude(baseline=1013.25, unit="feet"):
+def read_altitude(baseline=1030.0, unit="feet"):
 	bme680.sea_level_pressure = baseline
 	altitude = bme680.altitude
 
@@ -672,7 +672,7 @@ config.read('PiKite_Settings.ini')
 #Create bme680 Object
 i2c = I2C(board.SCL, board.SDA)
 bme680 = adafruit_bme680.Adafruit_BME680_I2C(i2c, debug=False)
-bme680.pressure_oversample = 8
+bme680.pressure_oversample = 16
 
 #Create PiCamera Object
 camera = PiCamera()
