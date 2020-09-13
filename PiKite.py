@@ -420,6 +420,10 @@ def start_pikite():
 	pikite_thread = threading.Thread(target=run_pikite)
 	pikite_thread.start()
 
+def how_long(start, op):
+    print('%s took %.2fs' % (op, time.time() - start))
+    return time.time()
+
 def run_pikite():
 	program_state.current_state = "runningPiKite"
 
@@ -501,6 +505,7 @@ def run_pikite():
 
 				if current_time > start_time + cam_delay_interval:
 					if current_time <= previous_pic_time + pic_interval and pic_flag != True:
+						start = time.time()
 						altitude = read_altitude(baseline)
 
 						if settings_dict["pic_annotations"] == "alt":
@@ -513,6 +518,7 @@ def run_pikite():
 						photo_location = folder_name + "/" + timestamp + ".jpg"
 						camera.capture("/home/pi/pikite/output/photos/" + photo_location)
 						pic_flag = True
+						start = how_long(start, 'capture')
 
 				if current_time <= previous_send_time + 1 and socket_flag != True:
 					json_data = {"photo": photo_location, "altitude": altitude, "runtime": runtime_string}
