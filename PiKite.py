@@ -22,7 +22,7 @@ import digitalio
 import adafruit_rgb_display.st7789 as st7789
 from PIL import Image, ImageDraw, ImageFont
 
-websocket_command = ""
+print(os.getcwd())
 
 class Menu:
 	def __init__(self, xml):
