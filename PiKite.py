@@ -247,6 +247,30 @@ class State:
 		else:
 			return False
 
+class RuntimeTimer(threading.Thread):
+	def __init__(self):
+		threading.Thread.__init__(self)
+		self._running = False
+
+	def stop(self):
+		self._running = False
+
+	def run(self):
+		self._running = True
+		self.start_time = int(time.time())
+		self.previous_time = 0
+
+		while self._running:
+			self.time = int(time.time()) - self.start_time
+			if self.time != self.previous_time:
+				runtime_string = "{0:02d}:{1:02d}".format(int(self.time/60), int(self.time%60))
+				print_one_line(runtime_string)
+				json_data = {"runtime": runtime_string}
+				json_string = json.dumps(json_data)
+				OUTGOING_MESSAGES.add(json_string)
+
+				self.previous_time = self.time
+
 def new_image():
 	lcd_image = Image.new("RGBA", (IMAGE_WIDTH, IMAGE_HEIGHT), (255,255,255,255))
 	canvas = ImageDraw.Draw(lcd_image)
@@ -420,10 +444,6 @@ def start_pikite():
 	pikite_thread = threading.Thread(target=run_pikite)
 	pikite_thread.start()
 
-def how_long(start, op):
-    print('%s took %.2fs' % (op, time.time() - start))
-    return time.time()
-
 def run_pikite():
 	program_state.current_state = "runningPiKite"
 
@@ -446,12 +466,10 @@ def run_pikite():
 		alt_interval = int(settings_dict["alt_reading_interval"])
 		pic_interval = int(settings_dict["pic_interval"])
 		cam_delay_interval = int(settings_dict["cam_recording_delay"])
-		start_time = time.time()
-		previous_alt_time = start_time
-		previous_pic_time = start_time
-		previous_send_time = start_time
-		runtime = 0
-		runtime_string = "{0:02d}:{1:02d}".format(int(runtime/60), int(runtime%60))
+		previous_alt_time = 0
+		previous_pic_time = 0
+		previous_send_time = 0
+		timer = RuntimeTimer()
 		altitude = read_altitude(baseline)
 		alt_flag = False
 		pic_flag = False
@@ -459,33 +477,29 @@ def run_pikite():
 		photo_location = "/var/www/html/placeholder.png"
 
 		if settings_dict["cam_take_photos"] == "none":
+			timer.start()
 			while program_state == "runningPiKite":
 				current_time = time.time()
-				previous_runtime = runtime
-				runtime = current_time - start_time
-				if runtime != previous_runtime:
-					runtime_string = "{0:02d}:{1:02d}".format(int(runtime/60), int(runtime%60))
-					print_one_line(runtime_string)
 
-				if current_time <= previous_alt_time + alt_interval and alt_flag != True:
+				if timer.time <= previous_alt_time + alt_interval and alt_flag != True:
 					altitude = read_altitude(baseline)
 					timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 					log.write("{0},{1}\n".format(timestamp, altitude))
+					previous_alt_time = timer.time
 					alt_flag = True
 
-				if current_time <= previous_send_time + 1 and socket_flag != True:
-					json_data = {"altitude": altitude, "runtime": runtime_string}
+				if timer.time <= previous_send_time + 1 and socket_flag != True:
+					json_data = {"altitude": altitude}
 					json_string = json.dumps(json_data)
 					OUTGOING_MESSAGES.add(json_string)
+					previous_send_time = timer.time
 					socket_flag = True
 
-				if current_time > previous_alt_time + alt_interval:
+				if timer.time > previous_alt_time + alt_interval:
 					alt_flag = False
-					previous_alt_time = current_time
 
 				if current_time > previous_send_time + 1:
 					socket_flag = False
-					previous_send_time = current_time
 
 		elif settings_dict["cam_take_photos"] == "pic":
 			while program_state == "runningPiKite":
@@ -505,7 +519,6 @@ def run_pikite():
 
 				if current_time > start_time + cam_delay_interval:
 					if current_time <= previous_pic_time + pic_interval and pic_flag != True:
-						start = time.time()
 						altitude = read_altitude(baseline)
 
 						if settings_dict["pic_annotations"] == "alt":
@@ -518,7 +531,6 @@ def run_pikite():
 						photo_location = folder_name + "/" + timestamp + ".jpg"
 						camera.capture("/home/pi/pikite/output/photos/" + photo_location)
 						pic_flag = True
-						start = how_long(start, 'capture')
 
 				if current_time <= previous_send_time + 1 and socket_flag != True:
 					json_data = {"photo": photo_location, "altitude": altitude, "runtime": runtime_string}
