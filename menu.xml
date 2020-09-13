@@ -6,7 +6,7 @@
 		<previous>poweroff</previous>
 		<next>pikite</next>
 	</menu_item>
-	
+
 	<menu_item>
 		<name>pikite</name>
 		<message>Launch PiKite!</message>
@@ -14,14 +14,14 @@
 		<previous>logo</previous>
 		<next>settings</next>
 	</menu_item>
-	
+
 	<menu_item>
 		<name>settings</name>
 		<message>Settings</message>
 		<action>submenu</action>
 		<previous>pikite</previous>
 		<next>system</next>
-		
+
 		<submenu>
 			<menu_item>
 				<name>altitude</name>
@@ -29,7 +29,7 @@
 				<action>submenu</action>
 				<previous>settingsReturn</previous>
 				<next>camera</next>
-				
+
 				<submenu>
 					<menu_item>
 						<name>altitudeInterval</name>
@@ -37,9 +37,9 @@
 						<action>options</action>
 						<previous>altitudeReturn</previous>
 						<next>altitudeReturn</next>
-						
+
 						<setting>alt_reading_interval</setting>
-						
+
 						<options>
 							<option_item>
 								<name>two</name>
@@ -49,7 +49,7 @@
 								<next>five</next>
 								<value>2</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>five</name>
 								<message>Seconds: [05]</message>
@@ -58,7 +58,7 @@
 								<next>ten</next>
 								<value>5</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>ten</name>
 								<message>Seconds: [10]</message>
@@ -67,7 +67,7 @@
 								<next>fifteen</next>
 								<value>10</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>fifteen</name>
 								<message>Seconds: [15]</message>
@@ -76,7 +76,7 @@
 								<next>thirty</next>
 								<value>15</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>thirty</name>
 								<message>Seconds: [30]</message>
@@ -85,7 +85,7 @@
 								<next>sixty</next>
 								<value>30</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>sixty</name>
 								<message>Seconds: [60]</message>
@@ -96,7 +96,7 @@
 							</option_item>
 						</options>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>altitudeReturn</name>
 						<message>Exit Submenu</message>
@@ -107,14 +107,14 @@
 					</menu_item>
 				</submenu>
 			</menu_item>
-			
+
 			<menu_item>
 				<name>camera</name>
 				<message>Camera Settings</message>
 				<action>submenu</action>
 				<previous>altitude</previous>
 				<next>defaults</next>
-				
+
 				<submenu>
 					<menu_item>
 						<name>cameraMode</name>
@@ -122,9 +122,9 @@
 						<action>options</action>
 						<previous>cameraReturn</previous>
 						<next>cameraDelay</next>
-						
+
 						<setting>cam_take_photos</setting>
-						
+
 						<options>
 							<option_item>
 								<name>photo</name>
@@ -134,7 +134,7 @@
 								<next>video</next>
 								<value>pic</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>video</name>
 								<message>[Video]</message>
@@ -143,7 +143,7 @@
 								<next>none</next>
 								<value>vid</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>none</name>
 								<message>[None]</message>
@@ -154,16 +154,16 @@
 							</option_item>
 						</options>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>cameraDelay</name>
 						<message>Camera Delay</message>
 						<action>options</action>
 						<previous>cameraMode</previous>
 						<next>cameraRotation</next>
-						
+
 						<setting>cam_recording_delay</setting>
-						
+
 						<options>
 							<option_item>
 								<name>zero</name>
@@ -173,7 +173,7 @@
 								<next>two</next>
 								<value>0</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>two</name>
 								<message>Minutes: [2]</message>
@@ -182,7 +182,7 @@
 								<next>five</next>
 								<value>2</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>five</name>
 								<message>Minutes: [5]</message>
@@ -191,7 +191,7 @@
 								<next>ten</next>
 								<value>5</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>ten</name>
 								<message>Minutes: [10]</message>
@@ -202,16 +202,16 @@
 							</option_item>
 						</options>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>cameraRotation</name>
 						<message>Image Rotation</message>
 						<action>options</action>
 						<previous>cameraDelay</previous>
 						<next>photoSettings</next>
-						
+
 						<setting>cam_rotation</setting>
-						
+
 						<options>
 							<option_item>
 								<name>zero</name>
@@ -221,7 +221,7 @@
 								<next>ninety</next>
 								<value>0</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>ninety</name>
 								<message>Degrees: [90]</message>
@@ -230,7 +230,7 @@
 								<next>oneeighty</next>
 								<value>90</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>oneeighty</name>
 								<message>Degrees: [180]</message>
@@ -239,7 +239,7 @@
 								<next>twoseventy</next>
 								<value>180</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>twoseventy</name>
 								<message>Degrees: [270]</message>
@@ -250,14 +250,14 @@
 							</option_item>
 						</options>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>photoSettings</name>
 						<message>Photo Settings</message>
 						<action>submenu</action>
 						<previous>cameraRotation</previous>
 						<next>videoSettings</next>
-						
+
 						<submenu>
 							<menu_item>
 								<name>photoInterval</name>
@@ -265,9 +265,9 @@
 								<action>options</action>
 								<previous>cameraDelay</previous>
 								<next>imageResolution</next>
-								
+
 								<setting>pic_interval</setting>
-								
+
 								<options>
 									<option_item>
 										<name>two</name>
@@ -277,7 +277,7 @@
 										<next>five</next>
 										<value>2</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>five</name>
 										<message>Seconds: [05]</message>
@@ -286,7 +286,7 @@
 										<next>ten</next>
 										<value>5</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>ten</name>
 										<message>Seconds: [10]</message>
@@ -295,7 +295,7 @@
 										<next>fifteen</next>
 										<value>10</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>fifteen</name>
 										<message>Seconds: [15]</message>
@@ -304,7 +304,7 @@
 										<next>thirty</next>
 										<value>15</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>thirty</name>
 										<message>Seconds: [30]</message>
@@ -313,7 +313,7 @@
 										<next>sixty</next>
 										<value>30</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>sixty</name>
 										<message>Seconds: [60]</message>
@@ -324,16 +324,16 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>imageResolution</name>
 								<message>Image Resolution</message>
 								<action>options</action>
 								<previous>photoInterval</previous>
 								<next>imageEffect</next>
-								
+
 								<setting>pic_resolution_mode</setting>
-								
+
 								<options>
 									<option_item>
 										<name>seven</name>
@@ -343,7 +343,7 @@
 										<next>five</next>
 										<value>7</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>five</name>
 										<message>Resolution: [1296x730]</message>
@@ -352,7 +352,7 @@
 										<next>one</next>
 										<value>5</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>one</name>
 										<message>Resolution: [1920x1080]</message>
@@ -361,7 +361,7 @@
 										<next>two</next>
 										<value>1</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>two</name>
 										<message>Resolution: [2952x1944]</message>
@@ -372,16 +372,16 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>imageEffect</name>
 								<message>Image Effect</message>
 								<action>options</action>
 								<previous>imageResolution</previous>
 								<next>imageAnnotation</next>
-								
+
 								<setting>pic_effect</setting>
-								
+
 								<options>
 									<option_item>
 										<name>none</name>
@@ -391,7 +391,7 @@
 										<next>cartoon</next>
 										<value>none</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>cartoon</name>
 										<message>FX: [Cartoon]</message>
@@ -400,7 +400,7 @@
 										<next>colorswap</next>
 										<value>cartoon</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>colorswap</name>
 										<message>FX: [Color Swap]</message>
@@ -409,7 +409,7 @@
 										<next>emboss</next>
 										<value>colorswap</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>emboss</name>
 										<message>FX: [Emboss]</message>
@@ -418,7 +418,7 @@
 										<next>negative</next>
 										<value>emboss</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>negative</name>
 										<message>FX: [Negative]</message>
@@ -427,7 +427,7 @@
 										<next>oilpaint</next>
 										<value>negative</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>oilpaint</name>
 										<message>FX: [Oil Paint]</message>
@@ -436,7 +436,7 @@
 										<next>pastel</next>
 										<value>oilpaint</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>pastel</name>
 										<message>FX: [Pastel]</message>
@@ -445,7 +445,7 @@
 										<next>posterise</next>
 										<value>pastel</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>posterise</name>
 										<message>FX: [Posterise]</message>
@@ -454,7 +454,7 @@
 										<next>sketch</next>
 										<value>posterise</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>sketch</name>
 										<message>FX: [Sketch]</message>
@@ -463,7 +463,7 @@
 										<next>solarize</next>
 										<value>sketch</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>solarize</name>
 										<message>FX: [Solarize]</message>
@@ -472,7 +472,7 @@
 										<next>washedout</next>
 										<value>solarize</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>washedout</name>
 										<message>FX: [Washed Out]</message>
@@ -483,16 +483,16 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>imageAnnotation</name>
 								<message>Annotations</message>
 								<action>options</action>
 								<previous>imageEffect</previous>
 								<next>photoReturn</next>
-								
+
 								<setting>pic_annotations</setting>
-								
+
 								<options>
 									<option_item>
 										<name>none</name>
@@ -502,7 +502,7 @@
 										<next>altstamp</next>
 										<value>none</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>altstamp</name>
 										<message>[Altitude]</message>
@@ -511,7 +511,7 @@
 										<next>timestamp</next>
 										<value>alt</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>timestamp</name>
 										<message>[Timestamp]</message>
@@ -520,7 +520,7 @@
 										<next>twoseventy</next>
 										<value>time</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>bothAnnotations</name>
 										<message>[Altitude and Timestamp]</message>
@@ -531,7 +531,7 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>photoReturn</name>
 								<message>Exit Submenu</message>
@@ -542,14 +542,14 @@
 							</menu_item>
 						</submenu>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>videoSettings</name>
 						<message>Video Settings</message>
 						<action>submenu</action>
 						<previous>photoSettings</previous>
 						<next>cameraBrightness</next>
-						
+
 						<submenu>
 							<menu_item>
 								<name>videoLength</name>
@@ -557,9 +557,9 @@
 								<action>options</action>
 								<previous>videoReturn</previous>
 								<next>multipleVideos</next>
-								
+
 								<setting>vid_length</setting>
-								
+
 								<options>
 									<option_item>
 										<name>fifteen</name>
@@ -569,7 +569,7 @@
 										<next>thirty</next>
 										<value>15</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>thirty</name>
 										<message>Seconds: [30]</message>
@@ -578,7 +578,7 @@
 										<next>sixty</next>
 										<value>30</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>sixty</name>
 										<message>Seconds: [60]</message>
@@ -587,7 +587,7 @@
 										<next>ninety</next>
 										<value>60</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>ninety</name>
 										<message>Seconds: [90]</message>
@@ -596,7 +596,7 @@
 										<next>onetwenty</next>
 										<value>90</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>onetwenty</name>
 										<message>Seconds: [120]</message>
@@ -605,7 +605,7 @@
 										<next>oneeighty</next>
 										<value>120</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>oneeighty</name>
 										<message>Seconds: [180]</message>
@@ -616,16 +616,16 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>multipleVideos</name>
 								<message>Multiple Videos?</message>
 								<action>options</action>
 								<previous>videoLength</previous>
 								<next>videoInterval</next>
-								
+
 								<setting>vid_multiple</setting>
-								
+
 								<options>
 									<option_item>
 										<name>yes</name>
@@ -635,7 +635,7 @@
 										<next>no</next>
 										<value>true</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>no</name>
 										<message>Yes     [No]</message>
@@ -646,16 +646,16 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>videoInterval</name>
 								<message>Video Interval</message>
 								<action>options</action>
 								<previous>multipleVideos</previous>
 								<next>videoResolution</next>
-								
+
 								<setting>vid_interval</setting>
-								
+
 								<options>
 									<option_item>
 										<name>two</name>
@@ -665,7 +665,7 @@
 										<next>five</next>
 										<value>2</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>five</name>
 										<message>Seconds: [05]</message>
@@ -674,7 +674,7 @@
 										<next>ten</next>
 										<value>5</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>ten</name>
 										<message>Seconds: [10]</message>
@@ -683,7 +683,7 @@
 										<next>fifteen</next>
 										<value>10</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>fifteen</name>
 										<message>Seconds: [15]</message>
@@ -692,7 +692,7 @@
 										<next>thirty</next>
 										<value>15</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>thirty</name>
 										<message>Seconds: [30]</message>
@@ -701,7 +701,7 @@
 										<next>sixty</next>
 										<value>30</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>sixty</name>
 										<message>Seconds: [60]</message>
@@ -712,16 +712,16 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>videoResolution</name>
 								<message>Video Resolution</message>
 								<action>options</action>
 								<previous>multipleVideos</previous>
 								<next>videoReturn</next>
-								
+
 								<setting>vid_resolution_mode</setting>
-								
+
 								<options>
 									<option_item>
 										<name>seven</name>
@@ -731,7 +731,7 @@
 										<next>five</next>
 										<value>7</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>five</name>
 										<message>Resolution: [1296x730]</message>
@@ -740,7 +740,7 @@
 										<next>one</next>
 										<value>5</value>
 									</option_item>
-									
+
 									<option_item>
 										<name>one</name>
 										<message>Resolution: [1920x1080]</message>
@@ -751,7 +751,7 @@
 									</option_item>
 								</options>
 							</menu_item>
-							
+
 							<menu_item>
 								<name>videoReturn</name>
 								<message>Exit Submenu</message>
@@ -762,16 +762,16 @@
 							</menu_item>
 						</submenu>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>cameraBrightness</name>
 						<message>Image Brightness</message>
 						<action>options</action>
 						<previous>imageResolution</previous>
 						<next>awbMode</next>
-						
+
 						<setting>cam_brightness</setting>
-						
+
 						<options>
 							<optionItem>
 								<name>0</name>
@@ -1583,16 +1583,16 @@
 							</optionItem>
 						</options>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>awbMode</name>
 						<message>AWB Mode</message>
 						<action>options</action>
 						<previous>cameraBrightness</previous>
 						<next>exposureMode</next>
-						
+
 						<setting>cam_awb_mode</setting>
-						
+
 						<options>
 							<option_item>
 								<name>auto</name>
@@ -1602,7 +1602,7 @@
 								<next>off</next>
 								<value>auto</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>off</name>
 								<message>AWB: [Off]</message>
@@ -1611,7 +1611,7 @@
 								<next>cloudy</next>
 								<value>off</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>cloudy</name>
 								<message>AWB: [Cloudy]</message>
@@ -1620,7 +1620,7 @@
 								<next>flash</next>
 								<value>cloudy</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>flash</name>
 								<message>AWB: [Flash]</message>
@@ -1629,7 +1629,7 @@
 								<next>fluorescent</next>
 								<value>flash</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>fluorescent</name>
 								<message>AWB: [Fluorescent]</message>
@@ -1638,7 +1638,7 @@
 								<next>horizon</next>
 								<value>fluorescent</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>horizon</name>
 								<message>AWB: [Horizon]</message>
@@ -1647,7 +1647,7 @@
 								<next>incandescent</next>
 								<value>horizon</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>incandescent</name>
 								<message>AWB: [Incandescent]</message>
@@ -1656,7 +1656,7 @@
 								<next>shade</next>
 								<value>incandescent</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>shade</name>
 								<message>AWB: [Shade]</message>
@@ -1665,7 +1665,7 @@
 								<next>sunlight</next>
 								<value>shade</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>sunlight</name>
 								<message>AWB: [Sunlight]</message>
@@ -1674,7 +1674,7 @@
 								<next>tungsten</next>
 								<value>sunlight</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>tungsten</name>
 								<message>AWB: [Tungsten]</message>
@@ -1685,16 +1685,16 @@
 							</option_item>
 						</options>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>exposureMode</name>
 						<message>Exposure Mode</message>
 						<action>options</action>
 						<previous>awbMode</previous>
 						<next>cameraReturn</next>
-						
+
 						<setting>cam_exposure_mode</setting>
-						
+
 						<options>
 							<option_item>
 								<name>auto</name>
@@ -1704,7 +1704,7 @@
 								<next>off</next>
 								<value>auto</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>off</name>
 								<message>Exposure: [Off]</message>
@@ -1713,7 +1713,7 @@
 								<next>antishake</next>
 								<value>off</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>antishake</name>
 								<message>Exposure: [Antishake]</message>
@@ -1722,7 +1722,7 @@
 								<next>backlight</next>
 								<value>antishake</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>backlight</name>
 								<message>Exposure: [Backlight]</message>
@@ -1731,7 +1731,7 @@
 								<next>beach</next>
 								<value>backlight</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>beach</name>
 								<message>Exposure: [Beach]</message>
@@ -1740,7 +1740,7 @@
 								<next>fixedfps</next>
 								<value>beach</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>fixedfps</name>
 								<message>Exposure: [Fixed FPS]</message>
@@ -1749,7 +1749,7 @@
 								<next>fireworks</next>
 								<value>fixedfps</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>fireworks</name>
 								<message>Exposure: [Fireworks]</message>
@@ -1758,7 +1758,7 @@
 								<next>night</next>
 								<value>fireworks</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>night</name>
 								<message>Exposure: [Night]</message>
@@ -1767,7 +1767,7 @@
 								<next>nightpreview</next>
 								<value>night</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>nightpreview</name>
 								<message>Exposure: [Night Preview]</message>
@@ -1776,7 +1776,7 @@
 								<next>snow</next>
 								<value>nightpreview</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>snow</name>
 								<message>Exposure: [Snow]</message>
@@ -1785,7 +1785,7 @@
 								<next>sports</next>
 								<value>snow</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>sports</name>
 								<message>Exposure: [Sports]</message>
@@ -1794,7 +1794,7 @@
 								<next>spotlight</next>
 								<value>sports</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>spotlight</name>
 								<message>Exposure: [Spotlight]</message>
@@ -1803,7 +1803,7 @@
 								<next>verylong</next>
 								<value>spotlight</value>
 							</option_item>
-							
+
 							<option_item>
 								<name>verylong</name>
 								<message>Exposure: [Very Long]</message>
@@ -1814,7 +1814,7 @@
 							</option_item>
 						</options>
 					</menu_item>
-				
+
 					<menu_item>
 						<name>cameraReturn</name>
 						<message>Exit Submenu</message>
@@ -1825,14 +1825,14 @@
 					</menu_item>
 				</submenu>
 			</menu_item>
-			
+
 			<menu_item>
 				<name>defaults</name>
 				<message>Load Defaults?</message>
 				<action>submenu</action>
 				<previous>camera</previous>
 				<next>settingsReturn</next>
-				
+
 				<submenu>
 					<menu_item>
 						<name>cancelDefault</name>
@@ -1842,17 +1842,17 @@
 						<next>confirmDefaults</next>
 						<parent_item>defaults</parent_item>
 					</menu_item>
-					
+
 					<menu_item>
 						<name>confirmDefaults</name>
 						<message>Really? [Yes]</message>
-						<action>updateSettings("load_defaults", "yes")</action>
+						<action>update_settings("load_defaults", "yes")</action>
 						<previous>cancelDefault</previous>
 						<next>cancelDefault</next>
 					</menu_item>
 				</submenu>
 			</menu_item>
-			
+
 			<menu_item>
 				<name>settingsReturn</name>
 				<message>Exit Submenu</message>
@@ -1863,7 +1863,7 @@
 			</menu_item>
 		</submenu>
 	</menu_item>
-	
+
 	<menu_item>
 		<name>system</name>
 		<message>System Info</message>
@@ -1871,14 +1871,14 @@
 		<previous>settings</previous>
 		<next>poweroff</next>
 	</menu_item>
-	
+
 	<menu_item>
 		<name>poweroff</name>
 		<message>Shut Down?</message>
 		<action>submenu</action>
 		<previous>system</previous>
 		<next>logo</next>
-		
+
 		<submenu>
 			<menu_item>
 				<name>cancelPoweroff</name>
@@ -1888,7 +1888,7 @@
 				<next>confirmPoweroff</next>
 				<parent_item>poweroff</parent_item>
 			</menu_item>
-			
+
 			<menu_item>
 				<name>confirmPoweroff</name>
 				<message>Really? [Yes]</message>
