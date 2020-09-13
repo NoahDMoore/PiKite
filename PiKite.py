@@ -479,7 +479,7 @@ def run_pikite():
 		if settings_dict["cam_take_photos"] == "none":
 			timer.start()
 			while program_state == "runningPiKite":
-				if timer.time <= previous_alt_time + alt_interval and alt_flag != True:
+				if alt_flag != True:
 					altitude = read_altitude(baseline)
 					timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 					log.write("{0},{1}\n".format(timestamp, altitude))
@@ -497,6 +497,7 @@ def run_pikite():
 					alt_flag = False
 
 				if timer.time >= previous_send_time + 1:
+					print("send")
 					socket_flag = False
 			timer.stop()
 
