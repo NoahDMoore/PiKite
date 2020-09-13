@@ -661,9 +661,8 @@ IMAGE_HEIGHT = lcd.width
 
 image_file_types = ['.jpg', '.jpeg', '.gif', '.png', '.bmp', '.tiff']
 
-#font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 25)
-font30 = ImageFont.truetype("Roboto-Bold.ttf", 30)
-font25 = ImageFont.truetype("Roboto-Bold.ttf", 25)
+font30 = ImageFont.truetype("robotobold.ttf", 30)
+font25 = ImageFont.truetype("robotobold.ttf", 25)
 
 #Import PiKite Settings
 config = ConfigParser.ConfigParser()
