@@ -486,7 +486,7 @@ def run_pikite():
 					previous_alt_time = timer.time
 					alt_flag = True
 
-				if timer.time <= previous_send_time + 1 and socket_flag != True:
+				if socket_flag != True:
 					json_data = {"altitude": altitude}
 					json_string = json.dumps(json_data)
 					OUTGOING_MESSAGES.add(json_string)
@@ -496,7 +496,7 @@ def run_pikite():
 				if timer.time > previous_alt_time + alt_interval:
 					alt_flag = False
 
-				if timer.time > previous_send_time + 1:
+				if timer.time >= previous_send_time + 1:
 					socket_flag = False
 			timer.stop()
 
@@ -543,7 +543,7 @@ def run_pikite():
 				if timer.time > previous_send_time + 1:
 					socket_flag = False
 			timer.stop()
-			
+
 	menu.restart()
 
 def control_handler(input, command=""):
