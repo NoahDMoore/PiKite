@@ -18,7 +18,7 @@ function connect() {
 
 function startWebsocket() {
 
-	var ws = new WebSocket("ws://" + "192.168.50.174" + ":1234/");
+	var ws = new WebSocket("ws://" + location.host + ":1234/");
 
 	ws.onerror = function (event) {
 		alert("Something went wrong. Connection failed.");
