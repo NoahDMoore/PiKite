@@ -254,7 +254,7 @@ def new_image():
 	return lcd_image, canvas
 
 def preloader():
-	preloader = GIF(Image.open('preloader.gif'))
+	preloader = GIF(Image.open('../preloader.gif'))
 	preloader.play()
 
 def get_settings():
@@ -661,8 +661,8 @@ IMAGE_HEIGHT = lcd.width
 
 image_file_types = ['.jpg', '.jpeg', '.gif', '.png', '.bmp', '.tiff']
 
-font30 = ImageFont.truetype("robotobold.ttf", 30)
-font25 = ImageFont.truetype("robotobold.ttf", 25)
+font30 = ImageFont.truetype("../robotobold.ttf", 30)
+font25 = ImageFont.truetype("../robotobold.ttf", 25)
 
 #Import PiKite Settings
 config = ConfigParser.ConfigParser()
