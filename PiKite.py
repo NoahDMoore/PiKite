@@ -479,8 +479,6 @@ def run_pikite():
 		if settings_dict["cam_take_photos"] == "none":
 			timer.start()
 			while program_state == "runningPiKite":
-				current_time = time.time()
-
 				if timer.time <= previous_alt_time + alt_interval and alt_flag != True:
 					altitude = read_altitude(baseline)
 					timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -498,27 +496,23 @@ def run_pikite():
 				if timer.time > previous_alt_time + alt_interval:
 					alt_flag = False
 
-				if current_time > previous_send_time + 1:
+				if timer.time > previous_send_time + 1:
 					socket_flag = False
+			timer.stop()
 
 		elif settings_dict["cam_take_photos"] == "pic":
+			timer.start()
 			while program_state == "runningPiKite":
-				current_time = time.time()
-				previous_runtime = runtime
-				runtime = current_time - start_time
-				if runtime != previous_runtime:
-					runtime_string = "{0:02d}:{1:02d}".format(int(runtime/60), int(runtime%60))
-					print_one_line(runtime_string)
-
 				timestamp = time.strftime("%m-%d-%Y-%H-%M-%S", time.localtime(current_time))
 
-				if current_time <= previous_alt_time + alt_interval and alt_flag != True:
+				if timer.time <= previous_alt_time + alt_interval and alt_flag != True:
 					altitude = read_altitude(baseline)
 					log.write("{0},{1}\n".format(timestamp, altitude))
+					previous_alt_time = timer.time
 					alt_flag = True
 
-				if current_time > start_time + cam_delay_interval:
-					if current_time <= previous_pic_time + pic_interval and pic_flag != True:
+				if timer.time > cam_delay_interval:
+					if timer.time <= previous_pic_time + pic_interval and pic_flag != True:
 						altitude = read_altitude(baseline)
 
 						if settings_dict["pic_annotations"] == "alt":
@@ -530,25 +524,26 @@ def run_pikite():
 
 						photo_location = folder_name + "/" + timestamp + ".jpg"
 						camera.capture("/home/pi/pikite/output/photos/" + photo_location)
+						previous_pic_time = timer.time
 						pic_flag = True
 
-				if current_time <= previous_send_time + 1 and socket_flag != True:
-					json_data = {"photo": photo_location, "altitude": altitude, "runtime": runtime_string}
+				if timer.time <= previous_send_time + 1 and socket_flag != True:
+					json_data = {"photo": photo_location, "altitude": altitude}
 					json_string = json.dumps(json_data)
 					OUTGOING_MESSAGES.add(json_string)
+					previous_send_time = timer.time
 					socket_flag = True
 
-				if current_time > previous_alt_time + alt_interval:
+				if timer.time > previous_alt_time + alt_interval:
 					alt_flag = False
-					previous_alt_time = current_time
 
-				if current_time > previous_pic_time + pic_interval:
+				if timer.time > previous_pic_time + pic_interval:
 					pic_flag = False
-					previous_pic_time = current_time
 
-				if current_time > previous_send_time + 1:
+				if timer.time > previous_send_time + 1:
 					socket_flag = False
-					previous_send_time = current_time
+			timer.stop()
+			
 	menu.restart()
 
 def control_handler(input, command=""):
