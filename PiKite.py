@@ -22,7 +22,7 @@ import digitalio
 import adafruit_rgb_display.st7789 as st7789
 from PIL import Image, ImageDraw, ImageFont
 
-print(os.path.dirname(sys.argv[0]))
+os.chdir(os.path.dirname(sys.argv[0]))
 
 class Menu:
 	def __init__(self, xml):
