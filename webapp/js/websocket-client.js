@@ -71,8 +71,6 @@ function startWebsocket() {
 					document.getElementById('failure-dialog').style.display = "block";
 					document.getElementById('failure-alert').innerHTML = obj["alert"];
 				}
-			} else if (obj.hasOwnProperty("program_state")) {
-				program_state = obj["program_state"];
 			} else {
 				var snackbarContainer = document.querySelector('#demo-toast-example');
 				var data = {message: obj['alert']};
@@ -80,12 +78,30 @@ function startWebsocket() {
 			}
 		}
 
+		if (obj.hasOwnProperty("program_state")) {
+			program_state = obj["program_state"];
+		}
+
 		if (obj.hasOwnProperty("start_time")) {
 			start_time = obj["start_time"];
-			setInterval(function(){
-				runtime = parseInt(new Date().getTime() / 1000) - start_time;
-				runtime_string = parseInt(runtime/60).toString() + ":" + (runtime % 60).toString();
-				document.getElementById("runtime").innerHTML =  runtime_string;
+			runtime_timer = setInterval(function(){
+				if (program_state == "runningPiKite") {
+					runtime = parseInt(new Date().getTime() / 1000) - start_time;
+					runtime_minutes = parseInt(runtime/60);
+					if (runtime_minutes < 10) {
+						runtime_minutes = "0" + runtime_minutes.toString();
+					}
+					runtime_seconds = (runtime % 60)
+					if (runtime_seconds < 10) {
+						runtime_seconds = "0" + runtime_seconds.toString();
+					}
+					runtime_string = runtime_minutes + ":" + runtime_seconds
+					document.getElementById("runtime").innerHTML =  runtime_string;
+				} else {
+					clearInterval(runtime_timer);
+					document.getElementById("runtime").innerHTML =  "00:00";
+					runtime = 0
+				}
 			}, 1000);
 		}
 
