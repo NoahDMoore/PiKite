@@ -254,7 +254,7 @@ class State:
 	@current_state.setter
 	def current_state(self, new_state):
 		self._current_state = new_state
-		#OUTGOING_MESSAGES.add(self.json_state)
+		print(self.json_state)
 
 	@property
 	def json_state(self):
