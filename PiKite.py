@@ -490,7 +490,7 @@ def run_pikite():
 		alt_flag = False
 		pic_flag = False
 		socket_flag = False
-		photo_location = "images/placeholder.png"
+		photo_location = "placeholder.png"
 
 		if settings_dict["cam_take_photos"] == "none":
 			timer.start()
