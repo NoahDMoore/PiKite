@@ -236,16 +236,31 @@ class State:
 		self.current_state = initial_state
 
 	def __repr__(self):
-		return self.current_state
+		return self._current_state
 
 	def __str__(self):
-		return self.current_state
+		return self._current_state
 
 	def __eq__(self,comparison):
-		if self.current_state == comparison:
+		if self._current_state == comparison:
 			return True
 		else:
 			return False
+
+	@property
+	def current_state(self):
+		return self._current_state
+
+	@current_state.setter
+	def current_state(self, new_state):
+		self._current_state = new_state
+		OUTGOING_MESSAGES.add(self.json_state)
+
+	@property
+	def json_state(self):
+			json_data = {"program_state": self._current_state}
+			json_string = json.dumps(json_data)
+			return json_string
 
 class RuntimeTimer(threading.Thread):
 	def __init__(self):
@@ -260,14 +275,15 @@ class RuntimeTimer(threading.Thread):
 		self.start_time = int(time.time())
 		self.previous_time = 0
 
+		json_start_time = {"start_time": self.start_time}
+		json_string = json.dumps(json_start_time)
+		OUTGOING_MESSAGES.add(json_string)
+
 		while self._running:
 			self.time = int(time.time()) - self.start_time
 			if self.time != self.previous_time:
 				runtime_string = "{0:02d}:{1:02d}".format(int(self.time/60), int(self.time%60))
 				print_one_line(runtime_string)
-				json_data = {"runtime": runtime_string}
-				json_string = json.dumps(json_data)
-				OUTGOING_MESSAGES.add(json_string)
 
 				self.previous_time = self.time
 

@@ -1,6 +1,10 @@
 var photo = " "
 var runtime = " "
 var altitude = " "
+var program_state = "menu"
+var start_time = 0
+var runtime = 0
+var previous_runtime = -1
 var connected = false
 
 document.getElementById("connect-button").addEventListener("click", connect);
@@ -57,6 +61,7 @@ function startWebsocket() {
 					document.getElementById('success-dialog').style.display = "block";
 					document.getElementById('success-alert').innerHTML = obj["alert"];
 					document.getElementById('connection-dialog').style.opacity = "0";
+
 					setTimeout(function(){
 						document.getElementById('connection-dialog').style.display = "none";
 					}, 3100);
@@ -66,6 +71,11 @@ function startWebsocket() {
 					document.getElementById('failure-dialog').style.display = "block";
 					document.getElementById('failure-alert').innerHTML = obj["alert"];
 				}
+			} else if (obj.hasOwnProperty("program_state")) {
+				program_state = obj["program_state"];
+			} else if (obj.hasOwnProperty("start_time")) {
+				start_time = obj["start_time"];
+				setInterval(getRuntime(), 1000);
 			} else {
 				var snackbarContainer = document.querySelector('#demo-toast-example');
 				var data = {message: obj['alert']};
@@ -82,12 +92,6 @@ function startWebsocket() {
 				}
 			}
 
-			if (obj.hasOwnProperty("runtime")) {
-				if (obj["runtime"] != runtime) {
-					document.getElementById("runtime").innerHTML =  obj["runtime"];
-					runtime = obj["runtime"];
-				}
-			}
 			if (obj.hasOwnProperty("altitude")) {
 				if (obj["altitude"] != altitude) {
 					document.getElementById("altitude").innerHTML = obj["altitude"] + "'";
@@ -96,4 +100,10 @@ function startWebsocket() {
 			}
 		}
 	};
+}
+
+function getRuntime() {
+	runtime = parseInt(new Date().getTime() / 1000) - start_time;
+	runtime_string = parseInt(runtime/60).toString() + ":" + (runtime % 60).toString();
+	document.getElementById("runtime").innerHTML =  obj["runtime"];
 }
