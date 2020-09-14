@@ -82,7 +82,11 @@ function startWebsocket() {
 
 		if (obj.hasOwnProperty("start_time")) {
 			start_time = obj["start_time"];
-			setInterval(getRuntime(), 1000);
+			setInterval(function(){
+				runtime = parseInt(new Date().getTime() / 1000) - start_time;
+				runtime_string = parseInt(runtime/60).toString() + ":" + (runtime % 60).toString();
+				document.getElementById("runtime").innerHTML =  runtime_string;
+			}, 1000);
 		}
 
 		if (connected == true) {
@@ -106,10 +110,4 @@ function startWebsocket() {
 			}
 		}
 	};
-}
-
-function getRuntime() {
-	runtime = parseInt(new Date().getTime() / 1000) - start_time;
-	runtime_string = parseInt(runtime/60).toString() + ":" + (runtime % 60).toString();
-	document.getElementById("runtime").innerHTML =  runtime_string;
 }
