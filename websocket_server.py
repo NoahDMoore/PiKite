@@ -89,10 +89,10 @@ async def handler(websocket, path):
 			print("{} has connected succesfully. Password accepted.".format(user))
 			await user.send('{"alert": "Password accepted. Welcome.", "handshake": "success"}')
 
-			if PIKITE_START_TIME != 0:
-				json_start_time = {"start_time": PIKITE_START_TIME}
-				json_string = json.dumps(json_start_time)
-				await user.send(json_string)
+			#if PIKITE_START_TIME != 0:
+				#json_start_time = {"start_time": PIKITE_START_TIME}
+				#json_string = json.dumps(json_start_time)
+				#await user.send(json_string)
 
 			try:
 				async for message in user.websocket:
