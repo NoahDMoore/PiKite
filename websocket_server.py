@@ -4,7 +4,7 @@ import subprocess
 import json
 import hashlib
 
-PIKITE_START_TIME = 0
+#PIKITE_START_TIME = 0
 
 class User:
 	def __init__(self, websocket, index=0):
@@ -65,7 +65,7 @@ async def unregister(user):
     USERS.remove(user)
 
 async def handler(websocket, path):
-	global PIKITE_START_TIME
+	#global PIKITE_START_TIME
 	user = await register(websocket)
 
 	print("{} has connected to the server. Waiting for password.".format(user))
@@ -97,8 +97,8 @@ async def handler(websocket, path):
 			try:
 				async for message in user.websocket:
 					data = json.loads(message)
-					if data.hasOwnProperty("start_time"):
-						PIKITE_START_TIME = data["start_time"]
+					#if data.hasOwnProperty("start_time"):
+						#PIKITE_START_TIME = data["start_time"]
 					print(data)
 					if len(USERS) > 1:
 						await asyncio.wait([connection.send(message) for connection in USERS if connection != user])
