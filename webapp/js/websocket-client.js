@@ -111,5 +111,5 @@ function startWebsocket() {
 function getRuntime() {
 	runtime = parseInt(new Date().getTime() / 1000) - start_time;
 	runtime_string = parseInt(runtime/60).toString() + ":" + (runtime % 60).toString();
-	document.getElementById("runtime").innerHTML =  obj["runtime"];
+	document.getElementById("runtime").innerHTML =  runtime_string;
 }
