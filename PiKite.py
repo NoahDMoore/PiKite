@@ -272,15 +272,15 @@ class RuntimeTimer(threading.Thread):
 
 	def run(self):
 		self._running = True
-		self.start_time = int(time.time())
+		self.start_time = time.time()
 		self.previous_time = 0
 
-		json_start_time = {"start_time": self.start_time}
+		json_start_time = {"start_time": int(self.start_time)}
 		json_string = json.dumps(json_start_time)
 		OUTGOING_MESSAGES.add(json_string)
 
 		while self._running:
-			self.time = int(time.time()) - self.start_time
+			self.time = int(time.time()) - int(self.start_time)
 			if self.time != self.previous_time:
 				runtime_string = "{0:02d}:{1:02d}".format(int(self.time/60), int(self.time%60))
 				print_one_line(runtime_string)
@@ -520,7 +520,7 @@ def run_pikite():
 		elif settings_dict["cam_take_photos"] == "pic":
 			timer.start()
 			while program_state == "runningPiKite":
-				timestamp = time.strftime("%m-%d-%Y-%H-%M-%S", time.localtime(current_time))
+				timestamp = time.strftime("%m-%d-%Y-%H-%M-%S", time.localtime(time.time()))
 
 				if timer.time <= previous_alt_time + alt_interval and alt_flag != True:
 					altitude = read_altitude(baseline)
