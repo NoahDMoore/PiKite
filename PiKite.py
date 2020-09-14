@@ -616,6 +616,7 @@ async def consumer_handler(websocket):
 			if 'handshake' in command:
 				if command['handshake'] == "success":
 					WEBSOCKET_CONNECTED = True
+					print("true")
 		else:
 			pass
 
