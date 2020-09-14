@@ -603,7 +603,9 @@ async def check_outgoing():
 				return message
 
 async def consumer_handler(websocket):
-	async for message in websocket:
+	global INCOMING_MESSAGES
+	while True:
+		message = await websocket.recv()
 		command = json.loads(message)
 		if 'command' in command:
 			control_handler("websocket", command['command'])
