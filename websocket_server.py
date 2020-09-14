@@ -97,8 +97,8 @@ async def handler(websocket, path):
 			try:
 				async for message in user.websocket:
 					data = json.loads(message)
-					#if data.hasOwnProperty("start_time"):
-						#PIKITE_START_TIME = data["start_time"]
+					if data.hasOwnProperty("start_time"):
+						PIKITE_START_TIME = data["start_time"]
 					print(data)
 					if len(USERS) > 1:
 						await asyncio.wait([connection.send(message) for connection in USERS if connection != user])
