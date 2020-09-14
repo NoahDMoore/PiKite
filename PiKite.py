@@ -254,7 +254,7 @@ class State:
 	@current_state.setter
 	def current_state(self, new_state):
 		self._current_state = new_state
-		print(self.json_state)
+		#OUTGOING_MESSAGES.add(self.json_state)
 
 	@property
 	def json_state(self):
@@ -604,6 +604,7 @@ async def check_outgoing():
 
 async def consumer_handler(websocket):
 	global INCOMING_MESSAGES
+	global WEBSOCKET_CONNECTED
 	while True:
 		message = await websocket.recv()
 		command = json.loads(message)
@@ -612,16 +613,22 @@ async def consumer_handler(websocket):
 			print(command['command'])
 		elif 'alert' in command:
 			print(command['alert'])
+			if 'handshake' in command:
+				if command['handshake'] == "success":
+					WEBSOCKET_CONNECTED = True
 		else:
 			pass
 
 async def producer_handler(websocket):
 	global OUTGOING_MESSAGES
 	while True:
-		await asyncio.sleep(.5)
-		if OUTGOING_MESSAGES:
-			message = OUTGOING_MESSAGES.pop()
-			await websocket.send(message)
+		if WEBSOCKET_CONNECTED == True:
+			await asyncio.sleep(.5)
+			if OUTGOING_MESSAGES:
+				message = OUTGOING_MESSAGES.pop()
+				await websocket.send(message)
+		else:
+			await asyncio.sleep(.5)
 
 async def websocket_loop(loop):
 	ip = subprocess.check_output("hostname -I", shell=True).decode("utf-8").split(" \n")[0]
@@ -716,6 +723,7 @@ p = subprocess.Popen([sys.executable, 'websocket_server.py'], stdout=subprocess.
 preload_thread.join()
 
 OUTGOING_MESSAGES = set()
+WEBSOCKET_CONNECTED = False
 
 menu = Menu(menu_xml)
 
