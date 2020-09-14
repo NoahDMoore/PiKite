@@ -73,14 +73,16 @@ function startWebsocket() {
 				}
 			} else if (obj.hasOwnProperty("program_state")) {
 				program_state = obj["program_state"];
-			} else if (obj.hasOwnProperty("start_time")) {
-				start_time = obj["start_time"];
-				setInterval(getRuntime(), 1000);
 			} else {
 				var snackbarContainer = document.querySelector('#demo-toast-example');
 				var data = {message: obj['alert']};
 				snackbarContainer.MaterialSnackbar.showSnackbar(data);
 			}
+		}
+
+		if (obj.hasOwnProperty("start_time")) {
+			start_time = obj["start_time"];
+			setInterval(getRuntime(), 1000);
 		}
 
 		if (connected == true) {
