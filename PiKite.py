@@ -649,6 +649,7 @@ async def websocket_loop(loop):
 def start_websocket_client():
 	try:
 		loop = asyncio.new_event_loop()
+		loop.set_debug(True)
 		loop.run_until_complete(websocket_loop(loop))
 	except KeyboardInterrupt:
 			print("\nKeyboard Interrupt: Closing Websocket Server Before Exit")
