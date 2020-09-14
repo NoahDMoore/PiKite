@@ -65,6 +65,7 @@ async def unregister(user):
     USERS.remove(user)
 
 async def handler(websocket, path):
+	global PIKITE_START_TIME
 	user = await register(websocket)
 
 	print("{} has connected to the server. Waiting for password.".format(user))
@@ -92,7 +93,7 @@ async def handler(websocket, path):
 				json_start_time = {"start_time": PIKITE_START_TIME}
 				json_string = json.dumps(json_start_time)
 				await user.send(json_string)
-			
+
 			try:
 				async for message in user.websocket:
 					data = json.loads(message)
