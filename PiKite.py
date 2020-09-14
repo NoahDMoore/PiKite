@@ -522,14 +522,14 @@ def run_pikite():
 			while program_state == "runningPiKite":
 				timestamp = time.strftime("%m-%d-%Y-%H-%M-%S", time.localtime(time.time()))
 
-				if timer.time <= previous_alt_time + alt_interval and alt_flag != True:
+				if alt_flag != True:
 					altitude = read_altitude(baseline)
 					log.write("{0},{1}\n".format(timestamp, altitude))
 					previous_alt_time = timer.time
 					alt_flag = True
 
 				if timer.time > cam_delay_interval:
-					if timer.time <= previous_pic_time + pic_interval and pic_flag != True:
+					if pic_flag != True:
 						altitude = read_altitude(baseline)
 
 						if settings_dict["pic_annotations"] == "alt":
@@ -544,7 +544,7 @@ def run_pikite():
 						previous_pic_time = timer.time
 						pic_flag = True
 
-				if timer.time <= previous_send_time + 1 and socket_flag != True:
+				if  socket_flag != True:
 					json_data = {"photo": photo_location, "altitude": altitude}
 					json_string = json.dumps(json_data)
 					OUTGOING_MESSAGES.add(json_string)
