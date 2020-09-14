@@ -715,6 +715,8 @@ p = subprocess.Popen([sys.executable, 'websocket_server.py'], stdout=subprocess.
 
 preload_thread.join()
 
+OUTGOING_MESSAGES = set()
+
 menu = Menu(menu_xml)
 
 program_state = State("menu")
@@ -722,8 +724,6 @@ program_state = State("menu")
 #Main Threads
 socket_thread = threading.Thread(target=start_websocket_client)
 button_thread = threading.Thread(target=button_input)
-
-OUTGOING_MESSAGES = set()
 
 if __name__ == "__main__":
 	try:
