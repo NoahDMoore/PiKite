@@ -254,7 +254,7 @@ class State:
 	@current_state.setter
 	def current_state(self, new_state):
 		self._current_state = new_state
-		OUTGOING_MESSAGES.add(self.json_state)
+		#OUTGOING_MESSAGES.add(self.json_state)
 
 	@property
 	def json_state(self):
@@ -649,7 +649,6 @@ async def websocket_loop(loop):
 def start_websocket_client():
 	try:
 		loop = asyncio.new_event_loop()
-		loop.set_debug(True)
 		loop.run_until_complete(websocket_loop(loop))
 	except KeyboardInterrupt:
 			print("\nKeyboard Interrupt: Closing The Websocket Server Before Exit")
