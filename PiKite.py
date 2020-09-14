@@ -652,7 +652,7 @@ def start_websocket_client():
 		loop.set_debug(True)
 		loop.run_until_complete(websocket_loop(loop))
 	except KeyboardInterrupt:
-			print("\nKeyboard Interrupt: Closing Websocket Server Before Exit")
+			print("\nKeyboard Interrupt: Closing The Websocket Server Before Exit")
 			subprocess.call("sudo pkill -f websocket_server.py", shell=True)
 
 def button_input():
