@@ -97,7 +97,7 @@ async def handler(websocket, path):
 			try:
 				async for message in user.websocket:
 					data = json.loads(message)
-					if data.hasOwnProperty("start_time"):
+					if "start_time" in data:
 						PIKITE_START_TIME = data["start_time"]
 					print(data)
 					if len(USERS) > 1:
