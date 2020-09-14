@@ -719,7 +719,7 @@ menu_xml = ET.parse('menu.xml').getroot()
 
 get_settings()
 
-p = subprocess.Popen([sys.executable, 'websocket_server.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+#p = subprocess.Popen([sys.executable, 'websocket_server.py'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 preload_thread.join()
 
