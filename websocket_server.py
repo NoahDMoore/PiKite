@@ -106,7 +106,7 @@ async def handler(websocket, path):
 					if "start_time" in data:
 						PIKITE_START_TIME = data["start_time"]
 					if "program_state" in data:
-							if PROGRAM_STATE == "runningPiKite""
+							if PROGRAM_STATE == "runningPiKite":
 								PIKITE_START_TIME = 0
 							PROGRAM_STATE = data["program_state"]
 					print(data)
