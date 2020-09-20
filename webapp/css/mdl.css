@@ -8654,7 +8654,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
   box-sizing: border-box;
   border-right: 1px solid rgb(224,224,224);
   background: rgb(250,250,250);
-  transform: translateX(-250px);
+  transform: translateX(-490px);
   transform-style: preserve-3d;
   will-change: transform;
   transition-duration: 0.2s;
@@ -8685,6 +8685,10 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
 }
 
 @media screen and (max-width: 1024px) {
+    .mdl-layout__drawer {
+        width: 80%;
+    }
+
   .mdl-layout__drawer > .mdl-layout__title,
   .mdl-layout__drawer > .mdl-layout-title {
     line-height: 56px;
