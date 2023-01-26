@@ -450,6 +450,10 @@ def initialize_camera():
 		camera.resolution = (resolution_modes[settings_dict["vid_resolution_mode"]]["width"], resolution_modes[settings_dict["vid_resolution_mode"]]["height"])
 		camera.framerate = int(resolution_modes[settings_dict["vid_resolution_mode"]]["fps"])
 
+def start_focus():
+	focus_thread = threading.Thread(target=focus_camera)
+	focus_thread.start()
+
 def focus_camera():
 	program_state.current_state = "focusCamera"
 
@@ -461,6 +465,8 @@ def focus_camera():
 	camera.resolution = (640, 480)
 	camera.framerate = 90
 	camera.image_effect = settings_dict["pic_effect"]
+
+	print_one_line("Adjust Focus!")
 
 	time.sleep(2)
 
