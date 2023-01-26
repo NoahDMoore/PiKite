@@ -473,6 +473,8 @@ def focus_camera():
 	while program_state == "focusCamera":
 		camera.capture("/home/pi/pikite/output/photos/focus.jpg")
 		time.sleep(2)
+
+	menu.restart()
 	
 
 def print_one_line(message):
