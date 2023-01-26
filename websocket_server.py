@@ -80,8 +80,8 @@ async def handler(websocket, path):
 			password = await asyncio.wait_for(user.recv(), 60)
 			password = hashlib.md5(password.encode()).hexdigest()
 		else:
-			password = "03d66e75dfc0b2a9f147dcaac2846c86"
-		if password != "03d66e75dfc0b2a9f147dcaac2846c86":
+			password = "98c45e3f9d0a8f9f7ab69111b1ed6543"
+		if password != "98c45e3f9d0a8f9f7ab69111b1ed6543":
 			print("{} has entered an incorrect password. Connection Refused!".format(user))
 			await user.send('{"alert": "Incorrect Password - Connection Refused!", "handshake": "failure"}')
 			await user.disconnect()
