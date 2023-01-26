@@ -12,6 +12,14 @@
 		<message>Launch PiKite!</message>
 		<action>start_pikite()</action>
 		<previous>logo</previous>
+		<next>focus</next>
+	</menu_item>
+
+	<menu_item>
+		<name>focus</name>
+		<message>Focus Camera</message>
+		<action>focus_camera()</action>
+		<previous>pikite</previous>
 		<next>settings</next>
 	</menu_item>
 

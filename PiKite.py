@@ -22,6 +22,9 @@ import digitalio
 import adafruit_rgb_display.st7789 as st7789
 from PIL import Image, ImageDraw, ImageFont
 
+#PiKite Project Classes
+
+
 os.chdir(os.path.dirname(sys.argv[0]))
 
 class Menu:
@@ -447,6 +450,25 @@ def initialize_camera():
 		camera.resolution = (resolution_modes[settings_dict["vid_resolution_mode"]]["width"], resolution_modes[settings_dict["vid_resolution_mode"]]["height"])
 		camera.framerate = int(resolution_modes[settings_dict["vid_resolution_mode"]]["fps"])
 
+def focus_camera():
+	program_state.current_state = "focusCamera"
+
+	camera.rotation = settings_dict["cam_rotation"]
+	camera.brightness = int(settings_dict["cam_brightness"])
+	camera.awb_mode = settings_dict["cam_awb_mode"]
+	camera.exposure_mode = settings_dict["cam_exposure_mode"]
+
+	camera.resolution = (640, 480)
+	camera.framerate = 90
+	camera.image_effect = settings_dict["pic_effect"]
+
+	time.sleep(2)
+
+	while program_state == "focusCamera":
+		camera.capture("/home/pi/pikite/output/photos/focus.jpg")
+		time.sleep(2)
+	
+
 def print_one_line(message):
 	lcd_image, canvas = new_image()
 
@@ -592,6 +614,9 @@ def control_handler(input, command=""):
 			pass
 	elif program_state == "runningPiKite":
 		if input == "GPIO23" or command == "stopPiKite":
+			program_state.current_state = "menu"
+	elif program_state == "focusCamera":
+		if input == "GPIO23" or command == "endFocus":
 			program_state.current_state = "menu"
 	else:
 		pass
