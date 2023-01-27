@@ -475,6 +475,8 @@ def focus_camera():
 		time.sleep(4)
 
 	menu.restart()
+
+	return
 	
 
 def print_one_line(message):
