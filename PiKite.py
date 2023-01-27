@@ -7,7 +7,7 @@ import json
 import urllib.request
 import asyncio
 import websockets
-from picamerax import PiCamera, Color
+from picamera import PiCamera, Color
 from gpiozero import Button
 import xml.etree.ElementTree as ET
 import board
