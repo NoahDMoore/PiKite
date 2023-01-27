@@ -752,7 +752,7 @@ bme680 = adafruit_bme680.Adafruit_BME680_I2C(i2c, debug=False)
 bme680.pressure_oversample = 16
 
 #Create PiCamera Object
-camera = PiCamera(stereo_mode='side-by-side', sensor_mode = 2, stereo_decimate=False)
+camera = PiCamera()
 
 #Import Menu XML
 menu_xml = ET.parse('menu.xml').getroot()
