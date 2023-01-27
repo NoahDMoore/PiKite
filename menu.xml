@@ -27,7 +27,7 @@
 		<name>settings</name>
 		<message>Settings</message>
 		<action>submenu</action>
-		<previous>pikite</previous>
+		<previous>focus</previous>
 		<next>system</next>
 
 		<submenu>

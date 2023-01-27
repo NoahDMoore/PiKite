@@ -472,7 +472,13 @@ def focus_camera():
 
 	while program_state == "focusCamera":
 		camera.capture("/home/pi/pikite/output/photos/focus.jpg")
-		time.sleep(4)
+		time.sleep(1)
+
+		json_data = {"photo": "focus.jpg"}
+		json_string = json.dumps(json_data)
+		OUTGOING_MESSAGES.add(json_string)
+
+		time.sleep(2)
 
 	menu.restart()
 
