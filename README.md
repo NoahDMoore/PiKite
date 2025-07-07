@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/NoahDMoore/PiKite/master/webapp/images/Logo.svg?token=AQ4VW3AXCBCMMIPIKZ5GIUS7LK3SY" width="300">
+<img src="https://raw.githubusercontent.com/NoahDMoore/PiKite/2806c1f449fab20d122442a2e7c6eb204799122d/webapp/images/logo.svg?token=AQ4VW3CBFQNIGUD33UU32K3INQV7O" width="300">
 <h1>PiKite Aerial Photography</h1>
 <p>A kite aerial photography project utilizing the Raspberry Pi.</p>
 </div>
