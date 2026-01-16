@@ -1,0 +1,23 @@
+[project]
+name = "pikite"
+version = "3.0.0"
+description = "An integrated kite aerial photography system for Raspberry Pi"
+authors = [
+    {name = "Noah Moore",email = "noahsemailis@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "adafruit-blinka (>=8.66.0,<9.0.0)",
+    "adafruit-circuitpython-bmp280 (>=3.3.8,<4.0.0)",
+    "adafruit-circuitpython-rgb-display (>=3.14.1,<4.0.0)",
+    "microdot (>=2.3.3,<3.0.0)",
+    "picamera2 (>=0.3.30,<0.4.0)",
+    "pillow (>=11.3.0,<12.0.0)"
+    "rpi-hardware-pwm (>=0.3.0,<0.4.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

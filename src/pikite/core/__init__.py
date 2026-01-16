@@ -1,0 +1,1 @@
+# Core subpackage: contains the core classes and functions that are essential for the PiKite project
