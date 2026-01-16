@@ -13,8 +13,8 @@ dependencies = [
     "adafruit-circuitpython-rgb-display (>=3.14.1,<4.0.0)",
     "microdot (>=2.3.3,<3.0.0)",
     "picamera2 (>=0.3.30,<0.4.0)",
-    "pillow (>=11.3.0,<12.0.0)"
     "rpi-hardware-pwm (>=0.3.0,<0.4.0)",
+    "pillow (>=11.3.0,<12.0.0)"
 ]
 
 
