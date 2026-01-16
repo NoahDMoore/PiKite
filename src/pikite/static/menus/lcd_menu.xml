@@ -1,0 +1,481 @@
+<menu>
+	<menu_item name="logo" message="logo.jpg" action="pass" parent="root" />
+	<menu_item name="pikite" message="Launch PiKite!" action="start_pikite()" parent="root" />
+	<menu_item name="focus" message="Focus Camera" action="start_focus()" parent="root" />
+	<menu_item name="settings" message="Settings" action="submenu" parent="root" >
+		<menu_item name="altitude" message="Alt. Settings" action="submenu" parent="settings">
+			<menu_item name="altitudeInterval" message="Set Alt. Interval" action="options" parent="altitude">
+				<setting>alt_reading_interval</setting>
+				<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
+				<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
+				<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
+				<option_item name="fifteen" message="Seconds: [15]" action="selectOption" value="15" />
+				<option_item name="thirty" message="Seconds: [30]" action="selectOption" value="30" />
+				<option_item name="sixty" message="Seconds: [60]" action="selectOption" value="60" />
+			</menu_item>
+			
+			<menu_item name="altitudeReturn" message="Exit Submenu" action="return" parent="altitude" />
+		</menu_item>
+
+		<menu_item name="camera" message="Camera Settings" action="submenu" parent="settings">
+			<menu_item name="cameraModel" message="Select Camera Model" action="options" parent="camera">
+				<setting>cam_model</setting>
+				<option_item name="V1" message="[V1]" action="selectOption" value="OV5647" />
+				<option_item name="V2" message="[V2]" action="selectOption" value="IMX219" />
+				<option_item name="V3" message="[V3]" action="selectOption" value="IMX708" />
+				<option_item name="HQ" message="[HQ]" action="selectOption" value="IMX477" />
+			</menu_item>
+
+			<menu_item name="cameraIRFilter" message="IR Filter?" action="options" parent="camera">
+				<setting>cam_ir_filter</setting>
+				<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
+				<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+			</menu_item>
+
+			<menu_item name="cameraMode" message="Photo or Video?" action="options" parent="camera">
+				<setting>cam_capture_mode</setting>
+				<option_item name="photo" message="[Photos]" action="selectOption" value="pic" />
+				<option_item name="video" message="[Video]" action="selectOption" value="vid" />
+				<option_item name="none" message="[None]" action="selectOption" value="none" />
+			</menu_item>
+
+			<menu_item name="cameraDelay" message="Camera Delay" action="options" parent="camera">
+				<setting>cam_recording_delay</setting>
+				<option_item name="zero" message="Minutes: [0]" action="selectOption" value="0" />
+				<option_item name="two" message="Minutes: [2]" action="selectOption" value="2" />
+				<option_item name="five" message="Minutes: [5]" action="selectOption" value="5" />
+				<option_item name="ten" message="Minutes: [10]" action="selectOption" value="10" />
+			</menu_item>
+
+			<menu_item name="cameraRotation" message="Image Rotation" action="options" parent="camera">
+				<setting>cam_rotation</setting>
+				<option_item name="zeroRotation" message="Degrees: [0]" action="selectOption" value="0" />
+				<option_item name="oneeightyRotation" message="Degrees: [180]" action="selectOption" value="180" />
+			</menu_item>
+
+			<menu_item name="imageResolution" message="Image Resolution" action="options" parent="photoSettings">
+				<setting>cam_resolution</setting>
+				<option_item name="QVGA" message="QVGA: [320x240]" action="selectOption" value="(320,240)"/>
+				<option_item name="VGA" message="VGA: [640x480]" action="selectOption" value="(640,480)"/>
+				<option_item name="SDNTSC" message="SD NTSC: [720x480]" action="selectOption" value="(720,480)"/>
+				<option_item name="SDPAL" message="SD PAL: [720x576]" action="selectOption" value="(720,576)"/>
+				<option_item name="SVGA" message="SVGA: [800x600]" action="selectOption" value="(800,600)"/>
+				<option_item name="XGA" message="XGA: [1024x768]" action="selectOption" value="(1024,768)"/>
+				<option_item name="HD720p" message="HD 720p: [1280x720]" action="selectOption" value="(1280,720)"/>
+				<option_item name="SXGA4x3" message="SXGA 4:3: [1280x960]" action="selectOption" value="(1280,960)"/>
+				<option_item name="HD+" message="HD+: [1600x900]" action="selectOption" value="(1600,900)"/>
+				<option_item name="UXGA" message="UXGA: [1600x1200]" action="selectOption" value="(1600,1200)"/>
+				<option_item name="FullHD" message="Full HD: [1920x1080]" action="selectOption" value="(1920,1080)"/>
+				<option_item name="2K" message="2K: [2048x1080]" action="selectOption" value="(2048,1080)"/>
+				<option_item name="QHD" message="QHD: [2560x1440]" action="selectOption" value="(2560,1440)"/>
+				<option_item name="5MP" message="V1 Max: [2592x1944]" action="selectOption" value="(2592,1944)"/>
+				<option_item name="8MP" message="V2 Max: [3280x2464]" action="selectOption" value="(3280,2464)"/>
+				<option_item name="12MP" message="HQ Max: [4056x3040]" action="selectOption" value="(4056,3040)"/>
+				<option_item name="16MP" message="V3 Max: [4608x2592]" action="selectOption" value="(4608,2592)"/>
+			</menu_item>
+			
+			<menu_item name="imageAdjustments" message="Image Adjustments" action="submenu" parent="camera">
+				<menu_item name="aeEnable" message="Auto Exposure?" action="options" parent="imageAdjustments">
+					<setting>cam_ae_enable</setting>
+					<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
+					<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+				</menu_item>
+
+				<menu_item name="afMode" message="Auto Focus Mode" action="options" parent="imageAdjustments">
+					<setting>cam_af_mode</setting>
+					<option_item name="manual" message="[Manual]" action="selectOption" value="manual" />
+					<option_item name="auto" message="[Auto]" action="selectOption" value="auto" />
+					<option_item name="continuous" message="[Continuous]" action="selectOption" value="continuous" />
+				</menu_item>
+
+				<menu_item name="afRange" message="Auto Focus Range" action="options" parent="imageAdjustments">
+					<setting>cam_af_range</setting>
+					<option_item name="normal" message="[Normal]" action="selectOption" value="normal" />
+					<option_item name="macro" message="[Macro]" action="selectOption" value="macro" />
+					<option_item name="full" message="[Full]" action="selectOption" value="full" />
+				</menu_item>
+
+				<menu_item name="afSpeed" message="Auto Focus Speed" action="options" parent="imageAdjustments">
+					<setting>cam_af_speed</setting>
+					<option_item name="normal" message="[Normal]" action="selectOption" value="normal" />
+					<option_item name="fast" message="[Fast]" action="selectOption" value="fast" />
+				</menu_item>
+
+				<menu_item name="awbEnable" message="Auto White Balance?" action="options" parent="imageAdjustments">
+					<setting>cam_awb_enable</setting>
+					<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
+					<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+				</menu_item>
+				
+				<menu_item name="awbMode" message="Auto White Balance Mode" action="options" parent="imageAdjustments">
+					<setting>cam_awb_mode</setting>
+					<option_item name="auto" message="[Auto]" action="selectOption" value="auto" />
+					<option_item name="tungsten" message="[Tungsten]" action="selectOption" value="tungsten" />
+					<option_item name="fluorescent" message="[Fluorescent]" action="selectOption" value="fluorescent" />
+					<option_item name="indoor" message="[Indoor]" action="selectOption" value="indoor" />
+					<option_item name="daylight" message="[Daylight]" action="selectOption" value="daylight" />
+					<option_item name="cloudy" message="[Cloudy]" action="selectOption" value="cloudy" />
+					<option_item name="custom" message="[Custom]" action="selectOption" value="custom" />
+				</menu_item>
+
+				<menu_item name="brightness" message="Brightness" action="options" parent="imageAdjustments">
+					<setting>cam_brightness</setting>
+					<option_item name="minus1" message="[-1.0]" action="selectOption" value="-1.0" />
+					<option_item name="minus09" message="[-0.9]" action="selectOption" value="-0.9" />
+					<option_item name="minus08" message="[-0.8]" action="selectOption" value="-0.8" />
+					<option_item name="minus07" message="[-0.7]" action="selectOption" value="-0.7" />
+					<option_item name="minus06" message="[-0.6]" action="selectOption" value="-0.6" />
+					<option_item name="minus05" message="[-0.5]" action="selectOption" value="-0.5" />
+					<option_item name="minus04" message="[-0.4]" action="selectOption" value="-0.4" />
+					<option_item name="minus03" message="[-0.3]" action="selectOption" value="-0.3" />
+					<option_item name="minus02" message="[-0.2]" action="selectOption" value="-0.2" />
+					<option_item name="minus01" message="[-0.1]" action="selectOption" value="-0.1" />
+					<option_item name="zero" message="[0.0]" action="selectOption" value="0.0" />
+					<option_item name="plus01" message="[+0.1]" action="selectOption" value="0.1" />
+					<option_item name="plus02" message="[+0.2]" action="selectOption" value="0.2" />
+					<option_item name="plus03" message="[+0.3]" action="selectOption" value="0.3" />
+					<option_item name="plus04" message="[+0.4]" action="selectOption" value="0.4" />
+					<option_item name="plus05" message="[+0.5]" action="selectOption" value="0.5" />
+					<option_item name="plus06" message="[+0.6]" action="selectOption" value="0.6" />
+					<option_item name="plus07" message="[+0.7]" action="selectOption" value="0.7" />
+					<option_item name="plus08" message="[+0.8]" action="selectOption" value="0.8" />
+					<option_item name="plus09" message="[+0.9]" action="selectOption" value="0.9" />
+					<option_item name="plus1" message="[+1.0]" action="selectOption" value="1.0" />
+				</menu_item>
+				
+				<menu_item name="contrast" message="Contrast" action="options" parent="imageAdjustments">
+					<setting>cam_contrast</setting>
+					<option_item name="zero" message="[0.0]" action="selectOption" value="0.0" />
+					<option_item name="plus05" message="[0.5]" action="selectOption" value="0.5" />
+					<option_item name="plus1" message="[1.0]" action="selectOption" value="1.0" />
+					<option_item name="plus1_5" message="[1.5]" action="selectOption" value="1.5" />
+					<option_item name="plus2" message="[2.0]" action="selectOption" value="2.0" />
+					<option_item name="plus2_5" message="[2.5]" action="selectOption" value="2.5" />
+					<option_item name="plus3" message="[3.0]" action="selectOption" value="3.0" />
+					<option_item name="plus3_5" message="[3.5]" action="selectOption" value="3.5" />
+					<option_item name="plus4" message="[4.0]" action="selectOption" value="4.0" />
+					<option_item name="plus4_5" message="[4.5]" action="selectOption" value="4.5" />
+					<option_item name="plus5" message="[5.0]" action="selectOption" value="5.0" />
+					<option_item name="plus5_5" message="[5.5]" action="selectOption" value="5.5" />
+					<option_item name="plus6" message="[6.0]" action="selectOption" value="6.0" />
+					<option_item name="plus6_5" message="[6.5]" action="selectOption" value="6.5" />
+					<option_item name="plus7" message="[7.0]" action="selectOption" value="7.0" />
+					<option_item name="plus7_5" message="[7.5]" action="selectOption" value="7.5" />
+					<option_item name="plus8" message="[8.0]" action="selectOption" value="8.0" />
+					<option_item name="plus8_5" message="[8.5]" action="selectOption" value="8.5" />
+					<option_item name="plus9" message="[9.0]" action="selectOption" value="9.0" />
+					<option_item name="plus9_5" message="[9.5]" action="selectOption" value="9.5" />
+					<option_item name="plus10" message="[10.0]" action="selectOption" value="10.0" />
+					<option_item name="plus10_5" message="[10.5]" action="selectOption" value="10.5" />
+					<option_item name="plus11" message="[11.0]" action="selectOption" value="11.0" />
+					<option_item name="plus11_5" message="[11.5]" action="selectOption" value="11.5" />
+					<option_item name="plus12" message="[12.0]" action="selectOption" value="12.0" />
+					<option_item name="plus12_5" message="[12.5]" action="selectOption" value="12.5" />
+					<option_item name="plus13" message="[13.0]" action="selectOption" value="13.0" />
+					<option_item name="plus13_5" message="[13.5]" action="selectOption" value="13.5" />
+					<option_item name="plus14" message="[14.0]" action="selectOption" value="14.0" />
+					<option_item name="plus14_5" message="[14.5]" action="selectOption" value="14.5" />
+					<option_item name="plus15" message="[15.0]" action="selectOption" value="15.0" />
+					<option_item name="plus15_5" message="[15.5]" action="selectOption" value="15.5" />
+					<option_item name="plus16" message="[16.0]" action="selectOption" value="16.0" />
+					<option_item name="plus16_5" message="[16.5]" action="selectOption" value="16.5" />
+					<option_item name="plus17" message="[17.0]" action="selectOption" value="17.0" />
+					<option_item name="plus17_5" message="[17.5]" action="selectOption" value="17.5" />
+					<option_item name="plus18" message="[18.0]" action="selectOption" value="18.0" />
+					<option_item name="plus18_5" message="[18.5]" action="selectOption" value="18.5" />
+					<option_item name="plus19" message="[19.0]" action="selectOption" value="19.0" />
+					<option_item name="plus19_5" message="[19.5]" action="selectOption" value="19.5" />
+					<option_item name="plus20" message="[20.0]" action="selectOption" value="20.0" />
+					<option_item name="plus20_5" message="[20.5]" action="selectOption" value="20.5" />
+					<option_item name="plus21" message="[21.0]" action="selectOption" value="21.0" />
+					<option_item name="plus21_5" message="[21.5]" action="selectOption" value="21.5" />
+					<option_item name="plus22" message="[22.0]" action="selectOption" value="22.0" />
+					<option_item name="plus22_5" message="[22.5]" action="selectOption" value="22.5" />
+					<option_item name="plus23" message="[23.0]" action="selectOption" value="23.0" />
+					<option_item name="plus23_5" message="[23.5]" action="selectOption" value="23.5" />
+					<option_item name="plus24" message="[24.0]" action="selectOption" value="24.0" />
+					<option_item name="plus24_5" message="[24.5]" action="selectOption" value="24.5" />
+					<option_item name="plus25" message="[25.0]" action="selectOption" value="25.0" />
+					<option_item name="plus25_5" message="[25.5]" action="selectOption" value="25.5" />
+					<option_item name="plus26" message="[26.0]" action="selectOption" value="26.0" />
+					<option_item name="plus26_5" message="[26.5]" action="selectOption" value="26.5" />
+					<option_item name="plus27" message="[27.0]" action="selectOption" value="27.0" />
+					<option_item name="plus27_5" message="[27.5]" action="selectOption" value="27.5" />
+					<option_item name="plus28" message="[28.0]" action="selectOption" value="28.0" />
+					<option_item name="plus28_5" message="[28.5]" action="selectOption" value="28.5" />
+					<option_item name="plus29" message="[29.0]" action="selectOption" value="29.0" />
+					<option_item name="plus29_5" message="[29.5]" action="selectOption" value="29.5" />
+					<option_item name="plus30" message="[30.0]" action="selectOption" value="30.0" />
+					<option_item name="plus30_5" message="[30.5]" action="selectOption" value="30.5" />
+					<option_item name="plus31" message="[31.0]" action="selectOption" value="31.0" />
+					<option_item name="plus31_5" message="[31.5]" action="selectOption" value="31.5" />
+					<option_item name="plus32" message="[32.0]" action="selectOption" value="32.0" />
+				</menu_item>
+			
+				<menu_item name="exposureValue" message="Exposure Value" action="options" parent="imageAdjustments">
+					<setting>cam_exposure_value</setting>
+					<option_item name="minus8" message="[-8.0]" action="selectOption" value="-8.0" />
+					<option_item name="minus7_5" message="[-7.5]" action="selectOption" value="-7.5" />
+					<option_item name="minus7" message="[-7.0]" action="selectOption" value="-7.0" />
+					<option_item name="minus6_5" message="[-6.5]" action="selectOption" value="-6.5" />
+					<option_item name="minus6" message="[-6.0]" action="selectOption" value="-6.0" />
+					<option_item name="minus5_5" message="[-5.5]" action="selectOption" value="-5.5" />
+					<option_item name="minus5" message="[-5.0]" action="selectOption" value="-5.0" />
+					<option_item name="minus4_5" message="[-4.5]" action="selectOption" value="-4.5" />
+					<option_item name="minus4" message="[-4.0]" action="selectOption" value="-4.0" />
+					<option_item name="minus3_5" message="[-3.5]" action="selectOption" value="-3.5" />
+					<option_item name="minus3" message="[-3.0]" action="selectOption" value="-3.0" />
+					<option_item name="minus2_5" message="[-2.5]" action="selectOption" value="-2.5"/>
+					<option_item name="minus2" message="[-2.0]" action="selectOption" value="-2.0"/>
+					<option_item name="minus1_5" message="[-1.5]" action="selectOption" value="-1.5"/>
+					<option_item name="minus1" message="[-1.0]" action= "selectOption" value="-1"/>
+					<option_item name="minus0_5" message="[-0.5]" action= "selectOption" value="-0.5"/>
+					<option_item name="zero" message="[0.0]" action= "selectOption" value= "0"/>
+					<option_item name="plus0_5" message="[+0.5]" action="selectOption" value="0.5" />
+					<option_item name="plus1" message="[+1.0]" action= "selectOption" value="1" />
+					<option_item name="plus1_5" message="[+1.5]" action="selectOption" value="1.5" />
+					<option_item name="plus2" message="[+2.0]" action="selectOption" value="2.0" />
+					<option_item name="plus2_5" message="[+2.5]" action="selectOption" value="2.5" />
+					<option_item name="plus3" message="[+3.0]" action="selectOption" value="3.0" />
+					<option_item name="plus3_5" message="[+3.5]" action="selectOption" value="3.5" />
+					<option_item name="plus4" message="[+4.0]" action="selectOption" value="4.0" />
+					<option_item name="plus4_5" message="[+4.5]" action="selectOption" value="4.5" />
+					<option_item name="plus5" message="[+5.0]" action="selectOption" value="5.0" />
+					<option_item name="plus5_5" message="[+5.5]" action="selectOption" value="5.5" />
+					<option_item name="plus6" message="[+6.0]" action="selectOption" value="6.0" />
+					<option_item name="plus6_5" message="[+6.5]" action="selectOption" value="6.5" />
+					<option_item name="plus7" message="[+7.0]" action="selectOption" value="7.0" />
+					<option_item name="plus7_5" message="[+7.5]" action="selectOption" value="7.5" />
+					<option_item name="plus8" message="[+8.0]" action="selectOption" value="8.0" />
+				</menu_item>
+
+				<menu_item name="saturation" message="Saturation" action="options" parent="imageAdjustments">
+					<setting>cam_saturation</setting>
+					<option_item name="zero" message="[0.0]" action="selectOption" value="0.0" />
+					<option_item name="plus05" message="[0.5]" action="selectOption" value="0.5" />
+					<option_item name="plus1" message="[1.0]" action="selectOption" value="1.0" />
+					<option_item name="plus1_5" message="[1.5]" action="selectOption" value="1.5" />
+					<option_item name="plus2" message="[2.0]" action="selectOption" value="2.0" />
+					<option_item name="plus2_5" message="[2.5]" action="selectOption" value="2.5" />
+					<option_item name="plus3" message="[3.0]" action="selectOption" value="3.0" />
+					<option_item name="plus3_5" message="[3.5]" action="selectOption" value="3.5" />
+					<option_item name="plus4" message="[4.0]" action="selectOption" value="4.0" />
+					<option_item name="plus4_5" message="[4.5]" action="selectOption" value="4.5" />
+					<option_item name="plus5" message="[5.0]" action="selectOption" value="5.0" />
+					<option_item name="plus5_5" message="[5.5]" action="selectOption" value="5.5" />
+					<option_item name="plus6" message="[6.0]" action="selectOption" value="6.0" />
+					<option_item name="plus6_5" message="[6.5]" action="selectOption" value="6.5" />
+					<option_item name="plus7" message="[7.0]" action="selectOption" value="7.0" />
+					<option_item name="plus7_5" message="[7.5]" action="selectOption" value="7.5" />
+					<option_item name="plus8" message="[8.0]" action="selectOption" value="8.0" />
+					<option_item name="plus8_5" message="[8.5]" action="selectOption" value="8.5" />
+					<option_item name="plus9" message="[9.0]" action="selectOption" value="9.0" />
+					<option_item name="plus9_5" message="[9.5]" action="selectOption" value="9.5" />
+					<option_item name="plus10" message="[10.0]" action="selectOption" value="10.0" />
+					<option_item name="plus10_5" message="[10.5]" action="selectOption" value="10.5" />
+					<option_item name="plus11" message="[11.0]" action="selectOption" value="11.0" />
+					<option_item name="plus11_5" message="[11.5]" action="selectOption" value="11.5" />
+					<option_item name="plus12" message="[12.0]" action="selectOption" value="12.0" />
+					<option_item name="plus12_5" message="[12.5]" action="selectOption" value="12.5" />
+					<option_item name="plus13" message="[13.0]" action="selectOption" value="13.0" />
+					<option_item name="plus13_5" message="[13.5]" action="selectOption" value="13.5" />
+					<option_item name="plus14" message="[14.0]" action="selectOption" value="14.0" />
+					<option_item name="plus14_5" message="[14.5]" action="selectOption" value="14.5" />
+					<option_item name="plus15" message="[15.0]" action="selectOption" value="15.0" />
+					<option_item name="plus15_5" message="[15.5]" action="selectOption" value="15.5" />
+					<option_item name="plus16" message="[16.0]" action="selectOption" value="16.0" />
+					<option_item name="plus16_5" message="[16.5]" action="selectOption" value="16.5" />
+					<option_item name="plus17" message="[17.0]" action="selectOption" value="17.0" />
+					<option_item name="plus17_5" message="[17.5]" action="selectOption" value="17.5" />
+					<option_item name="plus18" message="[18.0]" action="selectOption" value="18.0" />
+					<option_item name="plus18_5" message="[18.5]" action="selectOption" value="18.5" />
+					<option_item name="plus19" message="[19.0]" action="selectOption" value="19.0" />
+					<option_item name="plus19_5" message="[19.5]" action="selectOption" value="19.5" />
+					<option_item name="plus20" message="[20.0]" action="selectOption" value="20.0" />
+					<option_item name="plus20_5" message="[20.5]" action="selectOption" value="20.5" />
+					<option_item name="plus21" message="[21.0]" action="selectOption" value="21.0" />
+					<option_item name="plus21_5" message="[21.5]" action="selectOption" value="21.5" />
+					<option_item name="plus22" message="[22.0]" action="selectOption" value="22.0" />
+					<option_item name="plus22_5" message="[22.5]" action="selectOption" value="22.5" />
+					<option_item name="plus23" message="[23.0]" action="selectOption" value="23.0" />
+					<option_item name="plus23_5" message="[23.5]" action="selectOption" value="23.5" />
+					<option_item name="plus24" message="[24.0]" action="selectOption" value="24.0" />
+					<option_item name="plus24_5" message="[24.5]" action="selectOption" value="24.5" />
+					<option_item name="plus25" message="[25.0]" action="selectOption" value="25.0" />
+					<option_item name="plus25_5" message="[25.5]" action="selectOption" value="25.5" />
+					<option_item name="plus26" message="[26.0]" action="selectOption" value="26.0" />
+					<option_item name="plus26_5" message="[26.5]" action="selectOption" value="26.5" />
+					<option_item name="plus27" message="[27.0]" action="selectOption" value="27.0" />
+					<option_item name="plus27_5" message="[27.5]" action="selectOption" value="27.5" />
+					<option_item name="plus28" message="[28.0]" action="selectOption" value="28.0" />
+					<option_item name="plus28_5" message="[28.5]" action="selectOption" value="28.5" />
+					<option_item name="plus29" message="[29.0]" action="selectOption" value="29.0" />
+					<option_item name="plus29_5" message="[29.5]" action="selectOption" value="29.5" />
+					<option_item name="plus30" message="[30.0]" action="selectOption" value="30.0" />
+					<option_item name="plus30_5" message="[30.5]" action="selectOption" value="30.5" />
+					<option_item name="plus31" message="[31.0]" action="selectOption" value="31.0" />
+					<option_item name="plus31_5" message="[31.5]" action="selectOption" value="31.5" />
+					<option_item name="plus32" message="[32.0]" action="selectOption" value="32.0" />
+				</menu_item>
+
+				<menu_item name="sharpness" message="Sharpness" action="options" parent="imageAdjustments">
+					<setting>cam_sharpness</setting>
+					<option_item name="zero" message="[0.0]" action="selectOption" value="0.0" />
+					<option_item name="plus05" message="[0.5]" action="selectOption" value="0.5" />
+					<option_item name="plus1" message="[1.0]" action="selectOption" value="1.0" />
+					<option_item name="plus1_5" message="[1.5]" action="selectOption" value="1.5" />
+					<option_item name="plus2" message="[2.0]" action="selectOption" value="2.0" />
+					<option_item name="plus2_5" message="[2.5]" action="selectOption" value="2.5" />
+					<option_item name="plus3" message="[3.0]" action="selectOption" value="3.0" />
+					<option_item name="plus3_5" message="[3.5]" action="selectOption" value="3.5" />
+					<option_item name="plus4" message="[4.0]" action="selectOption" value="4.0" />
+					<option_item name="plus4_5" message="[4.5]" action="selectOption" value="4.5" />
+					<option_item name="plus5" message="[5.0]" action="selectOption" value="5.0" />
+					<option_item name="plus5_5" message="[5.5]" action="selectOption" value="5.5" />
+					<option_item name="plus6" message="[6.0]" action="selectOption" value="6.0" />
+					<option_item name="plus6_5" message="[6.5]" action="selectOption" value="6.5" />
+					<option_item name="plus7" message="[7.0]" action="selectOption" value="7.0" />
+					<option_item name="plus7_5" message="[7.5]" action="selectOption" value="7.5" />
+					<option_item name="plus8" message="[8.0]" action="selectOption" value="8.0" />
+					<option_item name="plus8_5" message="[8.5]" action="selectOption" value="8.5" />
+					<option_item name="plus9" message="[9.0]" action="selectOption" value="9.0" />
+					<option_item name="plus9_5" message="[9.5]" action="selectOption" value="9.5" />
+					<option_item name="plus10" message="[10.0]" action="selectOption" value="10.0" />
+					<option_item name="plus10_5" message="[10.5]" action="selectOption" value="10.5" />
+					<option_item name="plus11" message="[11.0]" action="selectOption" value="11.0" />
+					<option_item name="plus11_5" message="[11.5]" action="selectOption" value="11.5" />
+					<option_item name="plus12" message="[12.0]" action="selectOption" value="12.0" />
+					<option_item name="plus12_5" message="[12.5]" action="selectOption" value="12.5" />
+					<option_item name="plus13" message="[13.0]" action="selectOption" value="13.0" />
+					<option_item name="plus13_5" message="[13.5]" action="selectOption" value="13.5" />
+					<option_item name="plus14" message="[14.0]" action="selectOption" value="14.0" />
+					<option_item name="plus14_5" message="[14.5]" action="selectOption" value="14.5" />
+					<option_item name="plus15" message="[15.0]" action="selectOption" value="15.0" />
+					<option_item name="plus15_5" message="[15.5]" action="selectOption" value="15.5" />
+					<option_item name="plus16" message="[16.0]" action="selectOption" value="16.0" />
+				</menu_item>
+
+				<menu_item name="imageAdjustmentsReturn" message="Exit Image Adjustments" action="return" parent="imageAdjustments" />
+			</menu_item>
+
+			<menu_item name="photoSettings" message="Photo Settings" action="submenu" parent="camera">
+				<menu_item name="photoInterval" message="Photo Interval" action="options" parent="photoSettings">
+					<setting>pic_interval</setting>
+					<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
+					<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
+					<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
+					<option_item name="fifteen" message="Seconds: [15]" action="selectOption" value="15" />
+					<option_item name="thirty" message="Seconds: [30]" action="selectOption" value="30" />
+					<option_item name="sixty" message="Seconds: [60]" action="selectOption" value="60" />
+				</menu_item>
+
+				<menu_item name="imageAnnotation" message="Photo Annotations" action="options" parent="photoSettings">
+					<setting>pic_annotations</setting>
+					<option_item name="none" message="[None]" action="selectOption" value="none" />
+					<option_item name="altstamp" message="[Altitude]" action="selectOption" value="alt" />
+					<option_item name="timestamp" message="[Timestamp]" action="selectOption" value="time" />
+					<option_item name="bothAnnotations" message="[Altitude and Timestamp]" action="selectOption" value="alttime" />
+				</menu_item>
+				
+				<menu_item name="photoReturn" message="Exit Photo Settings" action="return" parent="photoSettings" />
+			</menu_item>
+
+			<menu_item name="videoSettings" message="Video Settings" action="submenu" parent="camera">
+				<menu_item name="videoLength" message="Video Length" action="options" parent="videoSettings">
+					<setting>vid_length</setting>
+					<option_item name="fifteen" message="Seconds: [15]" action="selectOption" value="15" />
+					<option_item name="thirty" message="Seconds: [30]" action="selectOption" value="30" />
+					<option_item name="sixty" message="Seconds: [60]" action="selectOption" value="60" />
+					<option_item name="ninety" message="Seconds: [90]" action="selectOption" value="90" />
+					<option_item name="onetwenty" message="Seconds: [120]" action="selectOption" value="120" />
+					<option_item name="oneeighty" message="Seconds: [180]" action="selectOption" value="180" />
+				</menu_item>
+				
+				<menu_item name="multipleVideos" message="Multiple Videos?" action="options" parent="videoSettings">
+					<setting>vid_multiple</setting>
+					<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
+					<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+				</menu_item>
+
+				<menu_item name="videoInterval" message="Video Interval" action="options" parent="videoSettings">
+					<setting>vid_interval</setting>
+					<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
+					<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
+					<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
+					<option_item name="fifteen" message="Seconds: [15]" action="selectOption" value="15" />
+					<option_item name="thirty" message="Seconds: [30]" action="selectOption" value="30" />
+					<option_item name="sixty" message="Seconds: [60]" action="selectOption" value="60" />
+				</menu_item>
+
+				<menu_item name="videoReturn" message="Exit Video Settings" action="return" parent="videoSettings" />
+			</menu_item>
+
+			<menu_item name="cameraReturn" message="Exit Camera Settings" action="return" parent="camera" />
+		</menu_item>
+
+		<menu_item name="panTiltSettings" message="Pan/Tilt Settings" action="submenu" parent="settings">
+			<menu_item name="panTiltMode" message="Pan/Tilt Mode" action="options" parent="panTiltSettings">
+				<setting>pan_tilt_mode</setting>
+				<option_item name="off" message="Mode: [Off]" action="selectOption" value="off" />
+				<option_item name="pan" message="Mode: [Pan]" action="selectOption" value="pan" />
+				<option_item name="tilt" message="Mode: [Tilt]" action="selectOption" value="tilt" />
+				<option_item name="both" message="Mode: [Both]" action="selectOption" value="both" />
+			</menu_item>
+
+			<menu_item name="panTiltInterval" message="Pan Interval" action="options" parent="panTiltSettings">
+				<setting>pan_tilt_interval</setting>
+				<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
+				<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
+				<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
+				<option_item name="fifteen" message="Seconds: [15]" action="selectOption" value="15" />
+				<option_item name="thirty" message="Seconds: [30]" action="selectOption" value="30" />
+				<option_item name="sixty" message="Seconds: [60]" action="selectOption" value="60" />
+			</menu_item>
+
+			<menu_item name="panTiltReturn" message="[Exit Pan/Tilt Settings]" action="return" parent="panTiltSettings"/>
+		</menu_item>
+
+		<menu_item name="log" message="Error Logging" action="submenu" parent="settings">
+			<menu_item name="logToFile" message="Log to File?" action="options" parent="log">
+				<setting>log_to_file</setting>
+				<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
+				<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+			</menu_item>
+
+			<menu_item name="logToConsole" message="Log to Console?" action="options" parent="log">
+				<setting>log_to_console</setting>
+				<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
+				<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+			</menu_item>
+
+			<menu_item name="logLevel" message="Set Log Level" action="options" parent="log">
+				<setting>log_level</setting>
+				<option_item name="debug" message="Level: [DEBUG]" action="selectOption" value="DEBUG" />
+				<option_item name="info" message="Level: [INFO]" action="selectOption" value="INFO" />
+				<option_item name="warning" message="Level: [WARNING]" action="selectOption" value="WARNING" />
+				<option_item name="error" message="Level: [ERROR]" action="selectOption" value="ERROR" />
+				<option_item name="critical" message="Seconds: [CRITICAL]" action="selectOption" value="CRITICAL" />
+			</menu_item>
+			
+			<menu_item name="logReturn" message="Exit Submenu" action="return" parent="log" />
+		</menu_item>
+
+		<menu_item name="defaults" message="Load Deafaults?" action="submenu" parent="settings">
+			<menu_item name="cancelDefaults" message="Really? [No]" action="return" parent="defaults" />
+			<menu_item name="confirmDefaults" message="Really? [Yes]" action="load_defaults" parent="defaults" />
+		</menu_item>
+
+		<menu_item name="settingsReturn" message="Exit Settings" action="return" parent="settings" />
+	</menu_item>
+	
+	<menu_item name="system" message="System Info" action="display_system_info" parent="root" />
+	<menu_item name="poweroff" message="Shut Down?" action="submenu" parent="root" >
+		<menu_item name="cancelPoweroff" message="Really? [No]" action="return" parent="poweroff" />
+		<menu_item name="confirmPoweroff" message="Really? [Yes]" action="shutdown" parent="poweroff" />
+	</menu_item>
+
+	<menu_item name="reboot" message="Reboot?" action="submenu" parent="root">
+		<menu_item name="cancelReboot" message="Really? [No]" action="return" parent="reboot" />
+		<menu_item name="confirmReboot" message="Really? [Yes]" action="reboot" parent="reboot" />
+	</menu_item>
+</menu>
