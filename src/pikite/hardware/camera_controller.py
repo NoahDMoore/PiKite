@@ -6,8 +6,14 @@ from ..core.constants import CAMERA_MODELS, CAPTURE_MODES, MAX_RESOLUTIONS
 from ..system.storage import StorageManager
 
 from picamera2 import Picamera2 # type: ignore
-from libcamera.controls import AfModeEnum, AfRangeEnum, AfSpeedEnum, AwbModeEnum # type: ignore
+from libcamera import controls # type: ignore
 from libcamera import Transform # type: ignore
+
+# Libcamera Control Aliases
+AfModeEnum = controls.AfModeEnum
+AfRangeEnum = controls.AfRangeEnum
+AfSpeedEnum = controls.AfSpeedEnum
+AwbModeEnum = controls.AwbModeEnum
 
 #Setup Logger
 logger = get_logger(__name__)
