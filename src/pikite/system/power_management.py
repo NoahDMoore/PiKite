@@ -1,7 +1,7 @@
 import platform
 import subprocess
 
-from core.logger import get_logger
+from ..core.logger import get_logger
 
 # Setup Logger
 logger = get_logger(__name__)

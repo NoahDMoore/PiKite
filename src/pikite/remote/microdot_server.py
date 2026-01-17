@@ -12,7 +12,7 @@ import json
 import asyncio
 from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
-from core.logger import get_logger
+from ..core.logger import get_logger
 
 # Setup Logger
 logger = get_logger(__name__)

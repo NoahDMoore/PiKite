@@ -15,8 +15,8 @@ import time
 
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
 
-from core.logger import get_logger
-from core.timer import Timer
+from ..core.logger import get_logger
+from ..core.timer import Timer
 
 # Setup Logger
 logger = get_logger(__name__)

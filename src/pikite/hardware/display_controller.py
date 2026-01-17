@@ -5,7 +5,7 @@ import time
 import board        # type: ignore
 import digitalio    # type: ignore
 
-from system.storage import StorageManager
+from ..system.storage import StorageManager
 
 #Mini PiTFT
 from adafruit_rgb_display import st7789             # type: ignore

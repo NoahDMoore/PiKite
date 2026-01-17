@@ -6,12 +6,12 @@ executing actions, and updating the display based on the current menu state.
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-from core.constants import XMLTAG, XMLATTRIB, MENUACTION
-from core.logger import get_logger
-from core.settings import Settings
-from hardware.display_controller import DisplayController, display_system_info
-from system import power_management
-from system.storage import StorageManager
+from .constants import XMLTAG, XMLATTRIB, MENUACTION
+from .logger import get_logger
+from .settings import Settings
+from ..hardware.display_controller import DisplayController, display_system_info
+from ..system import power_management
+from ..system.storage import StorageManager
 
 # Setup Logger
 logger = get_logger(__name__)

@@ -1,5 +1,5 @@
 import logging
-from system.storage import StorageManager
+from ..system.storage import StorageManager
 
 storage = StorageManager()
 LOG_FILE = storage.LOG_FILE

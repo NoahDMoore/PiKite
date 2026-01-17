@@ -22,7 +22,7 @@ Typical usage example:
 from pathlib import Path
 from datetime import datetime
 
-from core.constants import CAPTURE_MODES, MEDIA_EXTENSIONS
+from ..core.constants import CAPTURE_MODES, MEDIA_EXTENSIONS
 
 class StorageManager:
     """

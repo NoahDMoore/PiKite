@@ -4,8 +4,8 @@ import digitalio        # type: ignore
 from busio import I2C   # type: ignore
 import adafruit_bmp280  # type: ignore
 
-from core.logger import get_logger
-from hardware.display_controller import LoadingBar
+from ..core.logger import get_logger
+from .display_controller import LoadingBar
 
 # Setup Logger
 logger = get_logger(__name__)
