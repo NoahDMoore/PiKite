@@ -69,7 +69,7 @@ class Settings:
             except KeyError as e:
                 logger.error(f"{e}. Returning default value: {default}")
                 return default
-            
+        logger.debug(f"Returning {self.config[section][setting_key]}")
         return ast.literal_eval(str(self.config[section][setting_key]))    # Returns value stored for a given setting_key
 
     def set(self, setting_key, value):
