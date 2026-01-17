@@ -18,9 +18,6 @@ dependencies = [
     "rpi-gpio (>=0.7.1,<0.8.0)"
 ]
 
-[tool.poetry.virtualenvs]
-options.system-site-packages = true
-
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
