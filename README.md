@@ -108,9 +108,10 @@ Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/NoahDMoore/PiKite.git
 
-sudo apt install rpicam-apps
+sudo apt install -y python3-picamera2 python3-libcamera
 
 cd pikite
+poetry config virtualenvs.options.system-site-packages true --local
 poetry install
 ```
 ### Running PiKite
