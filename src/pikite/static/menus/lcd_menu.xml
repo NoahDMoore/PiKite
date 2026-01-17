@@ -28,8 +28,8 @@
 
 			<menu_item name="cameraIRFilter" message="IR Filter?" action="options" parent="camera">
 				<setting>cam_ir_filter</setting>
-				<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
-				<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+				<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
+				<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 			</menu_item>
 
 			<menu_item name="cameraMode" message="Photo or Video?" action="options" parent="camera">
@@ -77,8 +77,8 @@
 			<menu_item name="imageAdjustments" message="Image Adjustments" action="submenu" parent="camera">
 				<menu_item name="aeEnable" message="Auto Exposure?" action="options" parent="imageAdjustments">
 					<setting>cam_ae_enable</setting>
-					<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
-					<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+					<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
+					<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 				</menu_item>
 
 				<menu_item name="afMode" message="Auto Focus Mode" action="options" parent="imageAdjustments">
@@ -103,8 +103,8 @@
 
 				<menu_item name="awbEnable" message="Auto White Balance?" action="options" parent="imageAdjustments">
 					<setting>cam_awb_enable</setting>
-					<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
-					<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+					<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
+					<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 				</menu_item>
 				
 				<menu_item name="awbMode" message="Auto White Balance Mode" action="options" parent="imageAdjustments">
@@ -393,8 +393,8 @@
 				
 				<menu_item name="multipleVideos" message="Multiple Videos?" action="options" parent="videoSettings">
 					<setting>vid_multiple</setting>
-					<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
-					<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+					<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
+					<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 				</menu_item>
 
 				<menu_item name="videoInterval" message="Video Interval" action="options" parent="videoSettings">
@@ -438,14 +438,14 @@
 		<menu_item name="log" message="Error Logging" action="submenu" parent="settings">
 			<menu_item name="logToFile" message="Log to File?" action="options" parent="log">
 				<setting>log_to_file</setting>
-				<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
-				<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+				<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
+				<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 			</menu_item>
 
 			<menu_item name="logToConsole" message="Log to Console?" action="options" parent="log">
 				<setting>log_to_console</setting>
-				<option_item name="yes" message="[Yes]     No" action="selectOption" value="true" />
-				<option_item name="no" message="Yes     [No]" action="selectOption" value="false" />
+				<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
+				<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 			</menu_item>
 
 			<menu_item name="logLevel" message="Set Log Level" action="options" parent="log">
