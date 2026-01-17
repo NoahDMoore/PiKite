@@ -107,6 +107,9 @@ Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/NoahDMoore/PiKite.git
+
+sudo apt install rpicam-apps
+
 cd pikite
 poetry install
 ```
