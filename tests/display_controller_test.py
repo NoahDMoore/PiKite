@@ -18,19 +18,19 @@ def test_display_controller_initialization():
     assert display_controller is not None
     logger.info("DisplayController initialized successfully")
 
-def test_display_controller_clear():
+def test_display_clear():
     display_controller = DisplayController()
     display_controller.clear()
     logger.info("DisplayController cleared successfully")
 
-def test_display_controller_new_image():
+def test_new_image():
     display_controller = DisplayController()
     image, canvas = display_controller.new_image()
     assert image is not None
     assert canvas is not None
     logger.info("New image and canvas created successfully")
 
-def test_display_controller_backlight_control():
+def test_backlight_control():
     display_controller = DisplayController()
     display_controller.backlight_on()
     logger.info("Backlight turned on successfully")
@@ -41,7 +41,12 @@ def test_display_controller_backlight_control():
     display_controller.backlight_on()
     logger.info("Backlight turned on successfully")
 
-def test_display_controller_print_message():
+def test_print_one_line_message():
     display_controller = DisplayController()
     display_controller.print_message("Hello, PiKite!")
     logger.info("Message printed successfully on DisplayController")
+
+def test_print_two_line_message():
+    display_controller = DisplayController()
+    display_controller.print_message("Header: This is a test message")
+    logger.info("Two-line message printed successfully on DisplayController")
