@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from pikite.core.logger import get_logger
-from pikite.hardware.display_controller import DisplayController
+from pikite.hardware.display_controller import DisplayController, LoadingBar
 
 import time
 
@@ -50,3 +50,13 @@ def test_print_two_line_message():
     display_controller = DisplayController()
     display_controller.print_message("Header: This is a test.")
     logger.info("Two-line message printed successfully on DisplayController")
+
+def test_loading_bar():
+    display_controller = DisplayController()
+    loading_bar = LoadingBar(display_controller, "Loading Test")
+    logger.info("Loading bar displayed successfully on DisplayController")
+    time.sleep(2)
+    while loading_bar.percentage < 100:
+        loading_bar.advance()
+        time.sleep(0.5)
+    logger.info("Loading bar completed successfully on DisplayController")
