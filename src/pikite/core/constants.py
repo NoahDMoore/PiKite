@@ -101,3 +101,15 @@ class MEDIA_EXTENSIONS(str, Enum):
 
     def __str__(self):
         return self.value
+    
+class DISTANCE_UNITS(str, Enum):
+    """
+    Supported distance units for altitude measurement
+    """
+    FEET = "feet"
+    METERS = "meters"
+    YARDS = "yards"
+    MILES = "miles"
+    KILOMETERS = "kilometers"
+    CENTIMETERS = "centimeters"
+    MILLIMETERS = "millimeters"

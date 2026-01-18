@@ -5,10 +5,21 @@ from busio import I2C   # type: ignore
 import adafruit_bmp280  # type: ignore
 
 from ..core.logger import get_logger
+from ..core.constants import DISTANCE_UNITS
 from .display_controller import LoadingBar
 
 # Setup Logger
 logger = get_logger(__name__)
+
+UNIT_CONVERSION = {
+    DISTANCE_UNITS.FEET: 3.28084,
+    DISTANCE_UNITS.YARDS: 1.09361,
+    DISTANCE_UNITS.MILES: 0.000621371,
+    DISTANCE_UNITS.METERS: 1.0,
+    DISTANCE_UNITS.KILOMETERS: 0.001,
+    DISTANCE_UNITS.CENTIMETERS: 100.0,
+    DISTANCE_UNITS.MILLIMETERS: 1000.0
+}
 
 class PressureSensorController:
     """Controller for the BMP280 Pressure Sensor to measure altitude."""
@@ -21,28 +32,26 @@ class PressureSensorController:
 
         # Set the initial baseline pressure
         self.baseline_pressure = 1030.0  # Can be adjusted to a localised baseline by calling set_baseline_pressure()
-    
-    def get_altitude(self, unit="feet"):
+
+    def get_altitude(self, unit=DISTANCE_UNITS.FEET):
         """
         Calculate the current altitude based on the baseline pressure.
         
         Args:
-            unit (str): The unit for altitude measurement ("feet" or "meters"). Default is "feet".
+            unit (DISTANCE_UNITS): The unit for altitude measurement. Default is DISTANCE_UNITS.FEET.
 
         Returns:
             float: The calculated altitude in the specified unit.
         """
         self.sensor.sea_level_pressure = self.baseline_pressure
         altitude = self.sensor.altitude
-
-        # Convert altitude to US Feet by default (sensor returns meters)
-        if unit == "feet":
-            altitude *= 3.28084
+        
+        altitude *= UNIT_CONVERSION.get(unit, UNIT_CONVERSION[DISTANCE_UNITS.FEET]) # Convert to desired unit, default to feet if unit not found
 
         return round(altitude, 2)
 
     @property
-    def altitude(self):
+    def altitude(self, unit=DISTANCE_UNITS.FEET):
         """
         Get the current altitude as a string.
         
@@ -50,7 +59,7 @@ class PressureSensorController:
             str: The current altitude.
         """
         # Returns the current altitude as a string.
-        return str(self.get_altitude())
+        return str(self.get_altitude(unit=unit))
 
     def get_baseline_pressure(self, num_samples=80, display_controller=None):
         """
