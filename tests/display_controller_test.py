@@ -48,5 +48,5 @@ def test_print_one_line_message():
 
 def test_print_two_line_message():
     display_controller = DisplayController()
-    display_controller.print_message("Header: This is a test message")
+    display_controller.print_message("Header:This is a test.")
     logger.info("Two-line message printed successfully on DisplayController")
