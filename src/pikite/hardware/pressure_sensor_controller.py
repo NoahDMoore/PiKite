@@ -11,8 +11,9 @@ from .display_controller import LoadingBar
 logger = get_logger(__name__)
 
 class PressureSensorController:
+    """Controller for the BMP280 Pressure Sensor to measure altitude."""
     def __init__(self):
-        # Initialization of the BMP280 sensor
+        """Initialize the PressureSensorController and BMP280 sensor."""
         self.i2c = I2C(board.SCL, board.SDA)
         self.sensor = adafruit_bmp280.Adafruit_BMP280_SPI(board.SPI(), digitalio.DigitalInOut(board.CE1))
         self.sensor.overscan_pressure = adafruit_bmp280.OVERSCAN_X16    # Set overscan for better pressure accuracy
