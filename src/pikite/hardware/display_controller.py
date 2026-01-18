@@ -80,7 +80,10 @@ class DisplayController:
         # Print a message on the display
         lcd_image, canvas = None, None
 
-        if any(ele in message for ele in self.IMAGE_FILE_TYPES):
+        if isinstance(message, Image.Image):
+            # If the message is already an Image object, use it directly
+            lcd_image = message.convert('RGBA')
+        elif any(ele in message for ele in self.IMAGE_FILE_TYPES):
             # If the message is a file path, load the image
             try:
                 lcd_image = Image.open(message)
@@ -88,9 +91,6 @@ class DisplayController:
             except Exception as e:
                 print(f"Error loading image: {e}")
                 return
-        elif isinstance(message, Image.Image):
-            # If the message is already an Image object, use it directly
-            lcd_image = message.convert('RGBA')
         elif ":" in message:
             # Print a two-line message centered on the display
 
