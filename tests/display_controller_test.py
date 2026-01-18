@@ -53,7 +53,7 @@ def test_print_two_line_message():
 
 def test_loading_bar():
     display_controller = DisplayController()
-    loading_bar = LoadingBar(display_controller, "Loading Test")
+    loading_bar = LoadingBar("Loading Test", display_controller)
     logger.info("Loading bar displayed successfully on DisplayController")
     time.sleep(2)
     while loading_bar.percentage < 100:
