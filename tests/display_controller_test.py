@@ -1,5 +1,5 @@
-from src.pikite.core.logger import get_logger
-from src.pikite.hardware.display_controller import DisplayController
+from ..src.pikite.core.logger import get_logger
+from ..src.pikite.hardware.display_controller import DisplayController
 
 import time
 
