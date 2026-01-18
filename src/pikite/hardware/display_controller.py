@@ -55,8 +55,17 @@ class DisplayController:
     def dimensions(self):
         return (self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
 
-    def new_image(self):
-        lcd_image = Image.new("RGBA", (self.IMAGE_WIDTH, self.IMAGE_HEIGHT), (255,255,255,255)) # type: ignore
+    def new_image(self, color=(255, 255, 255), alpha=255):
+        """Create a new blank image and drawing canvas.
+        Args:
+            color (tuple): RGB color tuple for the background color. Default is white.
+            alpha (int): Alpha value for the background color. Default is 255 (opaque).
+        Returns:
+            tuple: A tuple containing the new image and drawing canvas.
+        """
+        
+        bg_color = (*color, alpha)
+        lcd_image = Image.new("RGBA", (self.IMAGE_WIDTH, self.IMAGE_HEIGHT), bg_color) # type: ignore
         canvas = ImageDraw.Draw(lcd_image)
 
         return lcd_image, canvas
@@ -205,7 +214,7 @@ class LoadingBar:
 
     @title.setter
     def title(self, new_title):
-        self.title_image, canvas = self.display_controller.new_image()
+        self.title_image, canvas = self.display_controller.new_image(alpha=0)
 
         width = get_image_width(self.display_controller.FONT30.getbbox(new_title))
         canvas.text(((self.display_controller.IMAGE_WIDTH-width)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
