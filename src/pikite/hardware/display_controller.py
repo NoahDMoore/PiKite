@@ -99,10 +99,10 @@ class DisplayController:
             header = message.split(": ")[0] + ":"
             message = message.split(": ")[1]
 
-            height = self.FONT30.getsize(message)[1]
+            height = get_image_height(self.FONT30.getbbox(message))
 
-            header_width = self.FONT30.getsize(header)[0]
-            message_width = self.FONT30.getsize(message)[0]
+            header_width = get_image_width(self.FONT30.getbbox(header))
+            message_width = get_image_width(self.FONT30.getbbox(message))
 
             canvas.text(((self.IMAGE_WIDTH - header_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) - (height / 2)), header, font=self.FONT30, fill="black")
             canvas.text(((self.IMAGE_WIDTH - message_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) + (height / 2)), message, font=self.FONT30, fill="black")
@@ -111,9 +111,9 @@ class DisplayController:
 
             lcd_image, canvas = self.new_image()
 
-            width = self.FONT30.getsize(message)[0]
-            height = self.FONT30.getsize(message)[1]
-            
+            width = get_image_width(self.FONT30.getbbox(message))
+            height = get_image_height(self.FONT30.getbbox(message))
+
             canvas.text(((self.IMAGE_WIDTH - width) / 2, (self.IMAGE_HEIGHT - height) / 2), message, font=self.FONT30, fill="black")
         
         self.display.image(lcd_image)
@@ -207,8 +207,8 @@ class LoadingBar:
     def title(self, new_title):
         self.title_image, canvas = self.display_controller.new_image()
 
-        w = self.display_controller.FONT30.getsize(new_title)[0]
-        canvas.text(((self.display_controller.IMAGE_WIDTH-w)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
+        width = get_image_width(self.display_controller.FONT30.getbbox(new_title))
+        canvas.text(((self.display_controller.IMAGE_WIDTH-width)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
 
     def advance(self):
         if self.value < 200:
@@ -259,11 +259,25 @@ def display_system_info(display_controller: DisplayController):
     y = padding
     x = padding
     canvas.text((x, y), ip, font=display_controller.FONT25, fill="#FF2002")
-    y += display_controller.FONT25.getsize(ip)[1] + padding
+    y += display_controller.FONT25.getsize(ip)[1] + padding                         # Replace getsize with getbbox
     canvas.text((x, y), disk, font=display_controller.FONT25, fill="#C70096")
-    y += display_controller.FONT25.getsize(disk)[1] + padding
+    y += display_controller.FONT25.getsize(disk)[1] + padding                       # Replace getsize with getbbox
     canvas.text((x, y), network, font=display_controller.FONT25, fill="#6BB800")
-    #y += font25.getsize(network)[1] + padding
+    #y += font25.getsize(network)[1] + padding                                      # Replace getsize with getbbox
     #canvas.text((x, y), apache, font=font25, fill="#2121FF")
 
     display_controller.display.image(lcd_image)
+
+def get_image_width(bbox: tuple[int, int, int, int]) -> int:
+    """Calculate the width of an image given its bounding box.
+    
+    Args:
+        bbox (tuple[int, int, int, int]): A tuple representing the bounding box (left, top, right, bottom)."""
+    return bbox[2] - bbox[0]
+
+def get_image_height(bbox: tuple[int, int, int, int]) -> int:
+    """Calculate the height of an image given its bounding box.
+
+    Args:
+        bbox (tuple[int, int, int, int]): A tuple representing the bounding box (left, top, right, bottom)."""
+    return bbox[3] - bbox[1]
