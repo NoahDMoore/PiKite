@@ -47,3 +47,10 @@ def test_get_baseline_pressure_with_loading_bar():
     pressure_sensor.get_baseline_pressure(num_samples=10, display_controller=display_controller)
     assert isinstance(pressure_sensor.baseline_pressure, float)
     logger.info(f"Test returned Baseline Pressure: {pressure_sensor.baseline_pressure}")
+
+def test_altitude_after_setting_baseline():
+    pressure_sensor = PressureSensorController()
+    pressure_sensor.get_baseline_pressure(num_samples=10)
+    altitude = pressure_sensor.get_altitude(unit=DISTANCE_UNITS.FEET)
+    assert isinstance(altitude, float)
+    logger.info(f"Test returned Altitude after setting baseline: {altitude}")
