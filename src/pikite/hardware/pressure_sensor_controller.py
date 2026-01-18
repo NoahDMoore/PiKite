@@ -12,6 +12,7 @@ logger = get_logger(__name__)
 
 class PressureSensorController:
     """Controller for the BMP280 Pressure Sensor to measure altitude."""
+
     def __init__(self):
         """Initialize the PressureSensorController and BMP280 sensor."""
         self.i2c = I2C(board.SCL, board.SDA)
@@ -19,13 +20,22 @@ class PressureSensorController:
         self.sensor.overscan_pressure = adafruit_bmp280.OVERSCAN_X16    # Set overscan for better pressure accuracy
 
         # Set the initial baseline pressure
-        self.baseline_pressure = 1030.0  # Can be adjusted to localised baseline by calling set_baseline_pressure()
+        self.baseline_pressure = 1030.0  # Can be adjusted to a localised baseline by calling set_baseline_pressure()
     
     def get_altitude(self, unit="feet"):
+        """
+        Calculate the current altitude based on the baseline pressure.
+        
+        Args:
+            unit (str): The unit for altitude measurement ("feet" or "meters"). Default is "feet".
+
+        Returns:
+            float: The calculated altitude in the specified unit.
+        """
         self.sensor.sea_level_pressure = self.baseline_pressure
         altitude = self.sensor.altitude
 
-        # Convert altitude to US Feet by default (sensor returns in meters)
+        # Convert altitude to US Feet by default (sensor returns meters)
         if unit == "feet":
             altitude *= 3.28084
 
@@ -33,18 +43,32 @@ class PressureSensorController:
 
     @property
     def altitude(self):
+        """
+        Get the current altitude as a string.
+        
+        Returns:
+            str: The current altitude.
+        """
         # Returns the current altitude as a string.
         return str(self.get_altitude())
 
-    def set_baseline_pressure(self, num_samples=80, display_controller=None):
+    def get_baseline_pressure(self, num_samples=80, display_controller=None):
+        """
+        Get the baseline pressure by averaging multiple samples.
+
+        Args:
+            num_samples (int): The number of pressure samples to average. Default is 80.
+            display_controller (DisplayController, optional): An instance of DisplayController to show a loading bar.
+        """
         baseline_pressure = 0
         loader = LoadingBar("Baseline Alt:", display_controller) if display_controller is not None else None
+
         for i in range(num_samples):
             baseline_pressure += self.sensor.pressure
             time.sleep(.1)
             
             divisor = num_samples // 20
-            if i % divisor == 0 and loader is not None:
+            if loader is not None and i % divisor == 0:
                 loader.advance()
 
         self.baseline_pressure = baseline_pressure / num_samples
