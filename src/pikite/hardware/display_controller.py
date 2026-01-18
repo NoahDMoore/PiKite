@@ -18,9 +18,16 @@ FONTS_DIR = storage_manager.FONTS_DIR   # Directory for fonts
 MEDIA_DIR = storage_manager.MEDIA_DIR   # Directory for media files
 
 class DisplayController:
+    """
+    Class to control the Mini PiTFT display using the Adafruit ST7789 library.
+
+    This class allows for initializing the display, creating new images, clearing the display,
+    controlling the backlight, and printing messages or images on the display.
+    """
     IMAGE_FILE_TYPES = ['.jpg', '.jpeg', '.gif', '.png', '.bmp', '.tiff']
 
     def __init__(self):
+        """Initializes the DisplayController with the Mini PiTFT display."""
         # Setup the display
         self.display = st7789.ST7789(
             spi=board.SPI(),
@@ -46,47 +53,75 @@ class DisplayController:
         self.FONT25 = ImageFont.truetype(FONTS_DIR / "robotobold.ttf", 25)
 
     def __repr__(self):
+        """Return a string representation of the DisplayController."""
         return "DisplayController for MiniPiTFT display"
     
     def __str__(self):
+        """Return a string description of the initialized DisplayController."""
         return "DisplayController for MiniPiTFT display with dimensions {}x{}".format(self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
     
     @property
     def dimensions(self):
+        """
+        Return the dimensions of the display as a tuple (width, height).
+        
+        Returns:
+            tuple: A tuple containing the width and height of the display."""
         return (self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
 
-    def new_image(self, color=(255, 255, 255), alpha=255):
-        """Create a new blank image and drawing canvas.
+    def new_image(self, color: tuple[int, int, int] = (255, 255, 255), alpha: int = 255):
+        """
+        Create a new blank image and drawing canvas.
+        
         Args:
             color (tuple): RGB color tuple for the background color. Default is white.
             alpha (int): Alpha value for the background color. Default is 255 (opaque).
+
         Returns:
             tuple: A tuple containing the new image and drawing canvas.
+
+        Raises:
+            ValueError: If the color values are not between 0 and 255.
+            ValueError: If the alpha value is not between 0 and 255.
         """
         
+        if color[0] < 0 or color[0] > 255 or color[1] < 0 or color[1] > 255 or color[2] < 0 or color[2] > 255:
+            raise ValueError("Color values must RGB values between 0 and 255.")
+
+        if alpha < 0 or alpha > 255:
+            raise ValueError("Alpha value must be between 0 and 255.")
+
         bg_color = (*color, alpha)
         lcd_image = Image.new("RGBA", (self.IMAGE_WIDTH, self.IMAGE_HEIGHT), bg_color) # type: ignore
         canvas = ImageDraw.Draw(lcd_image)
 
         return lcd_image, canvas
-    
-    def clear(self, bg_color=(255, 255, 255)):
-        # Clear the display by filling it with white by default
-        # You can pass a different color if needed
-        lcd_image, canvas = self.new_image()
-        canvas.rectangle((0, 0, self.IMAGE_WIDTH, self.IMAGE_HEIGHT), fill=bg_color)
+
+    def clear(self, bg_color: tuple[int, int, int] = (255, 255, 255)):
+        """
+        Clear the display by filling it with the specified background color.
+        
+        Args:
+            bg_color (tuple): RGB color tuple for the background color. Default is white.
+        """
+        lcd_image, canvas = self.new_image(color=bg_color)
         self.display.image(lcd_image)
 
     def backlight_on(self):
-        # Turn on the backlight
+        """Turn on the display backlight."""
         self.backlight.value = True
     
     def backlight_off(self):
-        # Turn off the backlight
+        """Turn off the display backlight."""
         self.backlight.value = False
 
-    def print_message(self, message):
-        # Print a message on the display
+    def print_message(self, message: str | Image.Image):
+        """
+        Print a message or image on the display. The message can be a string, an image file path, or a PIL Image object.
+        
+        Args:
+            message (str or Image.Image): The message to print on the display.
+        """
         lcd_image, canvas = None, None
 
         if isinstance(message, Image.Image):
@@ -127,33 +162,57 @@ class DisplayController:
         
         self.display.image(lcd_image)
 
-
 class GIF:
+    """
+    Class to handle GIF images for display on the Mini PiTFT.
+    """
+
     def __init__(self, gif_image, display_controller):
+        """
+        Initialize the GIF object with a PIL Image and DisplayController.
+        Args:
+            gif_image (Image.Image): A PIL Image object representing the GIF.
+            display_controller (DisplayController): An instance of DisplayController to display the GIF.
+        """
         self.image = gif_image
         self.display_controller = display_controller
 
     def __repr__(self):
+        """Return a string representation of the GIF object."""
         return "GIF control for {}".format(self.image)
 
     def __str__(self):
+        """Return a string description of the GIF object."""
         return "GIF control for {}".format(self.image)
 
     def __len__(self):
+        """Return the number of frames in the GIF."""
         return self.frame_count
 
-    class NotInLoop(Exception): pass
+    class NotInLoop(Exception): pass    # Custom exception for handling non-looping GIFs
 
     @property
     def frame_count(self):
+        """Return the number of frames in the GIF."""
         return self.image.n_frames - 1    # Returns the number of frames in the GIF, minus one since the index starts at 0
 
     @property
     def frame(self):
+        """Return the current frame index of the GIF."""
         return self.image.tell()    # Returns the current frame index
 
     @frame.setter
     def frame(self, new_frame):
+        """
+        Set the current frame index of the GIF.
+
+        Args:
+            new_frame (int): The frame index to set.
+
+        Raises:
+            ValueError: If the new_frame is not a valid frame index.
+            TypeError: If the new_frame is not an integer.
+        """
         if isinstance(new_frame, int):
             if new_frame <= self.frame_count and new_frame >= 0:
                 self.image.seek(new_frame)
@@ -165,12 +224,27 @@ class GIF:
             raise TypeError("Frame must be an integer")
 
     def display_frame(self, paste=None):
+        """
+        Display the current frame of the GIF on the display.
+        
+        Args:
+            paste (Image.Image, optional): An optional image to paste onto the current frame before displaying
+        """
         output = self.image.convert('RGBA')
         if paste != None:
             output.paste(paste, (0,0), paste)
         self.display_controller.print_message(output)
 
     def advance_frame(self, loop=False):
+        """
+        Advance to the next frame in the GIF.
+        If at the last frame, either loop back to the first frame or raise NotInLoop exception.
+        
+        Args:
+            loop (bool): Whether to loop back to the first frame after reaching the last frame. Default is False.
+        Raises:
+            NotInLoop: If the end of the GIF is reached and loop is set to False.
+        """
         if self.frame < self.frame_count:
             self.frame +=1
         elif self.frame == self.frame_count and loop == True:
@@ -179,19 +253,36 @@ class GIF:
             raise self.NotInLoop
 
     def play(self, loop=False):
+        """
+        Play the GIF from the first frame to the last frame.
+
+        Args:
+            loop (bool): Whether to loop the GIF playback. Default is False.
+
+        Raises:
+            NotInLoop: If the end of the GIF is reached and loop is set to False
+        """
         self.frame = 0
 
         try:
             while self.frame <= self.frame_count:
                 self.display_frame()
                 self.advance_frame(loop)
-                time.sleep(0.1)
+                time.sleep(0.1) # Adjust delay as needed for frame rate
         except self.NotInLoop:
             pass
 
 
 class LoadingBar:
+    """A loading bar that displays a GIF animation."""
+
     def __init__(self, title, display_controller):
+        """
+        Initialize the LoadingBar with a title and DisplayController.
+        Args:
+            title (str): The title to display above the loading bar.
+            display_controller (DisplayController): An instance of DisplayController to display the loading bar.
+        """
         self.display_controller = display_controller
         self.image = GIF(Image.open(MEDIA_DIR / "loading_bar.gif"), self.display_controller)
         self.value = 0
@@ -199,49 +290,75 @@ class LoadingBar:
         self.update()
 
     def __repr__(self):
+        """Return a string representation of the LoadingBar."""
         return "Loading Bar, currently at {}%".format(self.percentage)
 
     def __str__(self):
+        """Return a string representation of the LoadingBar."""
         return "Loading Bar, currently at {}%".format(self.percentage)
 
     @property
     def percentage(self):
+        """Return the current percentage of the loading bar."""
         return ((self.value / 200) * 100)
 
     @property
     def title(self):
+        """Return the title of the loading bar."""
         return self.title_image
 
     @title.setter
     def title(self, new_title):
+        """
+        Set a new title for the loading bar.
+        
+        Args:
+            new_title (str): The new title to set.
+        """
         self.title_image, canvas = self.display_controller.new_image(alpha=0)
 
         width = get_image_width(self.display_controller.FONT30.getbbox(new_title))
         canvas.text(((self.display_controller.IMAGE_WIDTH-width)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
 
     def advance(self):
+        """Advance the loading bar by 5%."""
         if self.value < 200:
             self.value += 10
             self.update()
 
     def update(self):
+        """Update the loading bar display."""
         self.image.frame = (self.value // 10)
         self.image.display_frame(self.title)
 
 class PreLoader:
+    """A preloader GIF animation for the display."""
+
     def __init__(self, display_controller):
+        """
+        Initialize the PreLoader with a DisplayController.
+        
+        Args:
+            display_controller (DisplayController): An instance of DisplayController to display the preloader GIF.
+        """
         super().__init__()
         self.display_controller = display_controller
         self.image = GIF(Image.open(MEDIA_DIR / "preloader.gif"), self.display_controller)
 
     def __repr__(self):
+        """Return a string representation of the PreLoader."""
         return "Preloader GIF for display"
     
     def __str__(self):
+        """Return a string description of the PreLoader."""
         return "Preloader GIF for display"
     
     def play(self):
+        """Play the preloader GIF animation."""
         self.image.play()
+
+"""
+### The method below needs to be re-written before implementation ###
 
 def display_system_info(display_controller: DisplayController):
     lcd_image, canvas = display_controller.new_image()
@@ -276,6 +393,8 @@ def display_system_info(display_controller: DisplayController):
     #canvas.text((x, y), apache, font=font25, fill="#2121FF")
 
     display_controller.display.image(lcd_image)
+
+"""
 
 def get_image_width(bbox: tuple[int, int, int, int]) -> int:
     """Calculate the width of an image given its bounding box.
