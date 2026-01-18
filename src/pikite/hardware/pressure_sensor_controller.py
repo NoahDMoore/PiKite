@@ -77,7 +77,7 @@ class PressureSensorController:
             time.sleep(.1)
             
             divisor = num_samples // 20
-            if loader is not None and i % divisor == 0:
+            if loader is not None and i > 0 and i % divisor == 0:
                 loader.advance()
 
         self.baseline_pressure = baseline_pressure / num_samples
