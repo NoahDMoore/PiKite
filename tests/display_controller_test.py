@@ -1,5 +1,10 @@
-from ..src.pikite.core.logger import get_logger
-from ..src.pikite.hardware.display_controller import DisplayController
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
+
+from pikite.core.logger import get_logger
+from pikite.hardware.display_controller import DisplayController
 
 import time
 
