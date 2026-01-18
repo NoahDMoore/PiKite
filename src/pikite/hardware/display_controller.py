@@ -228,7 +228,7 @@ class LoadingBar:
         self.image.frame = (self.value // 10)
         self.image.display_frame(self.title)
 
-class preloader:
+class PreLoader:
     def __init__(self, display_controller):
         super().__init__()
         self.display_controller = display_controller

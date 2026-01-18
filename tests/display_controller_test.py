@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from pikite.core.logger import get_logger
-from pikite.hardware.display_controller import DisplayController, LoadingBar
+from pikite.hardware.display_controller import DisplayController, LoadingBar, PreLoader
 
 import time
 
@@ -60,3 +60,11 @@ def test_loading_bar():
         loading_bar.advance()
         time.sleep(0.5)
     logger.info("Loading bar completed successfully on DisplayController")
+
+def test_preloader_gif():
+    display_controller = DisplayController()
+    preloader = PreLoader(display_controller)
+    logger.info("Preloader GIF initialized successfully on DisplayController")
+    time.sleep(2)
+    preloader.play()
+    logger.info("Preloader GIF played successfully on DisplayController")
