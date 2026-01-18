@@ -35,13 +35,15 @@ def test_altitude_property():
 
 def test_get_baseline_pressure_without_loading_bar():
     pressure_sensor = PressureSensorController()
-    baseline_pressure = pressure_sensor.get_baseline_pressure(num_samples=10)
+    logger.info("Initial Baseline Pressure: " + str(pressure_sensor.baseline_pressure))
+    pressure_sensor.get_baseline_pressure(num_samples=10)
     assert isinstance(pressure_sensor.baseline_pressure, float)
-    logger.info(f"Test returned Baseline Pressure: {baseline_pressure}")
+    logger.info(f"Test returned Baseline Pressure: {pressure_sensor.baseline_pressure}")
 
 def test_get_baseline_pressure_with_loading_bar():
     display_controller = DisplayController()
     pressure_sensor = PressureSensorController()
-    baseline_pressure = pressure_sensor.get_baseline_pressure(num_samples=10, display_controller=display_controller)
+    logger.info("Initial Baseline Pressure: " + str(pressure_sensor.baseline_pressure))
+    pressure_sensor.get_baseline_pressure(num_samples=10, display_controller=display_controller)
     assert isinstance(pressure_sensor.baseline_pressure, float)
-    logger.info(f"Test returned Baseline Pressure: {baseline_pressure}")
+    logger.info(f"Test returned Baseline Pressure: {pressure_sensor.baseline_pressure}")
