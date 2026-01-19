@@ -39,7 +39,7 @@ class DisplayController:
             height=240,
             x_offset=53,
             y_offset=40,
-            rotation=270,
+            rotation=90,
         )
 
         self.backlight = digitalio.DigitalInOut(board.D22)
