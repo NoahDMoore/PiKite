@@ -130,7 +130,7 @@ class PanServo:
     This class allows for controlling a continuous rotation servo motor using PWM signals to set the speed and direction of rotation.
     It supports setting the speed as a float between 0.0 (stopped) and 1.0 (full speed), and the direction as either clockwise (CW) or counter-clockwise (CCW).
     """
-    def __init__(self, pwm_channel=1, frequency=50, chip=0, cw_pulse_width=700, ccw_pulse_width=2300, rotation_time=1):
+    def __init__(self, pwm_channel=1, frequency=50, chip=0, cw_pulse_width=700, ccw_pulse_width=2300, stop_pulse_width=1500, rotation_time=1):
         """
         Initializes the PanServo with the specified parameters.
 
@@ -165,7 +165,7 @@ class PanServo:
         # Set microsecond pulse widths for full speed clockwise and counter-clockwise, and calculate the stop position pulse width.
         self.cw_pulse_width = cw_pulse_width
         self.ccw_pulse_width = ccw_pulse_width
-        self.stop_pw = (self.ccw_pulse_width - cw_pulse_width) // 2     # Stop pulse width in microseconds, used to stop the servo motor (assumes the greater pulse width is CCW)
+        self.stop_pw = stop_pulse_width
         
         self.stop_duty_cycle = self.get_duty_cycle(0.0, DIRECTION.CW)   # Duty cycle for stop position
         
