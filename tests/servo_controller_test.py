@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from pikite.core.logger import get_logger
-from pikite.hardware.servo_controller import TiltServo, PanServo
+from pikite.hardware.servo_controller import TiltServo, PanServo, DIRECTION
 
 import time
 
@@ -37,3 +37,25 @@ def test_tilt_servo_move_to_position():
     tilt_servo.angle = 180  # Move to 180 degrees
     logger.info("TiltServo moved to 180 degrees successfully")
     time.sleep(2)
+
+# Pan Servo Tests
+def test_pan_servo_initialization():
+    pan_servo = PanServo()
+    assert pan_servo is not None
+    logger.info("PanServo initialized successfully")
+
+def test_pan_servo_rotate():
+    pan_servo = PanServo()
+
+    pan_servo.start(direction=DIRECTION.CW)
+    logger.info("PanServo rotating clockwise")
+    time.sleep(3)  # Rotate for 3 seconds
+    pan_servo.stop()
+    logger.info("PanServo stopped successfully")
+    time.sleep(2)
+
+    pan_servo.start(direction=DIRECTION.CCW)
+    logger.info("PanServo rotating counterclockwise")
+    time.sleep(3)  # Rotate for 3 seconds
+    pan_servo.stop()
+    logger.info("PanServo stopped successfully")
