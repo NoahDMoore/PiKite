@@ -247,7 +247,11 @@ class CameraController:
                 return
         encoder = H264Encoder(bitrate=10000000)
         output = FfmpegOutput(str(output_filepath))
-        self.picam2.start_recording(encoder, output)
+        self.picam2.start_recording(
+            encoder,
+            output,
+            name="main"
+        )
 
     def stop_video(self):
         """
