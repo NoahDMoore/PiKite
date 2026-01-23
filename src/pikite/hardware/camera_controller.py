@@ -223,3 +223,4 @@ class CameraController:
         Closes the camera and releases resources.
         """
         self.picam2.stop()
+        self.picam2.close()
