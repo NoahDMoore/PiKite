@@ -80,6 +80,10 @@ class CameraController:
         """
         Context manager exit method that safely closes the camera and releases resources.
         
+        Ensures the camera is closed even if errors occur, allowing the device to be available
+        for future calls. Logs any errors encountered during closure but does not suppress
+        exceptions that occurred within the context.
+        
         Args:
             exc_type: Exception type if an exception occurred within the context.
             exc_value: Exception value if an exception occurred within the context.
@@ -92,11 +96,7 @@ class CameraController:
             self.close()
         except Exception as e:
             logger.error(f"Error closing camera: {e}")
-            # Return False to propagate the exception if one occurred in the with block
-            if exc_type is not None:
-                return False
-            # Re-raise if no exception was already occurring
-            raise
+        # Always return False to propagate any exception that occurred in the with block
         return False
         
     def close(self):
