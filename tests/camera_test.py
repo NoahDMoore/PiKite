@@ -42,3 +42,24 @@ def test_capture_image():
         assert image_path.exists()
         assert image_path.stat().st_size > 0
     logger.info(f"Image capture test passed. Image saved at {image_path}")
+
+def test_record_video():
+    settings = Settings()
+    storage_manager = StorageManager()
+    session_dir = storage_manager.new_session_dir(CAPTURE_MODES.VIDEO)
+
+    with CameraController(settings) as camera_controller:
+        video_path = storage_manager.media_file_path(
+            mode=CAPTURE_MODES.VIDEO,
+            extension=MEDIA_EXTENSIONS.MP4,
+            use_timestamp=True,
+            session_dir=session_dir
+        )
+
+        camera_controller.start_video(video_path)
+        time.sleep(5)  # Record for 5 seconds
+        camera_controller.stop_video()
+
+        assert video_path.exists()
+        assert video_path.stat().st_size > 0
+    logger.info(f"Video recording test passed. Video saved at {video_path}")
