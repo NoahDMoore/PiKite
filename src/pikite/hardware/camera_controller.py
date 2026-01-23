@@ -71,6 +71,39 @@ class CameraController:
         self.picam2 = Picamera2()
         self.initialize_camera()
 
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Context manager exit method that safely closes the camera and releases resources.
+        
+        Args:
+            exc_type: Exception type if an exception occurred within the context.
+            exc_value: Exception value if an exception occurred within the context.
+            traceback: Traceback object if an exception occurred within the context.
+        
+        Returns:
+            bool: False to propagate any exception that occurred within the context.
+        """
+        try:
+            self.close()
+        except Exception as e:
+            logger.error(f"Error closing camera: {e}")
+            # Return False to propagate the exception if one occurred in the with block
+            if exc_type is not None:
+                return False
+            # Re-raise if no exception was already occurring
+            raise
+        return False
+        
+    def close(self):
+        """
+        Closes the camera and releases resources.
+        """
+        self.picam2.stop()
+        self.picam2.close()
+
     def initialize_camera(self):
         """
         Initializes and configures the camera based on the provided settings.
@@ -217,10 +250,3 @@ class CameraController:
         Stops the ongoing video recording.
         """
         self.picam2.stop_recording()
-
-    def close(self):
-        """
-        Closes the camera and releases resources.
-        """
-        self.picam2.stop()
-        self.picam2.close()
