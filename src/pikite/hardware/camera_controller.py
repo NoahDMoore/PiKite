@@ -6,6 +6,7 @@ from ..core.constants import CAMERA_MODELS, CAPTURE_MODES, MAX_RESOLUTIONS
 from ..system.storage import StorageManager
 
 from picamera2 import Picamera2 # type: ignore
+from picamera2.encoders import H264Encoder # type: ignore
 from libcamera import controls # type: ignore
 from libcamera import Transform # type: ignore
 
@@ -243,7 +244,8 @@ class CameraController:
             except ValueError as e:
                 logger.error(e)
                 return
-        self.picam2.start_recording(str(output_filepath))
+        encoder = H264Encoder(bitrate=10000000)
+        self.picam2.start_recording(encoder, str(output_filepath))
 
     def stop_video(self):
         """
