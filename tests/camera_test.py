@@ -20,6 +20,7 @@ def test_camera_controller_class_initialization():
     settings = Settings()
     camera_controller = CameraController(settings)
     assert camera_controller is not None
+    camera_controller.close()
     logger.info("CameraController initialization test passed.")
 
 def test_capture_image():
@@ -39,4 +40,5 @@ def test_capture_image():
     time.sleep(2)  # Wait for the image to be saved
     assert image_path.exists()
     assert image_path.stat().st_size > 0
+    camera_controller.close()
     logger.info(f"Image capture test passed. Image saved at {image_path}")

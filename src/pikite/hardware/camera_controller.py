@@ -217,3 +217,9 @@ class CameraController:
         Stops the ongoing video recording.
         """
         self.picam2.stop_recording()
+
+    def close(self):
+        """
+        Closes the camera and releases resources.
+        """
+        self.picam2.stop()
