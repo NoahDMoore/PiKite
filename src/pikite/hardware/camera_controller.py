@@ -7,6 +7,7 @@ from ..system.storage import StorageManager
 
 from picamera2 import Picamera2 # type: ignore
 from picamera2.encoders import H264Encoder # type: ignore
+from picamera2.outputs import FfmpegOutput # type: ignore
 from libcamera import controls # type: ignore
 from libcamera import Transform # type: ignore
 
@@ -245,7 +246,8 @@ class CameraController:
                 logger.error(e)
                 return
         encoder = H264Encoder(bitrate=10000000)
-        self.picam2.start_recording(encoder, str(output_filepath))
+        output = FfmpegOutput(str(output_filepath))
+        self.picam2.start_recording(encoder, output)
 
     def stop_video(self):
         """
