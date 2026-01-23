@@ -136,7 +136,7 @@ class CameraController:
         if self.capture_mode == CAPTURE_MODES.STILL:
             config = self.picam2.create_still_configuration(main={"size": resolution}, transform=transformation)
         elif self.capture_mode == CAPTURE_MODES.VIDEO:
-            config = self.picam2.create_video_configuration(main={"size": resolution}, transform=transformation)
+            config = self.picam2.create_video_configuration(main={"size": resolution}, encode="main", transform=transformation)
         else:
             config = self.picam2.create_preview_configuration(main={"size": resolution}, transform=transformation)
 
