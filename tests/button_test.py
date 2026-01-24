@@ -85,7 +85,9 @@ def test_real_button_presses():
     with ButtonController(input_handler, pin_next=24, pin_select=23, pull_up=True, debounce_ms=200) as button_controller:
         logger.info("Press the NEXT and SELECT buttons to test callbacks.")
 
+        global next_pressed
         next_pressed = False
+        global select_pressed
         select_pressed = False
 
         def next_callback(**kwargs):
