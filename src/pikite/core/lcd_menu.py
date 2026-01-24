@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 from .constants import XMLTAG, XMLATTRIB, MENUACTION
 from .logger import get_logger
 from .settings import Settings
-from ..hardware.display_controller import DisplayController, display_system_info
+from ..hardware.display_controller import DisplayController, display_system_info # type: ignore
 from ..system import power_management
 from ..system.storage import StorageManager
 
