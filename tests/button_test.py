@@ -83,7 +83,7 @@ def test_real_button_presses():
     input_handler = InputHandler()
 
     with ButtonController(input_handler, pin_next=24, pin_select=23, pull_up=True, debounce_ms=200) as button_controller:
-        logger.info("Press the NEXT and SELECT buttons to test callbacks. Waiting for 10 seconds...")
+        logger.info("Press the NEXT and SELECT buttons to test callbacks.")
 
         next_pressed = False
         select_pressed = False
@@ -99,12 +99,12 @@ def test_real_button_presses():
         input_handler.register("default", InputCommand.NEXT, next_callback)
         input_handler.register("default", InputCommand.SELECT, select_callback)
 
-        # Press the Next Button within 10 seconds
-        time.sleep(10)
+        logger.info("Waiting for NEXT button press...")
+        time.sleep(20)
         assert next_pressed, "NEXT button was not pressed during the test period."
 
-        # Press the Select Button within 10 seconds
-        time.sleep(10)
+        logger.info("Waiting for SELECT button press...")
+        time.sleep(20)
         assert select_pressed, "SELECT button was not pressed during the test period."
 
     logger.info("Finished real button press test")
