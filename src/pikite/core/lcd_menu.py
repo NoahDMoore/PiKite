@@ -118,7 +118,7 @@ class Menu:
 		self.settings = settings
 
 		self.update_menu()
-		
+
 	def __repr__(self):
 		return f"<Current Menu Element: {self.current_element}>"
 
@@ -151,7 +151,16 @@ class Menu:
 
 	def _print_menu(self):
 		"""Print the current menu message on the display"""
-		self.display_controller.print_message(self.current_element.message)
+		message = self.current_element.message
+		
+		if message is None:
+			message = "No Message Defined"
+			logger.warning(f"No message defined for menu element: {self.current_element}")
+
+		if ".jpg" in message or ".png" in message:
+			message = str(storage_manager.MEDIA_DIR / message)
+		
+		self.display_controller.print_message(message)
 		logger.debug(f"Menu Updated: {self.current_element}")
 
 	def increment_element(self):
