@@ -113,11 +113,12 @@ class Menu:
 			raise
 		self.current_element = self.root.submenu[0]
 		self.default_element = self.current_element
-		self.update_menu()
 
 		self.display_controller = display_controller
 		self.settings = settings
 
+		self.update_menu()
+		
 	def __repr__(self):
 		return f"<Current Menu Element: {self.current_element}>"
 
