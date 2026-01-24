@@ -15,10 +15,15 @@ class InputCommand(Enum):
     SHUTDOWN = auto()
     REBOOT = auto()
 
+class InputSource(Enum):
+    GPIO = auto()
+    WEBSOCKET = auto()
+    SYSTEM = auto() 
+
 class InputHandler:
     def __init__(self):
         """Initialize the InputHandler with empty listener mappings and default scope."""
-        
+
         self._listeners: dict[str, dict[InputCommand, list[Callable]]] = defaultdict(lambda: defaultdict(list))
         self._active_scope = "default"
         logger.info(f"InputHandler initialized with scope '{self._active_scope}'")
@@ -78,36 +83,42 @@ class InputHandler:
         )
 
 
-    def handle(self, command: InputCommand, **kwargs):
+    def handle(self, *, command: InputCommand, source: InputSource, **kwargs):
         """
         Handle an input command by invoking all registered callbacks for the current scope.
 
         Args:
             command (InputCommand): The input command to handle.
+            source (InputSource): The source of the input.
             **kwargs: Additional keyword arguments to pass to the callbacks.
-        """
-
+        """        
         logger.info(
-            f"Input received: Command={command.name}, Scope='{self._active_scope}'"
+            f"Input received: Command={command.name}, "
+            f"Scope='{self._active_scope}', "
+            f"Source={source.name}"
         )
 
         callbacks = self._listeners[self._active_scope].get(command, [])
 
         if not callbacks:
             logger.debug(
-                f"No handlers for Command={command.name} in Scope='{self._active_scope}'"
+                f"No handlers for Command={command.name} "
+                f"in Scope='{self._active_scope}' "
+                f"(Source={source.name})"
             )
             return
 
         for callback in callbacks:
             try:
                 logger.debug(
-                    f"Executing {command.name} -> {callback.__qualname__}"
+                    f"Executing {command.name} -> {callback.__qualname__} "
+                    f"(Source={source.name})"
                 )
-                callback(**kwargs)
+                callback(source=source, **kwargs)
             except Exception:
                 logger.exception(
                     f"Error while handling Command: {command.name} "
                     f"in Scope:'{self._active_scope}' "
                     f"with {callback.__qualname__}"
+                    f" (Source={source.name})"
                 )
