@@ -21,6 +21,10 @@ class InputSource(Enum):
     SYSTEM = auto() 
 
 class InputHandler:
+    """
+    Centralized input handling system that manages input commands
+    from various sources and dispatches them to registered callbacks.
+    """
     def __init__(self):
         """Initialize the InputHandler with empty listener mappings and default scope."""
 
