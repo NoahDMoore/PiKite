@@ -357,9 +357,6 @@ class PreLoader:
         """Play the preloader GIF animation."""
         self.image.play()
 
-"""
-### The method below needs to be re-written before implementation ###
-
 def display_system_info(display_controller: DisplayController):
     lcd_image, canvas = display_controller.new_image()
 
@@ -393,8 +390,6 @@ def display_system_info(display_controller: DisplayController):
     #canvas.text((x, y), apache, font=font25, fill="#2121FF")
 
     display_controller.display.image(lcd_image)
-
-"""
 
 def get_image_width(bbox: tuple[int, int, int, int]) -> int:
     """Calculate the width of an image given its bounding box.
