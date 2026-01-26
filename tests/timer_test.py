@@ -3,14 +3,14 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from pikite.core.logger import get_logger
+from pikite.core.logger import get_logger, set_log_level
 from pikite.core.timer import Timer
 
 import time
 
 # Setup Logger
 logger = get_logger(__name__)
-logger.setLevel("DEBUG")
+set_log_level("DEBUG")
 
 logger.info("Starting Timer Tests")
 
