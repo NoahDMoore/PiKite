@@ -118,7 +118,7 @@ class InputHandler:
                     f"Executing {command.name} -> {callback.__qualname__} "
                     f"(Source={source.name})"
                 )
-                callback(source=source, **kwargs)
+                callback(**kwargs)
             except Exception:
                 logger.exception(
                     f"Error while handling Command: {command.name} "
