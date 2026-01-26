@@ -33,33 +33,17 @@ def test_menu_navigation():
     time.sleep(2)
 
     # Increment and Decrement the menu
-    menu.increment_element()
-    logger.info(f"Successfully incremented menu")
-    logger.info(f"Current Menu Element Name: {menu.current_element.name}")
-    time.sleep(2)
-    menu.increment_element()
-    logger.info(f"Successfully incremented menu")
-    logger.info(f"Current Menu Element Name: {menu.current_element.name}")
-    time.sleep(2)
-    menu.increment_element()
-    logger.info(f"Successfully incremented menu")
-    logger.info(f"Current Menu Element Name: {menu.current_element.name}")
-    time.sleep(2)
-    menu.increment_element()
-    logger.info(f"Successfully incremented menu")
-    logger.info(f"Current Menu Element Name: {menu.current_element.name}")
-    time.sleep(2)
-    menu.increment_element()
-    logger.info(f"Successfully incremented menu")
-    logger.info(f"Current Menu Element Name: {menu.current_element.name}")
-    time.sleep(2)
-    menu.decrement_element()
-    logger.info(f"Successfully decremented menu")
-    logger.info(f"Current Menu Element Name: {menu.current_element.name}")
-    time.sleep(2)
-    menu.decrement_element()
-    logger.info(f"Successfully decremented menu")
-    logger.info(f"Current Menu Element Name: {menu.current_element.name}")
+    for i in range(5):
+        menu.increment_element()
+        logger.info(f"Successfully incremented menu")
+        logger.info(f"Current Menu Element Name: {menu.current_element.name}")
+        time.sleep(2)
+        
+    for i in range(2):    
+        menu.decrement_element()
+        logger.info(f"Successfully decremented menu")
+        logger.info(f"Current Menu Element Name: {menu.current_element.name}")
+        time.sleep(2)
 
     # Simulate navigating to the first submenu if available
     current_element = menu.current_element
