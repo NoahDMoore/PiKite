@@ -57,9 +57,9 @@ def test_timer_marks():
     timer.mark("second_mark")
     logger.info("Second mark set")
     time.sleep(1)
-    timer.stop()
     first_mark_time = timer.marks.get("first_mark")
     second_mark_time = timer.marks.get("second_mark")
+    timer.stop()
     if first_mark_time is None or second_mark_time is None:
         raise AssertionError("Marks were not recorded properly")
     assert 1.9 < first_mark_time < 2.1, f"First mark time should be around 2 seconds, got {first_mark_time}"
