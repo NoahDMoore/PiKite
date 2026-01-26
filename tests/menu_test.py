@@ -62,10 +62,11 @@ def test_menu_navigation():
     logger.info(f"Current Menu Element Name: {menu.current_element.name}")
 
     # Simulate navigating to the first submenu if available
-    if initial_element.submenu:
+    current_element = menu.current_element
+    if current_element.submenu:
         menu.do_action()
         new_element = menu.current_element
         logger.info(f"Navigated to Submenu Element: {new_element.name}")
-        assert new_element != initial_element
+        assert new_element != current_element
     else:
         logger.warning("No submenu available to navigate to in the initial element")
