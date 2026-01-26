@@ -113,8 +113,14 @@ class CameraController:
         Raises:
             ValueError: If the camera model is invalid or unspecified in settings.
         """
-        # Get camera model from settings
-        camera_model = self.settings.get("cam_model", None)
+        # Get camera model
+        camera_model = self.detect_camera_model()
+        if camera_model is not None:
+            self.camera_model = camera_model
+            self.settings.set("cam_model", camera_model.value)
+        else:
+            camera_model = self.settings.get("cam_model", None)
+
         self.camera_model = CAMERA_MODELS(camera_model) if camera_model is not None else None  # Default to None if not specified or invalid
         
         if self.camera_model is None:
@@ -258,3 +264,19 @@ class CameraController:
         Stops the ongoing video recording.
         """
         self.picam2.stop_recording()
+
+    def detect_camera_model(self) -> CAMERA_MODELS | None:
+        """
+        Detects the connected camera model.
+
+        Returns:
+            CAMERA_MODELS | None: Detected camera model or None if detection fails.
+        """
+        camera_list = Picamera2.global_camera_info()
+        detected_model = camera_list[0].get("model", None) if camera_list else None
+
+        if detected_model in CAMERA_MODELS.__members__ and detected_model is not None:
+            return CAMERA_MODELS[detected_model]
+        else:
+            logger.warning("Unable to detect camera model.")
+            return None

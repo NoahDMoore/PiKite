@@ -20,10 +20,11 @@
 		<menu_item name="camera" message="Camera Settings" action="submenu" parent="settings">
 			<menu_item name="cameraModel" message="Select Camera Model" action="options" parent="camera">
 				<setting>cam_model</setting>
-				<option_item name="V1" message="[V1]" action="selectOption" value="OV5647" />
-				<option_item name="V2" message="[V2]" action="selectOption" value="IMX219" />
-				<option_item name="V3" message="[V3]" action="selectOption" value="IMX708" />
-				<option_item name="HQ" message="[HQ]" action="selectOption" value="IMX477" />
+				<option_item name="V1" message="[V1]" action="selectOption" value="imx647" />
+				<option_item name="V2" message="[V2]" action="selectOption" value="imx219" />
+				<option_item name="V3" message="[V3]" action="selectOption" value="imx708" />
+				<option_item name="V3_WIDE" message="[V3 Wide]" action="selectOption" value="imx708_wide" />
+				<option_item name="HQ" message="[HQ]" action="selectOption" value="imx477" />
 			</menu_item>
 
 			<menu_item name="cameraIRFilter" message="IR Filter?" action="options" parent="camera">

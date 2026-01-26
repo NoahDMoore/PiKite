@@ -73,21 +73,25 @@ class CAMERA_MODELS(Enum):
         Raspberry Pi Camera Module v2 (IMX219),
     V3:
         Raspberry Pi Camera Module 3 (IMX708),
+    V3_WIDE:
+        Raspberry Pi Camera Module 3 Wide Angle (IMX708),
     HQ:
         Raspberry Pi HQ Camera (IMX477)
 
     See https://www.raspberrypi.com/documentation/accessories/camera.html#camera-module-specifications for more details
     """
 
-    V1 = "OV5647"  # Raspberry Pi Camera Module v1
-    V2 = "IMX219"  # Raspberry Pi Camera Module v2
-    V3 = "IMX708"  # Raspberry Pi Camera Module 3
-    HQ = "IMX477"  # Raspberry Pi HQ Camera
+    V1 = "imx647"  # Raspberry Pi Camera Module v1
+    V2 = "imx219"  # Raspberry Pi Camera Module v2
+    V3 = "imx708"  # Raspberry Pi Camera Module 3
+    V3_WIDE = "imx708_wide"  # Raspberry Pi Camera Module 3
+    HQ = "imx477"  # Raspberry Pi HQ Camera
 
 MAX_RESOLUTIONS = {
     CAMERA_MODELS.V1: {CAPTURE_MODES.STILL: (2592, 1944), CAPTURE_MODES.VIDEO: (1920, 1080)},
     CAMERA_MODELS.V2: {CAPTURE_MODES.STILL: (3280, 2464), CAPTURE_MODES.VIDEO: (1920, 1080)},
     CAMERA_MODELS.V3: {CAPTURE_MODES.STILL: (4608, 2592), CAPTURE_MODES.VIDEO: (1920, 1080)},
+    CAMERA_MODELS.V3_WIDE: {CAPTURE_MODES.STILL: (4608, 2592), CAPTURE_MODES.VIDEO: (1920, 1080)},
     CAMERA_MODELS.HQ: {CAPTURE_MODES.STILL: (4056, 3040), CAPTURE_MODES.VIDEO: (1920, 1080)}
 }
 
