@@ -18,7 +18,6 @@ def test_timer_start_stop():
     timer.start()
     logger.info("Timer started")
     time.sleep(5)
-    timer.stop()
-    elapsed = timer.accumulated
+    elapsed = timer.stop()
     assert 4.9 < elapsed < 5.1, f"Elapsed time should be around 5 seconds, got {elapsed}"
     logger.info(f"Timer stopped, elapsed time: {elapsed} seconds")
