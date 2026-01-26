@@ -7,6 +7,9 @@ function for high-resolution timing.
 
 import time
 from enum import Enum, auto
+from .logger import get_logger
+
+logger = get_logger(__name__)
 
 class TimerState(Enum):
     STOPPED = auto()
@@ -23,6 +26,7 @@ class Timer:
         self.marks: dict[str, float | None] = {}
         self.named_intervals: dict[str, float] = {}
         self.state: TimerState = TimerState.STOPPED
+        logger.debug("Timer instance created")
 
     @property
     def time(self) -> float:
@@ -63,7 +67,7 @@ class Timer:
     def start(self):
         """Starts the timer."""
         if self.running or self.paused:
-            print("Timer is already started.")
+            logger.warning("Timer is already started. Cannot start again.")
             return
         else:
             self.start_time = self.time
@@ -73,6 +77,7 @@ class Timer:
             self.marks.clear()
             self.named_intervals.clear()
             self.state = TimerState.RUNNING
+            logger.debug("Timer started")
 
     def reset(self, clear_intervals: bool = True):
         """Resets the current timer state."""
@@ -94,7 +99,7 @@ class Timer:
     def stop(self) -> float | None:
         """Stops the timer and returns the total elapsed time."""
         if self.stopped:
-            print("Timer is not running.")
+            logger.warning("Timer is not running. Cannot stop.")
             return None
         else:
             elapsed = self.elapsed()
@@ -105,6 +110,7 @@ class Timer:
             self.marks.clear()
             self.named_intervals.clear()
             self.state = TimerState.STOPPED
+            logger.debug(f"Timer stopped. Elapsed time: {elapsed:.3f}s")
             return elapsed
     
     def pause(self):
@@ -114,11 +120,12 @@ class Timer:
             self.accumulated += (self.paused_time - self.start_time)  # type: ignore (to suppress mypy warning; start_time and paused_time cannot be None if running is True)
             self.start_time = None
             self.state = TimerState.PAUSED
+            logger.debug(f"Timer paused. Accumulated time: {self.accumulated:.3f}s")
         elif self.stopped:
-            print("Timer is not running.")
+            logger.warning("Timer is not running. Cannot pause.")
             return
         else:
-            print("Timer is already paused.")
+            logger.warning("Timer is already paused.")
             return
     
     def resume(self):
@@ -127,11 +134,12 @@ class Timer:
             self.start_time = self.time
             self.paused_time = None
             self.state = TimerState.RUNNING
+            logger.debug("Timer resumed")
         elif self.running:
-            print("Timer is already running.")
+            logger.warning("Timer is already running.")
             return
         else:
-            print("Timer is not paused.")
+            logger.warning("Timer is not paused.")
             return
 
     def elapsed(self) -> float | None:
@@ -146,7 +154,7 @@ class Timer:
         elif self.paused:
             return self.accumulated
         else:
-            print("Timer is not running or paused. Cannot calculate elapsed time.")
+            logger.warning("Timer is not running or paused. Cannot calculate elapsed time.")
             return None
     
     def mark(self, name: str) -> None:
@@ -157,8 +165,9 @@ class Timer:
         """
         if self.running or self.paused:
             self.marks[name] = self.elapsed()
+            logger.debug(f"Mark '{name}' set at {self.marks[name]:.3f}s")
         else:
-            print("Timer is not running or paused. Cannot set mark.")
+            logger.warning("Timer is not running or paused. Cannot set mark.")
 
     def since_mark(self, name: str) -> float | None:
         """Returns the time since a specific mark.
@@ -170,14 +179,16 @@ class Timer:
             float | None: Time in seconds since the mark was set, or None if the mark does not exist.
         """
         if self.stopped:
-            print("Timer is not running or paused. Cannot calculate time since mark.")
+            logger.warning("Timer is not running or paused. Cannot calculate time since mark.")
             return None
 
         mark = self.marks.get(name, None)
         if mark is not None:
-            return self.elapsed() - mark    # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
+            time_since = self.elapsed() - mark    # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
+            logger.debug(f"Time since mark '{name}': {time_since:.3f}s")
+            return time_since
         else:
-            print(f"Mark '{name}' does not exist.")
+            logger.warning(f"Mark '{name}' does not exist.")
             return None
 
     def set_named_interval(self, name: str) -> None:
@@ -188,8 +199,9 @@ class Timer:
         """
         if self.running or self.paused:
             self.named_intervals[name] = self.elapsed()     # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
+            logger.debug(f"Named interval '{name}' set at {self.named_intervals[name]:.3f}s")
         else:
-            print("Timer is not running or paused. Cannot create named interval.")
+            logger.warning("Timer is not running or paused. Cannot create named interval.")
 
     def interval_elapsed(self, interval: float, name: str = "_default", catch_up: bool = True) -> bool:
         """Checks if the specified interval has passed since the last check.
@@ -209,19 +221,20 @@ class Timer:
         last_interval_time = self.named_intervals.get(name, None)
 
         if last_interval_time is None:
-            print(f"Interval '{name}' does not exist or there. Creating a new one.")
+            logger.debug(f"Interval '{name}' does not exist. Creating a new one.")
             self.set_named_interval(name)
             return False
         
         elapsed_time = self.elapsed()
 
         if elapsed_time is None:
-            print("Timer is not running or paused. Cannot check interval.")
+            logger.warning("Timer is not running or paused. Cannot check interval.")
             return False
         
         # Check if the specified interval has passed
         if elapsed_time - last_interval_time >= interval:
             self.named_intervals[name] = last_interval_time + interval if catch_up else elapsed_time
+            logger.debug(f"Interval '{name}' elapsed. Next check in {interval:.3f}s")
             return True
         else:
             return False
