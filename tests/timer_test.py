@@ -38,3 +38,23 @@ def test_timer_pause_resume():
     total_elapsed = timer.stop()
     assert 4.9 < total_elapsed < 5.1, f"Total elapsed time should be around 5 seconds, got {total_elapsed}"
     logger.info(f"Timer stopped, total elapsed time: {total_elapsed} seconds")
+
+def test_timer_marks():
+    timer = Timer()
+    timer.start()
+    logger.info("Timer started")
+    time.sleep(2)
+    timer.mark("first_mark")
+    logger.info("First mark set")
+    time.sleep(3)
+    timer.mark("second_mark")
+    logger.info("Second mark set")
+    time.sleep(1)
+    timer.stop()
+    first_mark_time = timer.marks.get("first_mark")
+    second_mark_time = timer.marks.get("second_mark")
+    if first_mark_time is None or second_mark_time is None:
+        raise AssertionError("Marks were not recorded properly")
+    assert 1.9 < first_mark_time < 2.1, f"First mark time should be around 2 seconds, got {first_mark_time}"
+    assert 4.9 < second_mark_time < 5.1, f"Second mark time should be around 5 seconds, got {second_mark_time}"
+    logger.info(f"First mark time: {first_mark_time} seconds, Second mark time: {second_mark_time} seconds")
