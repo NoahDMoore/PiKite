@@ -87,7 +87,7 @@ def test_menu_navigation_with_buttons():
 
     logger.info("InputHandler configured for menu navigation")
 
-    with ButtonController(input_handler, pin_next=24, pin_select=23, pull_up=True, debounce_ms=200) as button_controller:
+    with ButtonController(input_handler, pin_next=23, pin_select=24, pull_up=True, debounce_ms=200) as button_controller:
         logger.info("ButtonController initialized for menu navigation test")
         logger.info("Press the NEXT and SELECT buttons to navigate the menu. Test will run for 20 seconds.")
         start_time = time.time()

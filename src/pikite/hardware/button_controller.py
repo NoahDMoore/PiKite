@@ -17,8 +17,8 @@ class ButtonController:
         self,
         input_handler: InputHandler,
         *,
-        pin_next: int = 24,
-        pin_select: int = 23,
+        pin_next: int = 23,
+        pin_select: int = 24,
         pull_up: bool = True,
         debounce_ms: int = 200
     ):
