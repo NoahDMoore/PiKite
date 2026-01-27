@@ -65,3 +65,21 @@ def test_timer_marks():
     assert 1.9 < first_mark_time < 2.1, f"First mark time should be around 2 seconds, got {first_mark_time}"
     assert 4.9 < second_mark_time < 5.1, f"Second mark time should be around 5 seconds, got {second_mark_time}"
     logger.info(f"First mark time: {first_mark_time} seconds, Second mark time: {second_mark_time} seconds")
+
+def test_interval_timer():
+    timer = Timer()
+    timer.start()
+    logger.info("Timer started")
+    
+    in_test = True
+    test_loops = 10
+    while in_test:
+        logger.info(f"Elapsed time: {timer.elapsed():.3f}s")
+        if timer.interval_elapsed(interval=2.0, name="test_interval"):
+            logger.info("Interval of 2 seconds reached")
+            test_loops -= 1
+            logger.info(f"Test loops remaining: {test_loops}")
+        if test_loops <= 0:
+            in_test = False
+    logger.info("Interval timer test completed")
+    timer.stop()
