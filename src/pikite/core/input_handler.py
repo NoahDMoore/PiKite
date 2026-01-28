@@ -9,7 +9,6 @@ class InputCommand(Enum):
     NEXT = auto()
     PREVIOUS = auto()
     SELECT = auto()
-    BACK = auto()
     START_CAPTURE = auto()
     STOP_CAPTURE = auto()
     SHUTDOWN = auto()
