@@ -336,7 +336,7 @@ class LoadingBar:
 
     def update(self):
         """Update the loading bar display."""
-        self.image.frame = (self.value // 10)
+        self.image.frame = int(self.value // 10)
         self.image.display_frame(self.title)
 
 class PreLoader:
