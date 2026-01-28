@@ -104,6 +104,13 @@ def initialize_menu(settings: Settings, display_controller: DisplayController, i
 
     return menu
 
+def capture_loop():
+    """
+    Main capture loop for handling image capture and processing.
+    """
+    # Placeholder for capture logic
+    pass
+
 async def main():
     logger.info("Starting PiKite Application")
 
@@ -159,6 +166,14 @@ async def main():
 
     logger.info("PiKite Application Initialized")
 
+    # Main Application Loop
+    application_running = True
+    while application_running:
+        await asyncio.sleep(0.1)
+        if input_handler._active_scope == "MENU":
+            pass
+        elif input_handler._active_scope == "RUNNING":
+            capture_loop()
 
     # Cleanup at End of Runtime
     button_controller.cleanup()
