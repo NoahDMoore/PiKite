@@ -320,10 +320,18 @@ class LoadingBar:
         width = get_image_width(self.display_controller.FONT30.getbbox(new_title))
         canvas.text(((self.display_controller.IMAGE_WIDTH-width)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
 
-    def advance(self):
-        """Advance the loading bar by 5%."""
-        if self.value < 200:
-            self.value += 10
+    def advance(self, amount: int = 5):
+        """
+        Advance the loading bar by a specified amount.
+        
+        Args:
+            amount (int): The amount, as a percentage, to advance the loading bar by. Default is 5%.
+        """
+        self.value += ((amount/100) * 200)
+
+        if self.value > 200:
+            self.value = 200
+        else:
             self.update()
 
     def update(self):
