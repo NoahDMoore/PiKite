@@ -159,6 +159,10 @@ async def main():
 
     logger.info("PiKite Application Initialized")
 
+
+    # Cleanup at End of Runtime
+    button_controller.cleanup()
+
 if __name__ == "__main__":
     try:
         asyncio.run(main())
