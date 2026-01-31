@@ -3,10 +3,12 @@ Menu class for PiKite
 This class handles the menu system for the PiKite project, allowing navigation through different menu states,
 executing actions, and updating the display based on the current menu state.
 """
+import ast
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from .constants import XMLTAG, XMLATTRIB, MENUACTION
+from ..core.input_handler import InputHandler, InputCommand, InputSource
 from .logger import get_logger
 from .settings import Settings
 from ..hardware.display_controller import DisplayController, display_system_info # type: ignore
@@ -91,14 +93,16 @@ class Menu:
 		next_element (MenuElement): The next menu element in the current context.
 		display_controller (DisplayController): Instance of DisplayController to manage display output.
 		settings (Settings): Instance of Settings to manage application settings.
+		input_handler (InputHandler): Instance of InputHandler to manage input commands.
 	"""
-	def __init__(self, display_controller: DisplayController, settings: Settings, menu_file: Path=MENU_FILE):
+	def __init__(self, display_controller: DisplayController, settings: Settings, input_handler: InputHandler, menu_file: Path=MENU_FILE):
 		"""
 		Initializes the Menu instance by loading the menu structure from an XML file.
 		
 		Args:
 			display_controller (DisplayController): Instance of DisplayController to manage display output.
 			settings (Settings): Instance of Settings to manage application settings.
+			input_handler (InputHandler): Instance of InputHandler to manage input commands.
 			menu_file (Path): Path to the XML file defining the menu structure.
 							  Defaults to utils.StorageManager.MENU_FILE
 
@@ -116,6 +120,7 @@ class Menu:
 
 		self.display_controller = display_controller
 		self.settings = settings
+		self.input_handler = input_handler
 
 		self.update_menu()
 
@@ -201,12 +206,43 @@ class Menu:
 			case MENUACTION.LOAD_DEFAULTS:
 				self.settings.load_defaults()
 				self.reset()
+			case MENUACTION.INPUT_COMMAND:
+				if self.input_handler is None:
+					logger.error("No input handler available for input menu action")
+					return
+
+				command_name = self.current_element.__getattribute__("command")  # use command attribute for command name (enum NAME)
+				if not command_name:
+					logger.error("Input action with no command specified")
+					return
+
+				try:
+					command = InputCommand[command_name]  # expect enum NAME like START_CAPTURE
+				except KeyError:
+					logger.error(f"Unknown InputCommand: {command_name}")
+					return
+
+				# parse optional params node of element (e.g. "mode=vid,length=15")
+				params_elem = self.current_element.element.find("params")
+				kwargs: dict = {}
+
+				if params_elem is not None and params_elem.text:
+					for pair in params_elem.text.split(","):
+						pair = pair.strip()
+						if not pair:
+							continue
+						key, val = pair.split("=", 1)
+						val = val.strip()
+						try:
+							parsed = ast.literal_eval(val)   # safe parsing of numbers, tuples, booleans, lists, etc.
+						except (ValueError, SyntaxError):
+							parsed = val                     # fallback to raw string
+						kwargs[key.strip()] = parsed
+
+				# Handle the input command via the input handler
+				self.input_handler.handle(command=command, source=InputSource.SYSTEM, **kwargs)
 			case MENUACTION.DISPLAY_SYSTEM_INFO:
 				display_system_info(self.display_controller)
-			case MENUACTION.SHUTDOWN:
-				power_management.shutdown()
-			case MENUACTION.REBOOT:
-				power_management.reboot()
 			case _:
 				logger.warning(f"No action defined for menu element: {self.current_element}")
 				return

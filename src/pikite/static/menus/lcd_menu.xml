@@ -1,7 +1,6 @@
 <menu>
 	<menu_item name="logo" message="logo.jpg" action="pass" parent="root" />
-	<menu_item name="pikite" message="Launch PiKite!" action="start_pikite()" parent="root" />
-	<menu_item name="focus" message="Focus Camera" action="start_focus()" parent="root" />
+	<menu_item name="pikite" message="Launch PiKite!" action="input_command" command="START_CAPTURE" parent="root" />
 	<menu_item name="settings" message="Settings" action="submenu" parent="root" >
 		<menu_item name="altitude" message="Alt. Settings" action="submenu" parent="settings">
 			<menu_item name="altitudeInterval" message="Set Alt. Interval" action="options" parent="altitude">
@@ -472,11 +471,11 @@
 	<menu_item name="system" message="System Info" action="display_system_info" parent="root" />
 	<menu_item name="poweroff" message="Shut Down?" action="submenu" parent="root" >
 		<menu_item name="cancelPoweroff" message="Really? [No]" action="return" parent="poweroff" />
-		<menu_item name="confirmPoweroff" message="Really? [Yes]" action="shutdown" parent="poweroff" />
+		<menu_item name="confirmPoweroff" message="Really? [Yes]" action="input_command" command="SHUTDOWN" parent="poweroff" />
 	</menu_item>
 
 	<menu_item name="reboot" message="Reboot?" action="submenu" parent="root">
 		<menu_item name="cancelReboot" message="Really? [No]" action="return" parent="reboot" />
-		<menu_item name="confirmReboot" message="Really? [Yes]" action="reboot" parent="reboot" />
+		<menu_item name="confirmReboot" message="Really? [Yes]" action="input_command" command="REBOOT" parent="reboot" />
 	</menu_item>
 </menu>
