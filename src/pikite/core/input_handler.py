@@ -11,6 +11,8 @@ class InputCommand(Enum):
     SELECT = auto()
     START_CAPTURE = auto()
     STOP_CAPTURE = auto()
+    PAN = auto()
+    TILT = auto()
     SHUTDOWN = auto()
     REBOOT = auto()
 
@@ -28,8 +30,8 @@ class InputHandler:
         """Initialize the InputHandler with empty listener mappings and default scope."""
 
         self._listeners: dict[str, dict[InputCommand, list[Callable]]] = defaultdict(lambda: defaultdict(list))
-        self._active_scope = "default"
-        logger.info(f"InputHandler initialized with scope '{self._active_scope}'")
+        self.active_scope = "default"
+        logger.info(f"InputHandler initialized with scope '{self.active_scope}'")
 
     def set_scope(self, scope: str):
         """
@@ -39,13 +41,13 @@ class InputHandler:
             scope (str): The scope to set as active.
         """
 
-        if scope == self._active_scope:
+        if scope == self.active_scope:
             logger.debug(f"Scope already active: '{scope}'")
             return
         
-        logger.info(f"Switching input scope from '{self._active_scope}' to '{scope}'")
+        logger.info(f"Switching input scope from '{self.active_scope}' to '{scope}'")
 
-        self._active_scope = scope
+        self.active_scope = scope
 
     def clear_scope(self, scope: str):
         """
@@ -97,16 +99,15 @@ class InputHandler:
         """        
         logger.info(
             f"Input received: Command={command.name}, "
-            f"Scope='{self._active_scope}', "
+            f"Scope='{self.active_scope}', "
             f"Source={source.name}"
         )
 
-        callbacks = self._listeners[self._active_scope].get(command, [])
-
+        callbacks = self._listeners[self.active_scope].get(command, [])
         if not callbacks:
             logger.debug(
                 f"No handlers for Command={command.name} "
-                f"in Scope='{self._active_scope}' "
+                f"in Scope='{self.active_scope}' "
                 f"(Source={source.name})"
             )
             return
@@ -121,7 +122,7 @@ class InputHandler:
             except Exception:
                 logger.exception(
                     f"Error while handling Command: {command.name} "
-                    f"in Scope:'{self._active_scope}' "
+                    f"in Scope:'{self.active_scope}' "
                     f"with {callback.__qualname__}"
                     f" (Source={source.name})"
                 )
