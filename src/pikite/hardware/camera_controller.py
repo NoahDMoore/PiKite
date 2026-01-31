@@ -72,6 +72,7 @@ class CameraController:
 
         self.picam2 = Picamera2()
         self.initialize_camera()
+        self.is_recording = False
 
     def __enter__(self):
         return self
@@ -253,6 +254,7 @@ class CameraController:
                 return
         encoder = H264Encoder(bitrate=10000000)
         output = FfmpegOutput(str(output_filepath))
+        self.is_recording = True
         self.picam2.start_recording(
             encoder,
             output,
@@ -264,6 +266,7 @@ class CameraController:
         Stops the ongoing video recording.
         """
         self.picam2.stop_recording()
+        self.is_recording = False
 
     def detect_camera_model(self) -> CAMERA_MODELS | None:
         """
