@@ -96,8 +96,7 @@ class StorageManager:
         """Return the path to the user's configuration file."""
         return self.CONFIG_DIR / "pikite_settings.ini"
     
-    @property
-    def data_file_path(
+    def get_data_file_path(
         self,
         base_name: str="altitude_log",
         use_timestamp: bool=True
