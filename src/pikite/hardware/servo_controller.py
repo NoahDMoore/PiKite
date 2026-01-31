@@ -112,6 +112,18 @@ class TiltServo:
         """Deletes the current angle setting and stops the servo motor."""
         del self._angle
         self.stop()
+
+    def set_angle(self, angle: int, **kwargs) -> None:
+        """
+        Set the servo motor to a specific angle.
+        
+        Args:
+            angle (int): Angle in degrees to position the servo, where 0 is the minimum angle and self.max_angle is the maximum angle.
+        
+        Raises:
+            ValueError: If angle is not between 0 and max_angle.
+        """
+        self.angle = angle  # Use the angle property setter to set the angle
     
     def stop(self) -> None:
         """Stops the servo motor by setting the duty cycle to 0%."""
@@ -235,7 +247,7 @@ class PanServo:
         self.speed = 0.0                # Reset the speed to 0
         self.direction = DIRECTION.CW   # Reset the direction to CW
 
-    def rotate(self, speed: float, direction: DIRECTION, degrees: int) -> None:
+    def rotate(self, speed: float, direction: DIRECTION, degrees: int, **kwargs) -> None:
         """
         Rotate the servo motor an approximate number of degrees at a given speed and direction.
         Calculates the duration of rotation based on the given speed and ange of rotation in degrees,
