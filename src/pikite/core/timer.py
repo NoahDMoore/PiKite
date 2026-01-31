@@ -6,6 +6,7 @@ function for high-resolution timing.
 """
 
 import time
+import datetime
 from enum import Enum, auto
 from .logger import get_logger
 
@@ -238,3 +239,21 @@ class Timer:
             return True
         else:
             return False
+        
+    def format_elapsed_time(self, time_in_seconds):
+        """
+        Converts elapsed time, given in seconds, to a string with format hh:mm:ss
+
+        Args:
+            time_in_seconds (float): The elapsed time, in seconds, to be formatted.
+
+        Returns:
+            string: Elapsed time formatted as hh:mm:ss
+        """
+        minutes, seconds = divmod(time_in_seconds, 60)
+        hours, minutes = divmod(minutes, 60)
+
+        # Format with leading zeros (padding) using f-string
+        time_string = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+        return time_string
