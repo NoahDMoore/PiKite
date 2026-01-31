@@ -33,7 +33,7 @@ class PressureSensorController:
         # Set the initial baseline pressure
         self.baseline_pressure = 1030.0  # Can be adjusted to a localised baseline by calling set_baseline_pressure()
 
-    def get_altitude(self, unit=DISTANCE_UNITS.FEET):
+    def get_altitude(self, unit=DISTANCE_UNITS.METERS):
         """
         Calculate the current altitude based on the baseline pressure.
         
@@ -46,12 +46,12 @@ class PressureSensorController:
         self.sensor.sea_level_pressure = self.baseline_pressure
         altitude = self.sensor.altitude
         
-        altitude *= UNIT_CONVERSION.get(unit, UNIT_CONVERSION[DISTANCE_UNITS.FEET]) # Convert to desired unit, default to feet if unit not found
+        altitude *= UNIT_CONVERSION.get(unit, UNIT_CONVERSION[DISTANCE_UNITS.METERS]) # Convert to desired unit, default to meters if unit not found
 
         return round(altitude, 2)
 
     @property
-    def altitude(self, unit=DISTANCE_UNITS.FEET):
+    def altitude(self, unit=DISTANCE_UNITS.METERS):
         """
         Get the current altitude as a string.
         
