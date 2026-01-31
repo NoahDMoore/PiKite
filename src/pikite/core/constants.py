@@ -32,19 +32,16 @@ class MENUACTION (str, Enum):
             Load the default settings from the default configuration file
         DISPLAY_SYSTEM_INFO:
             Display system information on the screen
-        SHUTDOWN:
-            Shutdown the Raspberry Pi safely
-        REBOOT:
-            Reboot the Raspberry Pi safely
+        INPUT_COMMAND:
+            Trigger an input command defined in the InputCommand enum
     """
     SUBMENU = "submenu"
     RETURN = "return"
     OPTIONS = "options"
     SELECT_OPTION = "selectOption"
     LOAD_DEFAULTS = "load_defaults"
+    INPUT_COMMAND = "input_command"
     DISPLAY_SYSTEM_INFO = "display_system_info"
-    SHUTDOWN = "shutdown"
-    REBOOT = "reboot"
 
 # Constandts for Camera
 class CAPTURE_MODES(str, Enum):
