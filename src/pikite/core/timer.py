@@ -234,7 +234,7 @@ class Timer:
         
         # Check if the specified interval has passed
         if elapsed_time - last_interval_time >= interval:
-            self.named_intervals[name] = last_interval_time + interval if catch_up else elapsed_time
+            self.named_intervals[name] = last_interval_time + interval if catch_up else elapsed_time # Reset last_interval_time
             logger.debug(f"Interval '{name}' elapsed. Next check in {interval:.3f}s")
             return True
         else:
@@ -257,3 +257,12 @@ class Timer:
         time_string = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
         return time_string
+    
+    def wait(self, length):
+        """
+        A wrapper for time.sleep()
+        
+        Args:
+            length (int): The length to wait/sleep in seconds.
+        """
+        time.sleep(length)
