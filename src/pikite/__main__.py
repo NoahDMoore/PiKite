@@ -11,7 +11,7 @@ from pikite.hardware.camera_controller import CameraController
 from pikite.hardware.button_controller import ButtonController
 from pikite.hardware.display_controller import DisplayController, LoadingBar, PreLoader
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
-from pikite.hardware.servo_controller import TiltServo, PanServo
+from pikite.hardware.servo_controller import TiltServo, PanServo, PanTiltPattern
 from pikite.remote.microdot_server import ControllerServer
 from pikite.system.storage import StorageManager, get_timestamp
 import pikite.system.power_management as PowerManagement
@@ -145,7 +145,10 @@ def capture_loop(
     video_repeat = settings.get("vid_multiple", True)
 
     altitude_interval = settings.get("alt_interval", capture_interval)
+    
     pan_tilt_interval = settings.get("pan_tilt_interval", 30)
+    pan_tilt_mode = settings.get("pan_tilt_mode")
+    pan_tilt_pattern = PanTiltPattern(pan_tilt_mode, pan_servo, tilt_servo)
 
     try:
         session_dir = storage_manager.new_session_dir(capture_mode)
@@ -182,7 +185,7 @@ def capture_loop(
         csv_writer.writerow(["Timestamp", "Altitude (m)"])
 
         while input_handler.active_scope == "CAPTURE":
-            if timer.interval_elapsed(interval=1.0, name="runtime"):
+            if timer.interval_elapsed(1.0, "runtime"):
                 display_controller.print_message(f"PiKite Running: | {
                     timer.format_elapsed_time(timer.since_mark('capture_loop_start'))
                 }")
@@ -193,7 +196,7 @@ def capture_loop(
                 session_dir=session_dir
             ) if media_extension else None
 
-            if timer.interval_elapsed(interval=capture_interval, name="capture_interval"):
+            if timer.interval_elapsed(capture_interval, "capture_interval"):
                 match capture_mode:
                     case CONSTANTS.CAPTURE_MODES.NONE:
                         pass # Do Nothing if the capture mode is set to None
@@ -204,23 +207,25 @@ def capture_loop(
                             camera_controller.start_video(media_path)
                             timer.set_named_interval("video_length")
                         
-            if camera_controller.is_recording and timer.interval_elapsed(interval=video_length, name="video_length"):
+            if camera_controller.is_recording and timer.interval_elapsed(video_length, "video_length"):
                     camera_controller.stop_video()
                     timer.set_named_interval("capture_interval")
+                    del(timer.named_intervals["video_length"])
 
-            if timer.interval_elapsed(interval=altitude_interval, name="altitude_interval"):
+            if timer.interval_elapsed(altitude_interval, "altitude_interval"):
                 altitude = pressure_sensor.altitude
                 timestamp = get_timestamp()
                 csv_writer.writerow([timestamp, altitude])
 
-            if timer.interval_elapsed(interval=pan_tilt_interval, name="pan_tilt") and not camera_controller.is_recording:
-                # pan_tilt_pattern.step()
-                pass
+            if timer.interval_elapsed(pan_tilt_interval, "pan_tilt_interval") and not camera_controller.is_recording:
+                pan_tilt_pattern.step()
+                timer.wait(0.5)
         
         # Clear Capture Intervals
         del(timer.named_intervals["runtime"])
         del(timer.named_intervals["capture_interval"])
         del(timer.named_intervals["altitude_interval"])
+        del(timer.named_intervals["pan_tilt_interval"])
 
 async def main():
     logger.info("Starting PiKite Application")
