@@ -416,10 +416,14 @@
 		<menu_item name="panTiltSettings" message="Pan/Tilt Settings" action="submenu" parent="settings">
 			<menu_item name="panTiltMode" message="Pan/Tilt Mode" action="options" parent="panTiltSettings">
 				<setting>pan_tilt_mode</setting>
-				<option_item name="off" message="Mode: [Off]" action="selectOption" value="off" />
-				<option_item name="pan" message="Mode: [Pan]" action="selectOption" value="pan" />
-				<option_item name="tilt" message="Mode: [Tilt]" action="selectOption" value="tilt" />
-				<option_item name="both" message="Mode: [Both]" action="selectOption" value="both" />
+				<option_item name="off" message="Mode: [Off]" action="selectOption" value="NONE" />
+				<option_item name="pan_30" message="Mode: [Pan 30°]" action="selectOption" value="pan_30" />
+				<option_item name="pan_45" message="Mode: [Pan 45°]" action="selectOption" value="pan_45" />
+				<option_item name="pan_90" message="Mode: [Pan 90°]" action="selectOption" value="pan_90" />
+				<option_item name="tilt_30" message="Mode: [Tilt 30°]" action="selectOption" value="tilt_30" />
+				<option_item name="tilt_45" message="Mode: [Tilt 45°]" action="selectOption" value="tilt_45" />
+				<option_item name="grid_180" message="Mode: [Pan/Tilt Grid 180°]" action="selectOption" value="grid_180" />
+				<option_item name="grid_360" message="Mode: [Pan/Tilt Grid 360°]" action="selectOption" value="grid_360" />
 			</menu_item>
 
 			<menu_item name="panTiltInterval" message="Pan Interval" action="options" parent="panTiltSettings">
