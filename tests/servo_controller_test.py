@@ -48,14 +48,14 @@ def test_pan_servo_initialization():
 def test_pan_servo_rotate():
     pan_servo = PanServo()
 
-    pan_servo.start(direction=DIRECTION.CW)
+    pan_servo.start(speed=1.0, direction=DIRECTION.CW)
     logger.info("PanServo rotating clockwise")
     time.sleep(3)  # Rotate for 3 seconds
     pan_servo.stop()
     logger.info("PanServo stopped successfully")
     time.sleep(2)
 
-    pan_servo.start(direction=DIRECTION.CCW)
+    pan_servo.start(speed=1.0, direction=DIRECTION.CCW)
     logger.info("PanServo rotating counterclockwise")
     time.sleep(3)  # Rotate for 3 seconds
     pan_servo.stop()
