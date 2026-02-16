@@ -286,6 +286,7 @@ class PanServo:
                 time.sleep(0.005)                                                       # Sleep for a short time to avoid busy waiting unless the remaining time is less than 10ms
 
         self.halt()                                                                     # Stop the servo motor after the duration has elapsed
+        self.timer.stop()
 
     def get_duty_cycle(self, speed: float, direction: DIRECTION) -> float:
         """
