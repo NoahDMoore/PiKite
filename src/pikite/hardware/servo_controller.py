@@ -11,7 +11,7 @@ Typical usage example:
 """
 
 from enum import Enum
-import os
+from pathlib import Path
 import time
 
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
@@ -52,7 +52,7 @@ class TiltServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        wait_for_pwm(pwm_chip=self.chip, pwm_channel=self.pwm_channel)
+        ensure_pwm_initialized(chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -173,7 +173,7 @@ class PanServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        wait_for_pwm(pwm_chip=self.chip, pwm_channel=self.pwm_channel)
+        ensure_pwm_initialized(chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -413,12 +413,24 @@ class PanTiltPattern:
             self.pan_step_sum = 0
             self.pan_reverse = not self.pan_reverse
 
-def wait_for_pwm(pwm_chip: int, pwm_channel: int, timeout: float = 1.0):
-    pwm_path = f"/sys/class/pwm/pwmchip{pwm_chip}/pwm{pwm_channel}"
+def ensure_pwm_initialized(chip: int, pwm_channel: int, timeout: float = 1.0):
+    pwmchip_path = Path(f"/sys/class/pwm/pwmchip{chip}")
+    pwm_path = pwmchip_path / f"pwm{pwm_channel}"
+
+    # If already exported, do nothing
+    if pwm_path.exists():
+        return
+
+    # Export manually
+    with open(pwmchip_path / "export", "w") as f:
+        f.write(str(pwm_channel))
+
+    # Wait for kernel to create pwmX directory
     timer = Timer()
     timer.start()
-    
-    timer.wait_until(
-        lambda: os.path.exists(pwm_path),
-        timeout=timeout
-    )
+
+    while not pwm_path.exists():
+        elapsed = timer.elapsed()
+        if elapsed and elapsed >= timeout:
+            raise TimeoutError(f"PWM chip{chip} channel{pwm_channel} export timed out")
+        timer.wait(0.01)
