@@ -11,7 +11,6 @@ Typical usage example:
 """
 
 from enum import Enum
-import time
 
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
 
@@ -272,18 +271,15 @@ class PanServo:
                 self.halt()
                 return
         
-        duration = (degrees / 360) * (self.rotation_time / speed) if speed > 0 else 0.0 # Calculate duration in seconds to rotate the servo 
+        duration = ((degrees / 360) * self.rotation_time) / speed if speed > 0 else 0.0 # Calculate duration in seconds to rotate the servo
         self.timer.start()                                                              # Start the timer to track rotation time
-        end_time = self.timer.start_time + duration                                     # type: ignore (to suppress mypy warning; start_time cannot be None if timer is running)
         self.change(speed, direction)                                                   # Start the servo motor with the given speed and direction
 
         while True:                                                                     # Loop until the duration has elapsed
-            now = self.timer.time
-            remaining = end_time - now
-            if remaining <= 0:
+            elapsed = self.timer.elapsed()
+            if elapsed is not None and elapsed >= duration:
                 break
-            if remaining > 0.01:
-                time.sleep(0.005)                                                       # Sleep for a short time to avoid busy waiting unless the remaining time is less than 10ms
+            self.timer.wait(0.005)                                                           # Sleep for a short time to avoid busy waiting
 
         self.halt()                                                                     # Stop the servo motor after the duration has elapsed
         self.timer.stop()
