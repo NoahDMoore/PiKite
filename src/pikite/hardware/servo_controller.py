@@ -11,7 +11,6 @@ Typical usage example:
 """
 
 from enum import Enum
-from pathlib import Path
 import time
 
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
@@ -52,7 +51,6 @@ class TiltServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        reset_pwm_channel(chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -173,7 +171,6 @@ class PanServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        reset_pwm_channel(chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -412,31 +409,3 @@ class PanTiltPattern:
         if self.PAN_STEP > 0 and self.pan_step_sum >= self.PAN_LIMIT:
             self.pan_step_sum = 0
             self.pan_reverse = not self.pan_reverse
-
-def reset_pwm_channel(chip: int, pwm_channel: int):
-    pwmchip_path = Path(f"/sys/class/pwm/pwmchip{chip}")
-    pwm_path = pwmchip_path / f"pwm{pwm_channel}"
-
-    # If already exported, unexport it
-    if pwm_path.exists():
-        try:
-            with open(pwmchip_path / "unexport", "w") as f:
-                f.write(str(pwm_channel))
-        except OSError:
-            pass
-
-        # Wait for it to disappear
-        timer = Timer()
-        timer.start()
-        while pwm_path.exists():
-            timer.wait(0.01)
-
-    # Export cleanly
-    with open(pwmchip_path / "export", "w") as f:
-        f.write(str(pwm_channel))
-
-    # Wait for creation
-    timer = Timer()
-    timer.start()
-    while not pwm_path.exists():
-        timer.wait(0.01)
