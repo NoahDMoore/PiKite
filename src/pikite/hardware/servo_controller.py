@@ -11,6 +11,7 @@ Typical usage example:
 """
 
 from enum import Enum
+import os
 import time
 
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
@@ -51,6 +52,7 @@ class TiltServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
+        wait_for_pwm(pwm_chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -171,6 +173,7 @@ class PanServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
+        wait_for_pwm(pwm_chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -409,3 +412,12 @@ class PanTiltPattern:
         if self.PAN_STEP > 0 and self.pan_step_sum >= self.PAN_LIMIT:
             self.pan_step_sum = 0
             self.pan_reverse = not self.pan_reverse
+
+def wait_for_pwm(pwm_chip: int, pwm_channel: int, timeout: float = 1.0):
+    pwm_path = f"/sys/class/pwm/pwmchip{pwm_chip}/pwm{pwm_channel}"
+    
+    timer = Timer()
+    timer.wait_until(
+        lambda: os.path.exists(pwm_path),
+        timeout=timeout
+    )

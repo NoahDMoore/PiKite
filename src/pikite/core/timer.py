@@ -266,3 +266,24 @@ class Timer:
             length (int): The length to wait/sleep in seconds.
         """
         time.sleep(length)
+
+    def wait_until(self, condition, timeout: float, poll_interval: float = 0.01):
+        """
+        Waits until a callable condition returns True or timeout expires.
+
+        Args:
+            condition (Callable): Function returning bool.
+            timeout (float): Max seconds to wait.
+            poll_interval (float): Sleep interval between checks.
+
+        Raises:
+            RuntimeError: If the timer is not running.
+            TimeoutError: If timeout is exceeded.
+        """
+        if not self.running:
+            raise RuntimeError("Timer must be running to use wait_until")
+
+        while not condition():
+            if self.elapsed() >= timeout: # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
+                raise TimeoutError("Condition wait timed out")
+            self.wait(poll_interval)
