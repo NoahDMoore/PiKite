@@ -52,7 +52,7 @@ class TiltServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        ensure_pwm_initialized(chip=self.chip, pwm_channel=self.pwm_channel)
+        reset_pwm_channel(chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -173,7 +173,7 @@ class PanServo:
         self.chip = chip
 
         # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        ensure_pwm_initialized(chip=self.chip, pwm_channel=self.pwm_channel)
+        reset_pwm_channel(chip=self.chip, pwm_channel=self.pwm_channel)
         self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
@@ -413,24 +413,30 @@ class PanTiltPattern:
             self.pan_step_sum = 0
             self.pan_reverse = not self.pan_reverse
 
-def ensure_pwm_initialized(chip: int, pwm_channel: int, timeout: float = 1.0):
+def reset_pwm_channel(chip: int, pwm_channel: int):
     pwmchip_path = Path(f"/sys/class/pwm/pwmchip{chip}")
     pwm_path = pwmchip_path / f"pwm{pwm_channel}"
 
-    # If already exported, do nothing
+    # If already exported, unexport it
     if pwm_path.exists():
-        return
+        try:
+            with open(pwmchip_path / "unexport", "w") as f:
+                f.write(str(pwm_channel))
+        except OSError:
+            pass
 
-    # Export manually
+        # Wait for it to disappear
+        timer = Timer()
+        timer.start()
+        while pwm_path.exists():
+            timer.wait(0.01)
+
+    # Export cleanly
     with open(pwmchip_path / "export", "w") as f:
         f.write(str(pwm_channel))
 
-    # Wait for kernel to create pwmX directory
+    # Wait for creation
     timer = Timer()
     timer.start()
-
     while not pwm_path.exists():
-        elapsed = timer.elapsed()
-        if elapsed and elapsed >= timeout:
-            raise TimeoutError(f"PWM chip{chip} channel{pwm_channel} export timed out")
         timer.wait(0.01)
