@@ -415,8 +415,9 @@ class PanTiltPattern:
 
 def wait_for_pwm(pwm_chip: int, pwm_channel: int, timeout: float = 1.0):
     pwm_path = f"/sys/class/pwm/pwmchip{pwm_chip}/pwm{pwm_channel}"
-    
     timer = Timer()
+    timer.start()
+    
     timer.wait_until(
         lambda: os.path.exists(pwm_path),
         timeout=timeout
