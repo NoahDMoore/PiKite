@@ -6,7 +6,9 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 from pikite.core.logger import get_logger
 from pikite.core.timer import Timer
 from pikite.hardware.servo_controller import TiltServo, PanServo, PanTiltPattern, DIRECTION
+from pikite.system.storage import StorageManager
 
+import csv
 import time
 
 # Setup Logger
@@ -73,3 +75,42 @@ def test_pan_tilt_pattern(pattern):
     while timer.elapsed() < 300.0: # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
         if timer.interval_elapsed(5, "pattern_test"):
             pan_tilt_pattern.step()
+
+def calibrate_pan_servo_rotation_time():
+    SPEEDS = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0]
+    TEST_DURATION = 2.0  # Time to rotate at each speed, in seconds
+
+    storage_manager = StorageManager()
+    data_output_path = storage_manager.get_data_file_path()
+
+    pan_servo = PanServo()
+
+    logger.info("Servo Calibration: Degrees/sec at Different Speeds")
+    logger.info(f"Test duration: {TEST_DURATION} seconds per speed.\n")
+
+    pan_servo.start(speed=0.0, direction=DIRECTION.CW)  # Start at lowest speed for initial setup
+    
+    results = []
+    
+    for speed in SPEEDS:
+        input(f"Prepare to test speed {speed}. Press Enter to start...")
+
+        pan_servo.change(speed, DIRECTION.CW)
+        logger.info(f"Running at speed {speed} for {TEST_DURATION} seconds...")
+        time.sleep(TEST_DURATION)
+        pan_servo.halt()
+        
+        deg = input(f"Enter degrees rotated: ")
+        try:
+            deg = float(deg)
+            deg_per_sec = deg / TEST_DURATION
+            results.append((speed, deg, deg_per_sec))
+            logger.info(f"Speed: {speed}, Degrees: {deg}, Degrees/sec: {deg_per_sec:.2f}\n")
+        except ValueError:
+            logger.warning("Invalid input, skipping this speed.\n")
+
+    # Save results
+    with open(data_output_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["speed", "degrees", "degrees_per_sec"])
+        writer.writerows(results)
