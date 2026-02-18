@@ -236,8 +236,9 @@ class PanServo:
     
     def halt(self) -> None:
         """ Stop the servo motor by setting the duty cycle to the stop position."""
-        self.pwm.change_duty_cycle(self.stop_duty_cycle)    # Use CW direction with speed of 0 to stop the servo motor
-        self.speed = 0                                      # Update the current speed to 0
+        stop_direction = DIRECTION.CCW if self.direction == DIRECTION.CW else DIRECTION.CW # Use the current direction to determine the stop position
+        self.change(0.0, stop_direction) # Set speed to 0.0 to stop the motor, and reverse direction to ensure the stop position is reached.
+        self.speed = 0.0 # Update the current speed to 0
 
     def stop(self) -> None:
         """This method halts the servo motor, stops the PWM signal, and resets the speed and direction."""
