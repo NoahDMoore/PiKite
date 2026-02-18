@@ -147,7 +147,7 @@ def capture_loop(
     altitude_interval = settings.get("alt_interval", capture_interval)
     
     pan_tilt_interval = settings.get("pan_tilt_interval", 30)
-    pan_tilt_mode = settings.get("pan_tilt_mode")
+    pan_tilt_mode = PanTiltPattern.PAN_TILT_MODES(settings.get("pan_tilt_mode"))
     pan_tilt_pattern = PanTiltPattern(pan_tilt_mode, pan_servo, tilt_servo)
 
     try:

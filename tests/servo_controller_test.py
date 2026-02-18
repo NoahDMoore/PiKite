@@ -66,7 +66,7 @@ def test_pan_tilt_pattern(pattern):
     assert tilt_servo is not None
     logger.info("TiltServo initialized successfully")
 
-    mode = PanTiltPattern.PAN_TILT_MODES[pattern]
+    mode = PanTiltPattern.PAN_TILT_MODES(pattern)
 
     timer = Timer()
     timer.start()
