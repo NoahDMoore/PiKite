@@ -76,9 +76,9 @@ def test_pan_tilt_pattern(pattern):
         if timer.interval_elapsed(5, "pattern_test"):
             pan_tilt_pattern.step()
 
-def calibrate_pan_servo_rotation_time():
+def calibrate_pan_servo_rotation_time(test_duration=5.0):
     SPEEDS = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0]
-    TEST_DURATION = 2.0  # Time to rotate at each speed, in seconds
+    TEST_DURATION = test_duration  # Time to rotate at each speed, in seconds
 
     storage_manager = StorageManager()
     data_output_path = storage_manager.get_data_file_path()
