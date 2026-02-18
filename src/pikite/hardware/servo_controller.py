@@ -272,7 +272,7 @@ class PanServo:
                 self.halt()
                 return
         
-        duration = (degrees / 360) * (self.rotation_time / speed) if speed > 0 else 0.0 # Calculate duration in seconds to rotate the servo
+        duration = ((degrees / 360) * self.rotation_time) / speed if speed > 0 else 0.0 # Calculate duration in seconds to rotate the servo
         self.timer.start()                                                              # Start the timer to track rotation time
         self.change(speed, direction)                                                   # Start the servo motor with the given speed and direction
 
