@@ -57,8 +57,8 @@ def test_pan_servo_rotate():
     pan_servo.stop()
     logger.info("PanServo stopped successfully")
 
-def test_pan_tilt_pattern(pattern):
-    pan_servo = PanServo(rotation_time=1.82) # Set rotation time to 1.82 seconds for a full 360 degree rotation at speed=1.0
+def test_pan_tilt_pattern(pattern, rotation_time):
+    pan_servo = PanServo(rotation_time)
     assert pan_servo is not None
     logger.info("PanServo initialized successfully")
                 
