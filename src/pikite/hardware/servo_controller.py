@@ -376,6 +376,8 @@ class PanTiltPattern:
         self.pan_reverse = False
         self.tilt_reverse = False
 
+        self.timer = Timer()
+
         self.reset()
 
     def reset(self):
@@ -392,6 +394,7 @@ class PanTiltPattern:
             )
 
             self.pan_step_sum += self.PAN_STEP
+            self.timer.wait(0.5) # Wait for the pan movement to complete before moving the tilt servo
 
         if self.TILT_STEP > 0 and self.pan_step_sum >= self.PAN_LIMIT:
             tilt_delta = self.TILT_STEP if not self.tilt_reverse else -self.TILT_STEP
