@@ -58,7 +58,7 @@ def test_pan_servo_rotate():
     logger.info("PanServo stopped successfully")
 
 def test_pan_tilt_pattern(pattern, rotation_time):
-    pan_servo = PanServo(rotation_time)
+    pan_servo = PanServo(rotation_time=rotation_time)
     assert pan_servo is not None
     logger.info("PanServo initialized successfully")
                 
