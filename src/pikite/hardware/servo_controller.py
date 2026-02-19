@@ -291,14 +291,12 @@ class PanServo:
                 return
         
         duration = ((degrees / 360) * self.rotation_time) / speed if speed > 0 else 0.0 # Calculate duration in seconds to rotate the servo
+        logger.info(f"Rotating servo at speed {speed} in direction {direction.value} for {degrees} degrees, which should take approximately {duration:.2f} seconds.")
         self.timer.start()                                                              # Start the timer to track rotation time
         self.change(speed, direction)                                                   # Start the servo motor with the given speed and direction
 
-        while True:                                                                     # Loop until the duration has elapsed
-            elapsed = self.timer.elapsed()
-            if elapsed is not None and elapsed >= duration:
-                break
-            self.timer.wait(0.005)                                                           # Sleep for a short time to avoid busy waiting
+        while self.timer.elapsed() < duration:                                          # Loop until the duration has elapsed | # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
+            self.timer.wait(0.005)                                                      # Sleep for a short time to avoid busy waiting
 
         self.halt()                                                                     # Stop the servo motor after the duration has elapsed
         self.timer.stop()
