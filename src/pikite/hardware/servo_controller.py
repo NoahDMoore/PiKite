@@ -45,12 +45,23 @@ class TiltServo:
         if pwm_channel in [0, 1]:
             self.pwm_channel = pwm_channel
         else:
-            raise ValueError("Invalid PWM channel. Use 0 or 1.")
+            try:
+                raise ValueError("Invalid PWM channel. Use 0 or 1.")
+            except ValueError as e:
+                logger.critical(f"Value Error: {e}.")
+                raise
         self.frequency = frequency
         self.chip = chip
 
-        # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
+        # Initialize the PWM with the specified channel, frequency, and chip
+        self.pwm = initialize_pwm(
+            pwm_channel=self.pwm_channel,
+            frequency=self.frequency,
+            chip=self.chip,
+            retries=2
+        )
+
+        # Calculate the PWM period in microseconds based on the frequency
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
         # Set the maximum angle and pulse widths for the servo
@@ -169,8 +180,15 @@ class PanServo:
         self.frequency = frequency
         self.chip = chip
 
-        # Initialize the PWM with the specified channel, frequency, and chip, and calculate the period in microseconds
-        self.pwm = HardwarePWM(pwm_channel=self.pwm_channel, hz=self.frequency, chip=self.chip)
+        # Initialize the PWM with the specified channel, frequency, and chip
+        self.pwm = initialize_pwm(
+            pwm_channel=self.pwm_channel,
+            frequency=self.frequency,
+            chip=self.chip,
+            retries=2
+        )
+
+        # Calculate the PWM period in microseconds based on the frequency
         self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
 
         # Set microsecond pulse widths for full speed clockwise and counter-clockwise, and calculate the stop position pulse width.
@@ -319,7 +337,43 @@ class PanServo:
             self.speed = 0                  # Update the current speed to 0
             self.direction = DIRECTION.CW   # Reset the direction to CW
             return self.stop_duty_cycle     # Return duty cycle percentage for stop position
-        
+
+def initialize_pwm(pwm_channel: int, frequency: int, chip: int, retries: int = 2) -> HardwarePWM:
+    """
+    Initializes the HardwarePWM with the specified channel, frequency, and chip.
+
+    Args:
+        pwm_channel (int): The PWM channel to use (0 or 1). Channel 0 uses GPIO 18/12, and Channel 1 uses GPIO 19/13.
+        frequency (int): The PWM frequency in Hz.
+        chip (int): The chip number for the PWM channel.
+
+    Returns:
+        HardwarePWM: An instance of the initialized HardwarePWM.
+
+    Raises:
+        ValueError: If pwm_channel is not 0 or 1.
+    """
+    timer = Timer()
+
+    if pwm_channel in [0, 1]:
+        for attempt in range(retries):
+            try:
+                return HardwarePWM(
+                    pwm_channel=pwm_channel,
+                    hz=frequency,
+                    chip=chip
+                )
+            except PermissionError as e:
+                if attempt == retries - 1:
+                    raise
+                timer.wait(0.1)
+    else:
+        try:
+            raise ValueError("Invalid PWM channel. Use 0 or 1.")
+        except ValueError as e:
+            logger.critical(f"Value Error: {e}.")
+            raise
+
 class PanTiltPattern:
     """
     Pans and/or Tilts the PiKite rig at set
