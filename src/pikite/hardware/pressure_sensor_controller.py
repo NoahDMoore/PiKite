@@ -1,8 +1,7 @@
 import time
 import board            # type: ignore
 import digitalio        # type: ignore
-from busio import I2C   # type: ignore
-import adafruit_bmp280  # type: ignore
+import adafruit_bmp3xx  # type: ignore
 
 from ..core.logger import get_logger
 from ..core.constants import DISTANCE_UNITS
@@ -22,16 +21,24 @@ UNIT_CONVERSION = {
 }
 
 class PressureSensorController:
-    """Controller for the BMP280 Pressure Sensor to measure altitude."""
+    """Controller for the BMP388 Pressure Sensor to measure altitude."""
 
     def __init__(self):
-        """Initialize the PressureSensorController and BMP280 sensor."""
-        self.i2c = I2C(board.SCL, board.SDA)
-        self.sensor = adafruit_bmp280.Adafruit_BMP280_SPI(board.SPI(), digitalio.DigitalInOut(board.CE1))
-        self.sensor.overscan_pressure = adafruit_bmp280.OVERSCAN_X16    # Set overscan for better pressure accuracy
+        """Initialize the PressureSensorController and BMP388 sensor."""
+        self.sensor = adafruit_bmp3xx.BMP3XX_SPI(board.SPI(), digitalio.DigitalInOut(board.CE1))
+
+        # Configure the sensor for better accuracy
+        self.sensor.pressure_oversampling = 8
+        self.sensor.temperature_oversampling = 2
+        self.sensor.filter_coefficient = 7
+        self.sensor.output_data_rate = 25
 
         # Set the initial baseline pressure
         self.baseline_pressure = 1030.0  # Can be adjusted to a localised baseline by calling set_baseline_pressure()
+
+        # Altitude Smoothing
+        self._smoothed_altitude = None
+        self._alpha = 0.15
 
     def get_altitude(self, unit=DISTANCE_UNITS.METERS):
         """
@@ -44,9 +51,18 @@ class PressureSensorController:
             float: The calculated altitude in the specified unit.
         """
         self.sensor.sea_level_pressure = self.baseline_pressure
-        altitude = self.sensor.altitude
+        raw_altitude = self.sensor.altitude
         
-        altitude *= UNIT_CONVERSION.get(unit, UNIT_CONVERSION[DISTANCE_UNITS.METERS]) # Convert to desired unit, default to meters if unit not found
+        if self._smoothed_altitude is None:
+            self._smoothed_altitude = raw_altitude
+        else:
+            self._smoothed_altitude = (
+                self._alpha * raw_altitude + (1 - self._alpha) * self._smoothed_altitude
+            )
+
+        altitude = self._smoothed_altitude
+
+        altitude *= UNIT_CONVERSION.get(unit, UNIT_CONVERSION[DISTANCE_UNITS.METERS])
 
         return round(altitude, 2)
 
@@ -70,6 +86,12 @@ class PressureSensorController:
             display_controller (DisplayController, optional): An instance of DisplayController to show a loading bar.
         """
         baseline_pressure = 0
+
+        # discard initial unstable readings
+        for _ in range(5):
+            _ = self.sensor.pressure
+            time.sleep(0.05)
+
         loader = LoadingBar("Baseline Alt:", display_controller) if display_controller is not None else None
 
         for i in range(num_samples):
