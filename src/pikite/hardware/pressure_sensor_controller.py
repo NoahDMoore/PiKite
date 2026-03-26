@@ -30,7 +30,7 @@ class PressureSensorController:
         # Configure the sensor for better accuracy
         self.sensor.pressure_oversampling = 8
         self.sensor.temperature_oversampling = 2
-        self.sensor.filter_coefficient = 7
+        self.sensor.filter_coefficient = 8
         self.sensor.output_data_rate = 25
 
         # Set the initial baseline pressure
