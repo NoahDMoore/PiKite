@@ -306,7 +306,7 @@ class PanServo:
         self.change(speed, direction)   # Set the servo rotating at the given speed and direction
 
         # Loop until the target is reached within a margin of error
-        while (target_angle - margin) <= self.encoder.get_angle() <= (target_angle + margin):
+        while not ((target_angle - margin) <= self.encoder.get_angle() <= (target_angle + margin)):
             logger.debug(f"Current Angle: {self.encoder.get_angle():.2f} degrees, Target Angle: {target_angle:.2f} degrees")
             timer.wait(0.005)           # Sleep for a short time to avoid busy waiting
 
