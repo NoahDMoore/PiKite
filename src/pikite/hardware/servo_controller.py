@@ -310,27 +310,18 @@ class PanServo:
             current = self.encoder.get_angle()
             error = (target_angle - current + 180) % 360 - 180
 
-            if abs(error) < 20:
-                self.change(speed * 0.5, direction)
-            if abs(error) < 5:
-                self.change(speed * 0.25, direction)
-
-            # Stop if within margin
             if abs(error) <= margin:
                 break
 
-            # 🚨 Direction-based stopping (CRITICAL)
-            if direction == DIRECTION.CW and error < 0:
-                logger.debug("Passed target (CW), stopping.")
-                break
+            # Slowdown logic
+            if abs(error) > 30:
+                adjusted_speed = speed
+            elif abs(error) > 10:
+                adjusted_speed = speed * 0.5
+            else:
+                adjusted_speed = speed * 0.25
 
-            if direction == DIRECTION.CCW and error > 0:
-                logger.debug("Passed target (CCW), stopping.")
-                break
-
-            logger.debug(
-                f"Current: {current:.2f}, Target: {target_angle:.2f}, Error: {error:.2f}"
-            )
+            self.change(adjusted_speed, direction)
 
             timer.wait(0.005)
 
