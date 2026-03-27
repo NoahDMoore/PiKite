@@ -14,6 +14,7 @@ from enum import Enum
 
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
 
+from ..hardware.encoder_controller import EncoderController
 from ..core.logger import get_logger
 from ..core.timer import Timer
 
@@ -152,7 +153,7 @@ class PanServo:
     This class allows for controlling a continuous rotation servo motor using PWM signals to set the speed and direction of rotation.
     It supports setting the speed as a float between 0.0 (stopped) and 1.0 (full speed), and the direction as either clockwise (CW) or counter-clockwise (CCW).
     """
-    def __init__(self, pwm_channel=1, frequency=50, chip=0, cw_pulse_width=700, ccw_pulse_width=2300, stop_pulse_width=1500, rotation_time: float=1.0):
+    def __init__(self, pwm_channel=1, frequency=50, chip=0, cw_pulse_width=700, ccw_pulse_width=2300, stop_pulse_width=1500):
         """
         Initializes the PanServo with the specified parameters.
 
@@ -197,10 +198,8 @@ class PanServo:
         self.stop_pw = stop_pulse_width
         
         self.stop_duty_cycle = self.get_duty_cycle(0.0, DIRECTION.CW)   # Duty cycle for stop position
-        
-        # Initialize timer for rotation duration
-        self.timer: Timer = Timer()         # Timer to track rotation time
-        self.rotation_time = rotation_time  # Get time in seconds to rotate 360 degrees at full speed from configuration settings, default is 1 second
+
+        self.encoder = EncoderController() # Initialize the encoder controller to measure angle of rotation
 
         # Set initial speed and direction
         self.speed = 0.0               # Default speed is 0.0 (stopped)
@@ -265,17 +264,17 @@ class PanServo:
         self.speed = 0.0                # Reset the speed to 0
         self.direction = DIRECTION.CW   # Reset the direction to CW
 
-    def rotate(self, speed: float, direction: DIRECTION, degrees: int, **kwargs) -> None:
+    def rotate(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 2, **kwargs) -> None:
         """
         Rotate the servo motor an approximate number of degrees at a given speed and direction.
-        Calculates the duration of rotation based on the given speed and ange of rotation in degrees,
-        then starts the servo motor, waits for the calculated duration, and then halts the rotation.
+        Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
 
         Args:
             speed (float): Speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
             direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
             degrees (int): Number of degrees to rotate, must be greater than 0; 360 degrees is a full rotation
-        
+            margin (int): Margin of error for target angle, in degrees
+
         Raises:
             ValueError: If degrees is negative
             ValueError: If speed is not between 0.0 and 1.0
@@ -289,17 +288,27 @@ class PanServo:
                 logger.error(f"Value Error: {e}. Halting rotation.")
                 self.halt()
                 return
+            
+        if margin < 0:
+            try:
+                raise ValueError("Margin must be nonnegative")
+            except ValueError as e:
+                logger.error(f"Value Error: {e}. Using default margin of 5 degrees.")
+                margin = 5
         
-        duration = ((degrees / 360) * self.rotation_time) / speed if speed > 0 else 0.0 # Calculate duration in seconds to rotate the servo
-        logger.info(f"Rotating servo at speed {speed} in direction {direction.value} for {degrees} degrees, which should take approximately {duration:.2f} seconds.")
-        self.timer.start()                                                              # Start the timer to track rotation time
-        self.change(speed, direction)                                                   # Start the servo motor with the given speed and direction
+        current_angle = self.encoder.get_angle()    # Get the current angle from the encoder
+        target_angle = (current_angle + degrees) % 360 if direction == DIRECTION.CW else (current_angle - degrees) % 360 # Calculate the target angle based on the current angle, desired rotation, and direction
 
-        while self.timer.elapsed() < duration:                                          # Loop until the duration has elapsed | # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
-            self.timer.wait(0.005)                                                      # Sleep for a short time to avoid busy waiting
+        timer = Timer()
 
-        self.halt()                                                                     # Stop the servo motor after the duration has elapsed
-        self.timer.stop()
+        logger.info(f"Rotating from {current_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
+        self.change(speed, direction)   # Set the servo rotating at the given speed and direction
+
+        # Loop until the target is reached within a margin of error
+        while (target_angle - margin) <= self.encoder.get_angle() <= (target_angle + margin):
+            timer.wait(0.005)           # Sleep for a short time to avoid busy waiting
+
+        self.halt()                     # Stop the servo motor after the duration has elapsed
 
     def get_duty_cycle(self, speed: float, direction: DIRECTION) -> float:
         """
