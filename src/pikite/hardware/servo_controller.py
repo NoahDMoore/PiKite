@@ -164,7 +164,6 @@ class PanServo:
                     As of linux kernel 6.12, chip=0 is used for all Raspberry Pi models.
             cw_pulse_width (int): Pulse width in microseconds for full speed clockwise rotation. Default is based on FS90 continuous rotation servo.
             ccw_pulse_width (int): Pulse width in microseconds for full speed counter-clockwise rotation. Default is based on FS90 continuous rotation servo.
-            rotation_time (float): Time in seconds to rotate 360 degrees at full speed, default is 1 second.
 
         Raises:
             ValueError: If pwm_channel is not 0 or 1.

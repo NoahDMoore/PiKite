@@ -263,7 +263,7 @@ async def main():
     tilt_servo = TiltServo()
     initialization_progress_bar.advance(5)
 
-    pan_servo = PanServo(rotation_time = settings.get("pan_rotation_time", 1))  # Default to assuming 1 second for full rotation at full speed
+    pan_servo = PanServo()
     initialization_progress_bar.advance(5)
 
     # Initialize Input Handler
