@@ -15,7 +15,7 @@ from enum import Enum
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
 
 from ..hardware.encoder_controller import EncoderController
-from ..core.logger import get_logger
+from ..core.logger import get_logger, set_log_level
 from ..core.timer import Timer
 
 # Setup Logger
@@ -280,6 +280,7 @@ class PanServo:
             ValueError: If speed is not between 0.0 and 1.0
             ValueError: If direction is not DIRECTION.CW or DIRECTION.CCW
         """
+        set_log_level("DEBUG")
 
         if degrees < 0:
             try:
@@ -301,14 +302,17 @@ class PanServo:
 
         timer = Timer()
 
-        logger.info(f"Rotating from {current_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
+        logger.debug(f"Rotating from {current_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
         self.change(speed, direction)   # Set the servo rotating at the given speed and direction
 
         # Loop until the target is reached within a margin of error
         while (target_angle - margin) <= self.encoder.get_angle() <= (target_angle + margin):
+            logger.debug(f"Current Angle: {self.encoder.get_angle():.2f} degrees, Target Angle: {target_angle:.2f} degrees")
             timer.wait(0.005)           # Sleep for a short time to avoid busy waiting
 
         self.halt()                     # Stop the servo motor after the duration has elapsed
+        logger.debug(f"Rotation complete. Current angle: {self.encoder.get_angle():.2f} degrees.")
+        set_log_level("INFO")
 
     def get_duty_cycle(self, speed: float, direction: DIRECTION) -> float:
         """
