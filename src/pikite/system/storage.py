@@ -55,7 +55,7 @@ class StorageManager:
             root (str | None): Optional custom root directory. If not provided,
                                defaults to ~/pikite_output.
         """
-        # PiKite Library Directories
+        # PiKite Library Paths
         self.BASE_DIR = Path(__file__).resolve().parent.parent
         self.DEFAULT_CONFIG_FILE  = self.BASE_DIR / "config" / "default_settings.ini"
         self.FONTS_DIR = self.BASE_DIR / "static" / "fonts"
@@ -66,7 +66,7 @@ class StorageManager:
         # Set User Root Directory
         self.USER_ROOT = Path(root or Path.home() / "pikite_output")
 
-        # Define User Directories
+        # Define User Paths
         self.LOG_DIR = self.USER_ROOT / "logs"
         self.DATA_DIR = self.USER_ROOT / "data"
         self.CONFIG_DIR = self.USER_ROOT / "config"
@@ -74,16 +74,20 @@ class StorageManager:
         self.PHOTO_OUTPUT_DIR = self.USER_MEDIA_DIR / "photos"
         self.VIDEO_OUTPUT_DIR = self.USER_MEDIA_DIR / "videos"
 
-        self._initialize_dirs()
+        # Web Server Paths
+        self.WEB_ROOT = self.BASE_DIR / "remote" / "web"
 
-    def _initialize_dirs(self) -> None:
-        """Ensure that all required user directories exist. If not, create them."""
-        for path in (self.LOG_DIR,
+        # Initialize Required Directories
+        self._initialize_dirs((self.LOG_DIR,
             self.DATA_DIR,
             self.CONFIG_DIR,
             self.PHOTO_OUTPUT_DIR,
             self.VIDEO_OUTPUT_DIR
-        ):
+        ))
+
+    def _initialize_dirs(self, dirs: tuple[Path, ...]) -> None:
+        """Ensure that all required user directories exist. If not, create them."""
+        for path in dirs:
             path.mkdir(parents=True, exist_ok=True)
 
     @property

@@ -10,9 +10,12 @@ Usage:
 
 import json
 import asyncio
+
 from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
+
 from ..core.logger import get_logger
+from ..system.storage import StorageManager
 
 # Setup Logger
 logger = get_logger(__name__)
@@ -35,19 +38,10 @@ class ControllerServer:
         self.incoming_messages = []
         self.outgoing_messages = []
 
-        # Web Server Routes
-        @self.app.route('/')
-        async def index(request: Request):
-            try:
-                return send_file('index.html')
-            except FileNotFoundError:
-                logger.error(f"Index File Not Found for client ({request.client_addr}) request.")
-                return "Error 404: Index file not found", 404
-            except Exception as e:
-                logger.error(f"Unknown error serving index file for client ({request.client_addr}) request: {e}")
-                return "Error 500: Internal Server Error", 500
-            
-        # Serve static files (images, css, js)
+        # Initialize Storage Manager
+        self.storage = StorageManager()
+
+        # MIME types for static files (images, css, js)
         MIME_TYPES = {
             '.png':  'image/png',
             '.jpg':  'image/jpeg',
@@ -58,6 +52,23 @@ class ControllerServer:
             '.html': 'text/html'
         }
 
+
+        ''' Define Web Server Routes '''
+
+        # Web Server Routes
+        @self.app.route('/')
+        async def index(request: Request):
+            index_path = self.storage.WEB_ROOT / "index.html"
+            
+            try:
+                return send_file(index_path)
+            except FileNotFoundError:
+                logger.error(f"Index File Not Found for client ({request.client_addr}) request.")
+                return "Error 404: Index file not found", 404
+            except Exception as e:
+                logger.error(f"Unknown error serving index file for client ({request.client_addr}) request: {e}")
+                return "Error 500: Internal Server Error", 500
+            
         @self.app.route('/static/<path:path>')
         def media(request: Request, path):
             """
