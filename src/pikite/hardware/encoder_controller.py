@@ -14,15 +14,19 @@ class EncoderController:
         read_bytes = self.bus.read_i2c_block_data(self.DEVICE_AS5600, 0x0C, 2)
         value = (read_bytes[0] << 8) | read_bytes[1]
         return value & 0x0FFF # Mask to 12 bits
+    
+    @property
+    def angle(self):
+        """Get the current angle in degrees."""
+        return self.get_angle()
 
     def get_angle(self):
         """Get the current angle."""
         raw_angle = self._read_raw_angle()
-        self.angle = (raw_angle - self._zero_point) % 4096
-        return round(self.angle * (360.0 / 4096.0), 2)
+        angle = (raw_angle - self._zero_point) % 4096
+        return round(angle * (360.0 / 4096.0))
     
     def zero(self):
         """Zero the encoder by setting the current angle as the new zero point."""
         raw_angle = self._read_raw_angle()
         self._zero_point = raw_angle
-        self.angle = 0.0
