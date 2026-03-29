@@ -296,12 +296,12 @@ class PanServo:
                 logger.error(f"Value Error: {e}. Using default margin of 5 degrees.")
                 margin = 5
         
-        current_angle = self.encoder.get_angle()    # Get the current angle from the encoder
-        target_angle = (current_angle + degrees) % 360 if direction == DIRECTION.CW else (current_angle - degrees) % 360 # Calculate the target angle based on the current angle, desired rotation, and direction
+        starting_angle = self.encoder.get_angle()    # Get the current angle from the encoder
+        target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CW else (starting_angle - degrees) % 360 # Calculate the target angle based on the starting angle, desired rotation, and direction
 
         timer = Timer()
 
-        logger.debug(f"Rotating from {current_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
+        logger.debug(f"Rotating from {starting_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
         self.change(speed, direction)   # Set the servo rotating at the given speed and direction
 
         # Loop until the target is reached within a margin of error
