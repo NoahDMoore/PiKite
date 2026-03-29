@@ -297,7 +297,7 @@ class PanServo:
                 margin = 5
         
         starting_angle = self.encoder.get_angle()    # Get the current angle from the encoder
-        target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CW else (starting_angle - degrees) % 360 # Calculate the target angle based on the starting angle, desired rotation, and direction
+        target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CCW else (starting_angle - degrees) % 360 # Calculate the target angle based on the starting angle, desired rotation, and direction
 
         timer = Timer()
 
