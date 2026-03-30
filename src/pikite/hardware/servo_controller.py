@@ -299,6 +299,10 @@ class PanServo:
         starting_angle = self.encoder.get_angle()    # Get the current angle from the encoder
         target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CCW else (starting_angle - degrees) % 360 # Calculate the target angle based on the starting angle, desired rotation, and direction
 
+        lower_bound = (target_angle - margin) % 360
+        upper_bound = (target_angle + margin) % 360
+        in_margin = False
+
         timer = Timer()
 
         logger.debug(f"Rotating from {starting_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
@@ -307,11 +311,10 @@ class PanServo:
         while True:
             current_angle = self.encoder.get_angle()
 
-            lower_bound = (target_angle - margin) % 360
-            upper_bound = (target_angle + margin) % 360
-            in_margin = False
             if lower_bound < upper_bound:
                 in_margin = lower_bound <= current_angle <= upper_bound
+            elif lower_bound == upper_bound:
+                in_margin = current_angle == target_angle
             else:
                 in_margin = current_angle >= lower_bound or current_angle <= upper_bound
 
