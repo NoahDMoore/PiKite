@@ -307,14 +307,22 @@ class PanServo:
         while True:
             current_angle = self.encoder.get_angle()
 
-            if ((target_angle - margin) % 360) <= current_angle <= ((target_angle + margin) % 360):
-                self.halt()                     # Stop the servo motor after the duration has elapsed
-                logger.debug(f"Rotation complete. Current angle: {self.encoder.get_angle():.2f} degrees.")
+            lower_bound = (target_angle - margin) % 360
+            upper_bound = (target_angle + margin) % 360
+            in_margin = False
+            if lower_bound < upper_bound:
+                in_margin = lower_bound <= current_angle <= upper_bound
+            else:
+                in_margin = current_angle >= lower_bound or current_angle <= upper_bound
+
+            if in_margin:
+                self.halt()  # Stop the servo motor after the duration has elapsed
+                logger.debug(f"Rotation complete. Current angle: {self.encoder.get_angle()} degrees.")
                 
-                break # Exit the loop once the target angle is reached within the margin of error and the motor is halted
+                break   # Exit the loop once the target angle is reached within the margin of error and the motor is halted
             else:
                 logger.debug(f"Current Angle: {current_angle} degrees, Target Angle: {target_angle} degrees. Waiting to halt.")
-                timer.wait(0.005)           # Sleep for a short time to avoid busy waiting
+                timer.wait(0.005)   # Sleep for a short time to avoid busy waiting
 
         set_log_level("INFO")
 
