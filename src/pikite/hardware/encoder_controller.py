@@ -1,4 +1,5 @@
 import smbus    # type: ignore
+import time
 
 class EncoderController:
     """Controller for the AS5600 Magnetic Rotary Encoder to measure angle."""
@@ -26,6 +27,14 @@ class EncoderController:
         angle = (raw_angle - self._zero_point) % 4096
         return angle * (360.0 / 4096.0)
     
+    def get_smoothed_angle(self, samples=5):
+        """Get a smoothed angle by averaging multiple readings."""
+        total_angle = 0.0
+        for _ in range(samples):
+            total_angle += self.get_angle()
+            time.sleep(0.01)  # Small delay between samples to allow for sensor stabilization
+        return total_angle / samples
+
     def zero(self):
         """Zero the encoder by setting the current angle as the new zero point."""
         raw_angle = self._read_raw_angle()

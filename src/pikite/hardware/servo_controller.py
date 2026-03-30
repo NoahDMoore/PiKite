@@ -309,7 +309,7 @@ class PanServo:
         self.change(speed, direction)   # Set the servo rotating at the given speed and direction
 
         while True:
-            current_angle = self.encoder.get_angle()
+            current_angle = self.encoder.get_smoothed_angle()
 
             if lower_bound < upper_bound:
                 in_margin = lower_bound <= current_angle <= upper_bound
