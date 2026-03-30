@@ -1,4 +1,5 @@
 import smbus    # type: ignore
+import math
 import time
 
 class EncoderController:
@@ -27,13 +28,20 @@ class EncoderController:
         angle = (raw_angle - self._zero_point) % 4096
         return angle * (360.0 / 4096.0)
     
-    def get_smoothed_angle(self, samples=5):
-        """Get a smoothed angle by averaging multiple readings."""
-        total_angle = 0.0
-        for _ in range(samples):
-            total_angle += self.get_angle()
-            time.sleep(0.01)  # Small delay between samples to allow for sensor stabilization
-        return total_angle / samples
+    def get_smoothed_angle(self, num_samples=5):
+        """Get a smoothed angle by averaging multiple readings using circular mean."""
+        angles = []
+        for _ in range(num_samples):
+            angles.append(self.get_angle())
+            time.sleep(0.01)  # Small delay between samples to allow for sensor update
+        
+        # Convert to radians
+        angles_rad = [math.radians(a) for a in angles]
+        sin_sum = sum(math.sin(a) for a in angles_rad)
+        cos_sum = sum(math.cos(a) for a in angles_rad)
+        avg_angle_rad = math.atan2(sin_sum / num_samples, cos_sum / num_samples)
+        avg_angle_deg = math.degrees(avg_angle_rad) % 360
+        return avg_angle_deg
 
     def zero(self):
         """Zero the encoder by setting the current angle as the new zero point."""
