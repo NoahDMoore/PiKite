@@ -263,7 +263,7 @@ class PanServo:
         self.speed = 0.0                # Reset the speed to 0
         self.direction = DIRECTION.CW   # Reset the direction to CW
 
-    def rotate(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 2, **kwargs) -> None:
+    def rotate(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 5, **kwargs) -> None:
         """
         Rotate the servo motor an approximate number of degrees at a given speed and direction.
         Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
@@ -304,13 +304,18 @@ class PanServo:
         logger.debug(f"Rotating from {starting_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
         self.change(speed, direction)   # Set the servo rotating at the given speed and direction
 
-        # Loop until the target is reached within a margin of error
-        while not (((target_angle - margin) % 360) <= self.encoder.get_angle() <= ((target_angle + margin) % 360)):
-            logger.debug(f"Current Angle: {self.encoder.get_angle():.2f} degrees, Target Angle: {target_angle:.2f} degrees")
-            timer.wait(0.005)           # Sleep for a short time to avoid busy waiting
+        while True:
+            current_angle = self.encoder.get_angle()
 
-        self.halt()                     # Stop the servo motor after the duration has elapsed
-        logger.debug(f"Rotation complete. Current angle: {self.encoder.get_angle():.2f} degrees.")
+            if ((target_angle - margin) % 360) <= current_angle <= ((target_angle + margin) % 360):
+                self.halt()                     # Stop the servo motor after the duration has elapsed
+                logger.debug(f"Rotation complete. Current angle: {self.encoder.get_angle():.2f} degrees.")
+                
+                break # Exit the loop once the target angle is reached within the margin of error and the motor is halted
+            else:
+                logger.debug(f"Current Angle: {current_angle} degrees, Target Angle: {target_angle} degrees. Waiting to halt.")
+                timer.wait(0.005)           # Sleep for a short time to avoid busy waiting
+
         set_log_level("INFO")
 
     def get_duty_cycle(self, speed: float, direction: DIRECTION) -> float:
