@@ -24,7 +24,7 @@ class EncoderController:
         """Get the current angle."""
         raw_angle = self._read_raw_angle()
         angle = (raw_angle - self._zero_point) % 4096
-        return round(angle * (360.0 / 4096.0))
+        return angle * (360.0 / 4096.0)
     
     def zero(self):
         """Zero the encoder by setting the current angle as the new zero point."""
