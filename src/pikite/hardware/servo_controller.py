@@ -296,7 +296,7 @@ class PanServo:
                 logger.error(f"Value Error: {e}. Using default margin of 5 degrees.")
                 margin = 5
         
-        starting_angle = self.encoder.get_angle()    # Get the current angle from the encoder
+        starting_angle = self.encoder.get_smoothed_angle()    # Get the current angle from the encoder
         target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CCW else (starting_angle - degrees) % 360 # Calculate the target angle based on the starting angle, desired rotation, and direction
 
         lower_bound = (target_angle - margin) % 360
