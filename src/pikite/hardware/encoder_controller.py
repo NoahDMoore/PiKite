@@ -33,7 +33,7 @@ class EncoderController:
         angles = []
         for _ in range(num_samples):
             angles.append(self.get_angle())
-            time.sleep(0.01)  # Small delay between samples to allow for sensor update
+            time.sleep(0.002)  # Small delay between samples to allow for sensor update
         
         # Convert to radians
         angles_rad = [math.radians(a) for a in angles]
