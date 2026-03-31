@@ -326,7 +326,7 @@ class PanServo:
                 break   # Exit the loop once the target angle is reached within the margin of error and the motor is halted
             else:
                 logger.debug(f"Current Angle: {current_angle} degrees, Target Angle: {target_angle} degrees. Waiting to halt.")
-                timer.wait(0.005)   # Sleep for a short time to avoid busy waiting
+                timer.wait(0.002)   # Sleep for a short time to avoid busy waiting
 
         set_log_level("INFO")
 
