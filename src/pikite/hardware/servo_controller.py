@@ -321,7 +321,7 @@ class PanServo:
             if in_margin:
                 logger.debug(f"Current angle: {current_angle} prior to halting.")
                 self.halt()  # Stop the servo motor after the duration has elapsed
-                logger.debug(f"Rotation complete. Current angle: {self.encoder.get_angle()} degrees.")
+                logger.debug(f"Rotation complete. Current angle: {self.encoder.get_smoothed_angle()} degrees.")
                 
                 break   # Exit the loop once the target angle is reached within the margin of error and the motor is halted
             else:
