@@ -249,15 +249,9 @@ class PanServo:
         self.direction = direction  # Update the current direction
         self.speed = speed          # Update the current speed
         self.pwm.change_duty_cycle(self.get_duty_cycle(self.speed, self.direction))
-    
-    def halt(self) -> None:
-        """ Stop the servo motor by setting the duty cycle to the stop position."""
-        self.change(0.0, self.direction) # Set speed to 0.0 to stop the motor, and reverse direction to ensure the stop position is reached.
-        self.speed = 0.0 # Update the current speed to 0
 
     def stop(self) -> None:
-        """This method halts the servo motor, stops the PWM signal, and resets the speed and direction."""
-        self.halt()                     # Stop the servo motor
+        """This method halts the servo motor by stopping the PWM signal, and resets the speed and direction."""
         self.pwm.stop()                 # Stop the PWM signal
         self.speed = 0.0                # Reset the speed to 0
         self.direction = DIRECTION.CW   # Reset the direction to CW
@@ -285,8 +279,7 @@ class PanServo:
             try:
                 raise ValueError("Degrees must be nonnegative")
             except ValueError as e:
-                logger.error(f"Value Error: {e}. Halting rotation.")
-                self.halt()
+                logger.error(f"Value Error: {e}. No rotation will be performed.")
                 return
 
         if margin < 0:
@@ -308,6 +301,8 @@ class PanServo:
         max_speed = speed # Use the user-supplied max speed
         k = 0.03          # Proportional constant (tune as needed)
 
+        self.start()
+
         while True:
             current_angle = self.encoder.get_smoothed_angle() if hasattr(self.encoder, 'get_smoothed_angle') else self.encoder.get_angle()
             # Calculate shortest angular distance to target (handling wrap-around)
@@ -323,7 +318,7 @@ class PanServo:
 
             if abs_error <= margin:
                 logger.debug(f"Current angle: {current_angle:.2f}° within margin ({margin}°). Halting.")
-                self.halt()
+                self.stop()
                 logger.debug(f"Rotation complete. Final angle: {self.encoder.get_smoothed_angle() if hasattr(self.encoder, 'get_smoothed_angle') else self.encoder.get_angle():.2f}°. Target: {target_angle:.2f}°. Error: {error:.2f}°.")
                 break
 
