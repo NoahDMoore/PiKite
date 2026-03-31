@@ -319,6 +319,7 @@ class PanServo:
                 in_margin = current_angle >= lower_bound or current_angle <= upper_bound
 
             if in_margin:
+                logger.debug(f"Current angle: {current_angle} prior to halting.")
                 self.halt()  # Stop the servo motor after the duration has elapsed
                 logger.debug(f"Rotation complete. Current angle: {self.encoder.get_angle()} degrees.")
                 
