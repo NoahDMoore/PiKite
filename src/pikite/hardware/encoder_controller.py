@@ -41,6 +41,10 @@ class EncoderController:
         cos_sum = sum(math.cos(a) for a in angles_rad)
         avg_angle_rad = math.atan2(sin_sum / num_samples, cos_sum / num_samples)
         avg_angle_deg = math.degrees(avg_angle_rad) % 360
+
+        if abs(avg_angle_deg - 360.0) < 1e-6:
+            avg_angle_deg = 0.0
+        
         return avg_angle_deg
 
     def zero(self):
