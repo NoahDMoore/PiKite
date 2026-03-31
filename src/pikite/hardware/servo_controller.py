@@ -322,12 +322,13 @@ class PanServo:
                 
                 timer.wait(0.5)
                 
-                double_check_error = (target_angle - current_angle + 540) % 360 - 180  # Range: [-180, 180]
+                double_check_angle = self.encoder.get_smoothed_angle()
+                double_check_error = (target_angle - double_check_angle + 540) % 360 - 180  # Range: [-180, 180]
                 abs_double_check_error = abs(double_check_error)
                 
                 if abs_double_check_error <= margin:
-                    logger.debug(f"Double-check successful. Final angle: {self.encoder.get_smoothed_angle():.2f}° within margin ({margin}°).")
-                    logger.debug(f"Rotation complete. Final angle: {self.encoder.get_smoothed_angle():.2f}°. Target: {target_angle:.2f}°. Error: {double_check_error:.2f}°.")
+                    logger.debug(f"Double-check successful. Final angle: {double_check_angle:.2f}° within margin ({margin}°).")
+                    logger.debug(f"Rotation complete. Final angle: {double_check_angle:.2f}°. Target: {target_angle:.2f}°. Error: {double_check_error:.2f}°.")
                     break
                 else:
                     self.start()  # Restart the servo to correct any overshoot
