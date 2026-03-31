@@ -252,8 +252,7 @@ class PanServo:
     
     def halt(self) -> None:
         """ Stop the servo motor by setting the duty cycle to the stop position."""
-        stop_direction = DIRECTION.CCW if self.direction == DIRECTION.CW else DIRECTION.CW # Use the current direction to determine the stop position
-        self.change(0.0, stop_direction) # Set speed to 0.0 to stop the motor, and reverse direction to ensure the stop position is reached.
+        self.change(0.0, self.direction) # Set speed to 0.0 to stop the motor, and reverse direction to ensure the stop position is reached.
         self.speed = 0.0 # Update the current speed to 0
 
     def stop(self) -> None:
@@ -276,6 +275,7 @@ class PanServo:
 
         Raises:
             ValueError: If degrees is negative
+            ValueError: If margin is negative
             ValueError: If speed is not between 0.0 and 1.0
             ValueError: If direction is not DIRECTION.CW or DIRECTION.CCW
         """
