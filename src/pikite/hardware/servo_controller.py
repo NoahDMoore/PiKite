@@ -311,10 +311,9 @@ class PanServo:
 
             # Proportional speed control: slow down as you get closer
             prop_speed = min(max_speed, max(min_speed, k * abs_error))
-            prop_direction = DIRECTION.CCW if error > 0 else DIRECTION.CW
-            self.change(prop_speed, prop_direction)
+            self.change(prop_speed, self.direction)
 
-            logger.debug(f"Current Angle: {current_angle:.2f}°, Target Angle: {target_angle:.2f}°, Error: {error:.2f}°, Speed: {prop_speed:.2f}, Direction: {prop_direction.name}")
+            logger.debug(f"Current Angle: {current_angle:.2f}°, Target Angle: {target_angle:.2f}°, Error: {error:.2f}°, Speed: {prop_speed:.2f}")
 
             if abs_error <= margin:
                 logger.debug(f"Current angle: {current_angle:.2f}° within margin ({margin}°). Halting.")
