@@ -265,11 +265,11 @@ class PanServo:
 
     def rotate(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 5, **kwargs) -> None:
         """
-        Rotate the servo motor an approximate number of degrees at a given speed and direction.
+        Rotate the servo motor an approximate number of degrees at a given speed and direction using proportional control.
         Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
 
         Args:
-            speed (float): Speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
+            speed (float): Maximum speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
             direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
             degrees (int): Number of degrees to rotate, must be greater than 0; 360 degrees is a full rotation
             margin (int): Margin of error for target angle, in degrees
@@ -288,45 +288,46 @@ class PanServo:
                 logger.error(f"Value Error: {e}. Halting rotation.")
                 self.halt()
                 return
-            
+
         if margin < 0:
             try:
                 raise ValueError("Margin must be nonnegative")
             except ValueError as e:
                 logger.error(f"Value Error: {e}. Using default margin of 5 degrees.")
                 margin = 5
-        
-        starting_angle = self.encoder.get_smoothed_angle()    # Get the current angle from the encoder
-        target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CCW else (starting_angle - degrees) % 360 # Calculate the target angle based on the starting angle, desired rotation, and direction
 
-        lower_bound = (target_angle - margin) % 360
-        upper_bound = (target_angle + margin) % 360
-        in_margin = False
+        starting_angle = self.encoder.get_smoothed_angle()
+        target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CCW else (starting_angle - degrees) % 360
 
         timer = Timer()
 
-        logger.debug(f"Rotating from {starting_angle:.2f} degrees to {target_angle:.2f} degrees at speed {speed} in direction {direction.value}.")
-        self.change(speed, direction)   # Set the servo rotating at the given speed and direction
+        logger.debug(f"Rotating from {starting_angle:.2f}° to {target_angle:.2f}° at max speed {speed} in direction {direction.value}.")
+
+        # Proportional control parameters
+        min_speed = 0.15  # Minimum speed to avoid stalling (tune as needed)
+        max_speed = speed # Use the user-supplied max speed
+        k = 0.03          # Proportional constant (tune as needed)
 
         while True:
-            current_angle = self.encoder.get_smoothed_angle()
+            current_angle = self.encoder.get_smoothed_angle() if hasattr(self.encoder, 'get_smoothed_angle') else self.encoder.get_angle()
+            # Calculate shortest angular distance to target (handling wrap-around)
+            error = (target_angle - current_angle + 540) % 360 - 180  # Range: [-180, 180]
+            abs_error = abs(error)
 
-            if lower_bound < upper_bound:
-                in_margin = lower_bound <= current_angle <= upper_bound
-            elif lower_bound == upper_bound:
-                in_margin = current_angle == target_angle
-            else:
-                in_margin = current_angle >= lower_bound or current_angle <= upper_bound
+            # Proportional speed control: slow down as you get closer
+            prop_speed = min(max_speed, max(min_speed, k * abs_error))
+            prop_direction = DIRECTION.CCW if error > 0 else DIRECTION.CW
+            self.change(prop_speed, prop_direction)
 
-            if in_margin:
-                logger.debug(f"Current angle: {current_angle} prior to halting.")
-                self.halt()  # Stop the servo motor after the duration has elapsed
-                logger.debug(f"Rotation complete. Current angle: {self.encoder.get_smoothed_angle()} degrees.")
-                
-                break   # Exit the loop once the target angle is reached within the margin of error and the motor is halted
-            else:
-                logger.debug(f"Current Angle: {current_angle} degrees, Target Angle: {target_angle} degrees. Waiting to halt.")
-                timer.wait(0.002)   # Sleep for a short time to avoid busy waiting
+            logger.debug(f"Current Angle: {current_angle:.2f}°, Target Angle: {target_angle:.2f}°, Error: {error:.2f}°, Speed: {prop_speed:.2f}, Direction: {prop_direction.name}")
+
+            if abs_error <= margin:
+                logger.debug(f"Current angle: {current_angle:.2f}° within margin ({margin}°). Halting.")
+                self.halt()
+                logger.debug(f"Rotation complete. Final angle: {self.encoder.get_smoothed_angle() if hasattr(self.encoder, 'get_smoothed_angle') else self.encoder.get_angle():.2f}°. Target: {target_angle:.2f}°. Error: {error:.2f}°.")
+                break
+
+            timer.wait(0.002)   # Sleep for a short time to avoid busy waiting
 
         set_log_level("INFO")
 
