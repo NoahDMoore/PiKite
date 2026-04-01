@@ -299,7 +299,7 @@ class PanServo:
         # Proportional control parameters
         min_speed = 0.15  # Minimum speed to avoid stalling (tune as needed)
         max_speed = speed # Use the user-supplied max speed
-        k = 0.03          # Proportional constant (tune as needed)
+        k = 0.02          # Proportional constant (tune as needed)
 
         self.start()
 
