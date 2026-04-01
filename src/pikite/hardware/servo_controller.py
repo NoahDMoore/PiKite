@@ -256,7 +256,7 @@ class PanServo:
         self.speed = 0.0                # Reset the speed to 0
         self.direction = DIRECTION.CW   # Reset the direction to CW
 
-    def rotate(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 4, **kwargs) -> None:
+    def rotate_by(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 4, **kwargs) -> None:
         """
         Rotate the servo motor an approximate number of degrees at a given speed and direction using proportional control.
         Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
@@ -273,8 +273,6 @@ class PanServo:
             ValueError: If speed is not between 0.0 and 1.0
             ValueError: If direction is not DIRECTION.CW or DIRECTION.CCW
         """
-        set_log_level("DEBUG")
-
         if degrees < 0:
             try:
                 raise ValueError("Degrees must be nonnegative")
@@ -292,19 +290,68 @@ class PanServo:
         starting_angle = self.encoder.get_smoothed_angle()
         target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CCW else (starting_angle - degrees) % 360
 
-        timer = Timer()
-
         logger.debug(f"Rotating from {starting_angle:.2f}° to {target_angle:.2f}° at max speed {speed} in direction {direction.value}.")
 
+        self.proportional_rotate(speed, target_angle, margin)
+
+    def rotate_to(self, speed: float, direction: DIRECTION, target_angle: int, margin: int = 4, **kwargs) -> None:
+        """
+        Rotate the servo motor to a specific target angle at a given speed and direction using proportional control.
+        Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
+
+        Args:
+            speed (float): Maximum speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
+            direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
+            target_angle (int): Target angle to rotate to, in degrees from 0 to 360
+            margin (int): Margin of error for target angle, in degrees
+        
+        Raises:
+            ValueError: If target_angle is not between 0 and 360
+            ValueError: If margin is negative
+            ValueError: If speed is not between 0.0 and 1.0
+            ValueError: If direction is not DIRECTION.CW or DIRECTION.CCW
+        """
+
+        if target_angle < 0 or target_angle >= 360:
+            try:
+                raise ValueError("Target angle must be between 0 and 360 degrees.")
+            except ValueError as e:
+                logger.error(f"Value Error: {e}. No rotation will be performed.")
+                return
+
+        if margin < 0:
+            try:
+                raise ValueError("Margin must be nonnegative")
+            except ValueError as e:
+                logger.error(f"Value Error: {e}. Using default margin of 4 degrees.")
+                margin = 4
+
+        logger.debug(f"Rotating from {self.encoder.get_smoothed_angle():.2f}° to {target_angle:.2f}° at max speed {speed} in direction {direction.value}.")
+
+        self.proportional_rotate(speed, target_angle, margin)
+
+    def proportional_rotate(self, speed: float, target_angle: int|float, margin: int = 4) -> None:
+        """
+        Rotate the servo motor to a specific target angle at a given speed using proportional control.
+        Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
+
+        Args:
+            speed (float): Maximum speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
+            direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
+            target_angle (int): Target angle to rotate to, in degrees from 0 to 360
+            margin (int): Margin of error for target angle, in degrees
+        """
         # Proportional control parameters
         min_speed = 0.15  # Minimum speed to avoid stalling (tune as needed)
         max_speed = speed # Use the user-supplied max speed
         k = 0.02          # Proportional constant (tune as needed)
 
+        timer = Timer()
+
         self.start()
 
         while True:
-            current_angle = self.encoder.get_smoothed_angle() if hasattr(self.encoder, 'get_smoothed_angle') else self.encoder.get_angle()
+            current_angle = self.encoder.get_smoothed_angle()
             # Calculate shortest angular distance to target (handling wrap-around)
             error = (target_angle - current_angle + 540) % 360 - 180  # Range: [-180, 180]
             abs_error = abs(error)
@@ -332,11 +379,9 @@ class PanServo:
                     break
                 else:
                     self.start()  # Restart the servo to correct any overshoot
-                    logger.debug(f"Double-check failed. Final angle: {self.encoder.get_smoothed_angle() if hasattr(self.encoder, 'get_smoothed_angle') else self.encoder.get_angle():.2f}° outside margin ({margin}°). Restarting servo to correct overshoot.")
+                    logger.debug(f"Double-check failed. Final angle: {self.encoder.get_smoothed_angle():.2f}° outside margin ({margin}°). Restarting servo to correct overshoot.")
 
             timer.wait(0.002)   # Sleep for a short time to avoid busy waiting
-
-        set_log_level("INFO")
 
     def get_duty_cycle(self, speed: float, direction: DIRECTION) -> float:
         """
@@ -476,7 +521,7 @@ class PanTiltPattern:
         if self.PAN_STEP > 0:
             pan_direction = DIRECTION.CW if not self.pan_reverse else DIRECTION.CCW
 
-            self.pan_servo.rotate(
+            self.pan_servo.rotate_by(
                 speed=0.5,
                 direction=pan_direction,
                 degrees=self.PAN_STEP,
