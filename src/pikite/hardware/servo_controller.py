@@ -256,7 +256,7 @@ class PanServo:
         self.speed = 0.0                # Reset the speed to 0
         self.direction = DIRECTION.CW   # Reset the direction to CW
 
-    def rotate(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 5, **kwargs) -> None:
+    def rotate(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 4, **kwargs) -> None:
         """
         Rotate the servo motor an approximate number of degrees at a given speed and direction using proportional control.
         Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
@@ -286,8 +286,8 @@ class PanServo:
             try:
                 raise ValueError("Margin must be nonnegative")
             except ValueError as e:
-                logger.error(f"Value Error: {e}. Using default margin of 5 degrees.")
-                margin = 5
+                logger.error(f"Value Error: {e}. Using default margin of 4 degrees.")
+                margin = 4
 
         starting_angle = self.encoder.get_smoothed_angle()
         target_angle = (starting_angle + degrees) % 360 if direction == DIRECTION.CCW else (starting_angle - degrees) % 360
