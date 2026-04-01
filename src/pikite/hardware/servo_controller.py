@@ -477,9 +477,10 @@ class PanTiltPattern:
             pan_direction = DIRECTION.CW if not self.pan_reverse else DIRECTION.CCW
 
             self.pan_servo.rotate(
-                speed=1.0,
+                speed=0.5,
                 direction=pan_direction,
-                degrees=self.PAN_STEP
+                degrees=self.PAN_STEP,
+                margin=4
             )
 
             self.pan_step_sum += self.PAN_STEP
