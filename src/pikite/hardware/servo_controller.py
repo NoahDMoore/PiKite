@@ -294,14 +294,13 @@ class PanServo:
 
         self.proportional_rotate(speed, target_angle, margin)
 
-    def rotate_to(self, speed: float, direction: DIRECTION, target_angle: int, margin: int = 4, **kwargs) -> None:
+    def rotate_to(self, speed: float, target_angle: int, margin: int = 4, **kwargs) -> None:
         """
         Rotate the servo motor to a specific target angle at a given speed and direction using proportional control.
         Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
 
         Args:
             speed (float): Maximum speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
-            direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
             target_angle (int): Target angle to rotate to, in degrees from 0 to 360
             margin (int): Margin of error for target angle, in degrees
         
@@ -326,7 +325,7 @@ class PanServo:
                 logger.error(f"Value Error: {e}. Using default margin of 4 degrees.")
                 margin = 4
 
-        logger.debug(f"Rotating from {self.encoder.get_smoothed_angle():.2f}° to {target_angle:.2f}° at max speed {speed} in direction {direction.value}.")
+        logger.debug(f"Rotating from {self.encoder.get_smoothed_angle():.2f}° to {target_angle:.2f}° at max speed {speed}.")
 
         self.proportional_rotate(speed, target_angle, margin)
 
@@ -495,14 +494,16 @@ class PanTiltPattern:
         self.mode = mode
         self.pan_servo = pan_servo
         self.tilt_servo = tilt_servo
-
-        if self.pan_servo == None or self.tilt_servo == None:
-            raise TypeError ("pan_servo must be of type PanServo and tilt_servo must of type TiltServo")
+        if self.pan_servo is None or self.tilt_servo is None:
+            raise TypeError("pan_servo must be of type PanServo and tilt_servo must of type TiltServo")
 
         self.PAN_STEP = PanTiltPattern.MODE_PARAMETERS[self.mode]["pan_step"]
         self.TILT_STEP = PanTiltPattern.MODE_PARAMETERS[self.mode]["tilt_step"]
         self.PAN_LIMIT = PanTiltPattern.MODE_PARAMETERS[self.mode]["pan_limit"]
         self.TILT_LIMIT = PanTiltPattern.MODE_PARAMETERS[self.mode]["tilt_limit"]
+
+        self.current_pan_angle = 0
+        self.target_pan_angle = 0
 
         self.pan_step_sum = 0
         self.tilt_step_sum = 0
@@ -515,19 +516,24 @@ class PanTiltPattern:
         self.reset()
 
     def reset(self):
+        self.pan_servo.rotate_to(speed=0.5, target_angle=0, margin=4)
+        self.current_pan_angle = 0
         self.tilt_servo.angle = 0
 
     def step(self):
         if self.PAN_STEP > 0:
-            pan_direction = DIRECTION.CW if not self.pan_reverse else DIRECTION.CCW
+            if not self.pan_reverse:
+                self.target_pan_angle = (self.current_pan_angle + self.PAN_STEP) % 360
+            else:
+                self.target_pan_angle = (self.current_pan_angle - self.PAN_STEP) % 360
 
-            self.pan_servo.rotate_by(
+            self.pan_servo.rotate_to(
                 speed=0.5,
-                direction=pan_direction,
-                degrees=self.PAN_STEP,
+                target_angle=self.target_pan_angle,
                 margin=4
             )
 
+            self.current_pan_angle = self.target_pan_angle
             self.pan_step_sum += self.PAN_STEP
             self.timer.wait(0.5) # Wait for the pan movement to complete before moving the tilt servo
 
