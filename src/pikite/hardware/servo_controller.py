@@ -523,9 +523,9 @@ class PanTiltPattern:
     def step(self):
         if self.PAN_STEP > 0:
             if not self.pan_reverse:
-                self.target_pan_angle = (self.current_pan_angle + self.PAN_STEP) % 360
-            else:
                 self.target_pan_angle = (self.current_pan_angle - self.PAN_STEP) % 360
+            else:
+                self.target_pan_angle = (self.current_pan_angle + self.PAN_STEP) % 360
 
             self.pan_servo.rotate_to(
                 speed=0.5,
