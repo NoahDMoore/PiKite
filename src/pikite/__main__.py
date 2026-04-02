@@ -139,7 +139,7 @@ def capture_loop(
     else:
         capture_interval = 2  # Default interval for NONE mode
         media_extension = None
-        logger.info("Capture mode is NONE; no capture will be performed.")
+        logger.info("Capture mode is NONE; no media capture will be performed.")
 
     video_length = settings.get("vid_length", 15)
     video_repeat = settings.get("vid_multiple", True)
@@ -167,7 +167,7 @@ def capture_loop(
     input_handler.register(
         scope="CAPTURE",
         command=InputCommand.PAN,
-        callback=pan_servo.rotate
+        callback=pan_servo.rotate_to
     )
 
     input_handler.register(
