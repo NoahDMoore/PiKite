@@ -82,3 +82,42 @@ def unset_file_handler() -> None:
         logger.debug("File handler removed from logger.")
     else:
         logger.debug("No file handler found to remove.")
+
+def register_websocket_handler(server) -> None:
+    """
+    Register a WebSocket handler to send log messages to connected clients.
+
+    Args:
+        server: The WebSocket server instance to which the handler will send log messages.
+    """
+    websocket_handler = WebSocketHandler(server)
+    websocket_handler.setFormatter(logging.Formatter(
+        fmt="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    ))
+    logger.addHandler(websocket_handler)
+    logger.debug("WebSocket handler registered to logger.")
+
+class WebSocketHandler(logging.Handler):
+    """
+    Custom logging handler that sends log messages to connected WebSocket clients.
+    """
+    def __init__(self, server):
+        super().__init__()
+        self.server = server
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+
+            # Push into your existing TX pipeline
+            self.server.send({
+                "type": "log",
+                "level": record.levelname,
+                "logger": record.name,
+                "message": record.getMessage(),
+                "timestamp": record.created
+            })
+
+        except Exception:
+            self.handleError(record)

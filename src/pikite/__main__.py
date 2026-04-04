@@ -272,6 +272,9 @@ async def main():
 
     # Initialize Remote Controller Server
     remote_server = ControllerServer(port=5000)
+    
+    # Add WebSocket Handler for Remote Logging
+    logger_module.register_websocket_handler(remote_server)
     initialization_progress_bar.advance(10)
 
     # Initialize Buttons
