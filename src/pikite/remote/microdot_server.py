@@ -59,9 +59,9 @@ class ControllerServer:
         @self.app.route('/')
         async def index(request: Request):
             index_path = self.storage.WEB_ROOT / "index.html"
-            
+            logger.debug(f"Serving index file for client ({request.client_addr}) request: {index_path}")
             try:
-                return send_file(index_path)
+                return send_file(str(index_path))
             except FileNotFoundError:
                 logger.error(f"Index File Not Found for client ({request.client_addr}) request.")
                 return "Error 404: Index file not found", 404
@@ -85,7 +85,8 @@ class ControllerServer:
                 OSError: If there is an issue reading the file.
                 Exception: For any other unexpected errors.
             """
-            file_path = 'static/' + path
+            file_path = str(self.storage.WEB_ROOT / "static" / path)
+            logger.debug(f"Serving static file for client ({request.client_addr}) request: {file_path}")
 
             # Get extension without os.path
             dot = file_path.rfind('.')
