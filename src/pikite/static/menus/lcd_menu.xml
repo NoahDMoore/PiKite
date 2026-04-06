@@ -458,7 +458,7 @@
 				<option_item name="info" message="Level: [INFO]" action="selectOption" value="INFO" />
 				<option_item name="warning" message="Level: [WARNING]" action="selectOption" value="WARNING" />
 				<option_item name="error" message="Level: [ERROR]" action="selectOption" value="ERROR" />
-				<option_item name="critical" message="Seconds: [CRITICAL]" action="selectOption" value="CRITICAL" />
+				<option_item name="critical" message="Level: [CRITICAL]" action="selectOption" value="CRITICAL" />
 			</menu_item>
 			
 			<menu_item name="logReturn" message="Exit Submenu" action="return" parent="log" />
