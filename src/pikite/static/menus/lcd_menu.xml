@@ -4,7 +4,7 @@
 	<menu_item name="settings" message="Settings" action="submenu" parent="root" >
 		<menu_item name="altitude" message="Alt. Settings" action="submenu" parent="settings">
 			<menu_item name="altitudeInterval" message="Set Alt. Interval" action="options" parent="altitude">
-				<setting>alt_reading_interval</setting>
+				<setting type="int">alt_reading_interval</setting>
 				<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
 				<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
 				<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
@@ -18,7 +18,7 @@
 
 		<menu_item name="camera" message="Camera Settings" action="submenu" parent="settings">
 			<menu_item name="cameraModel" message="Select Camera Model" action="options" parent="camera">
-				<setting>cam_model</setting>
+				<setting type="str">cam_model</setting>
 				<option_item name="V1" message="[V1]" action="selectOption" value="imx647" />
 				<option_item name="V2" message="[V2]" action="selectOption" value="imx219" />
 				<option_item name="V3" message="[V3]" action="selectOption" value="imx708" />
@@ -27,20 +27,20 @@
 			</menu_item>
 
 			<menu_item name="cameraIRFilter" message="IR Filter?" action="options" parent="camera">
-				<setting>cam_ir_filter</setting>
+				<setting type="bool">cam_ir_filter</setting>
 				<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
 				<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 			</menu_item>
 
 			<menu_item name="cameraMode" message="Photo or Video?" action="options" parent="camera">
-				<setting>cam_capture_mode</setting>
+				<setting type="str">cam_capture_mode</setting>
 				<option_item name="photo" message="[Photos]" action="selectOption" value="pic" />
 				<option_item name="video" message="[Video]" action="selectOption" value="vid" />
 				<option_item name="none" message="[None]" action="selectOption" value="none" />
 			</menu_item>
 
 			<menu_item name="cameraDelay" message="Camera Delay" action="options" parent="camera">
-				<setting>cam_recording_delay</setting>
+				<setting type="int">cam_recording_delay</setting>
 				<option_item name="zero" message="Minutes: [0]" action="selectOption" value="0" />
 				<option_item name="two" message="Minutes: [2]" action="selectOption" value="2" />
 				<option_item name="five" message="Minutes: [5]" action="selectOption" value="5" />
@@ -48,13 +48,13 @@
 			</menu_item>
 
 			<menu_item name="cameraRotation" message="Image Rotation" action="options" parent="camera">
-				<setting>cam_rotation</setting>
+				<setting type="int">cam_rotation</setting>
 				<option_item name="zeroRotation" message="Degrees: [0]" action="selectOption" value="0" />
 				<option_item name="oneeightyRotation" message="Degrees: [180]" action="selectOption" value="180" />
 			</menu_item>
 
 			<menu_item name="imageResolution" message="Image Resolution" action="options" parent="photoSettings">
-				<setting>cam_resolution</setting>
+				<setting type="tuple">cam_resolution</setting>
 				<option_item name="QVGA" message="QVGA: [320x240]" action="selectOption" value="(320,240)"/>
 				<option_item name="VGA" message="VGA: [640x480]" action="selectOption" value="(640,480)"/>
 				<option_item name="SDNTSC" message="SD NTSC: [720x480]" action="selectOption" value="(720,480)"/>
@@ -76,39 +76,39 @@
 			
 			<menu_item name="imageAdjustments" message="Image Adjustments" action="submenu" parent="camera">
 				<menu_item name="aeEnable" message="Auto Exposure?" action="options" parent="imageAdjustments">
-					<setting>cam_ae_enable</setting>
+					<setting type="bool">cam_ae_enable</setting>
 					<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
 					<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 				</menu_item>
 
 				<menu_item name="afMode" message="Auto Focus Mode" action="options" parent="imageAdjustments">
-					<setting>cam_af_mode</setting>
+					<setting type="str">cam_af_mode</setting>
 					<option_item name="manual" message="[Manual]" action="selectOption" value="manual" />
 					<option_item name="auto" message="[Auto]" action="selectOption" value="auto" />
 					<option_item name="continuous" message="[Continuous]" action="selectOption" value="continuous" />
 				</menu_item>
 
 				<menu_item name="afRange" message="Auto Focus Range" action="options" parent="imageAdjustments">
-					<setting>cam_af_range</setting>
+					<setting type="str">cam_af_range</setting>
 					<option_item name="normal" message="[Normal]" action="selectOption" value="normal" />
 					<option_item name="macro" message="[Macro]" action="selectOption" value="macro" />
 					<option_item name="full" message="[Full]" action="selectOption" value="full" />
 				</menu_item>
 
 				<menu_item name="afSpeed" message="Auto Focus Speed" action="options" parent="imageAdjustments">
-					<setting>cam_af_speed</setting>
+					<setting type="str">cam_af_speed</setting>
 					<option_item name="normal" message="[Normal]" action="selectOption" value="normal" />
 					<option_item name="fast" message="[Fast]" action="selectOption" value="fast" />
 				</menu_item>
 
 				<menu_item name="awbEnable" message="Auto White Balance?" action="options" parent="imageAdjustments">
-					<setting>cam_awb_enable</setting>
+					<setting type="bool">cam_awb_enable</setting>
 					<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
 					<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 				</menu_item>
 				
 				<menu_item name="awbMode" message="Auto White Balance Mode" action="options" parent="imageAdjustments">
-					<setting>cam_awb_mode</setting>
+					<setting type="str">cam_awb_mode</setting>
 					<option_item name="auto" message="[Auto]" action="selectOption" value="auto" />
 					<option_item name="tungsten" message="[Tungsten]" action="selectOption" value="tungsten" />
 					<option_item name="fluorescent" message="[Fluorescent]" action="selectOption" value="fluorescent" />
@@ -119,7 +119,7 @@
 				</menu_item>
 
 				<menu_item name="brightness" message="Brightness" action="options" parent="imageAdjustments">
-					<setting>cam_brightness</setting>
+					<setting type="float">cam_brightness</setting>
 					<option_item name="minus1" message="[-1.0]" action="selectOption" value="-1.0" />
 					<option_item name="minus09" message="[-0.9]" action="selectOption" value="-0.9" />
 					<option_item name="minus08" message="[-0.8]" action="selectOption" value="-0.8" />
@@ -144,7 +144,7 @@
 				</menu_item>
 				
 				<menu_item name="contrast" message="Contrast" action="options" parent="imageAdjustments">
-					<setting>cam_contrast</setting>
+					<setting type="float">cam_contrast</setting>
 					<option_item name="zero" message="[0.0]" action="selectOption" value="0.0" />
 					<option_item name="plus05" message="[0.5]" action="selectOption" value="0.5" />
 					<option_item name="plus1" message="[1.0]" action="selectOption" value="1.0" />
@@ -213,7 +213,7 @@
 				</menu_item>
 			
 				<menu_item name="exposureValue" message="Exposure Value" action="options" parent="imageAdjustments">
-					<setting>cam_exposure_value</setting>
+					<setting type="float">cam_exposure_value</setting>
 					<option_item name="minus8" message="[-8.0]" action="selectOption" value="-8.0" />
 					<option_item name="minus7_5" message="[-7.5]" action="selectOption" value="-7.5" />
 					<option_item name="minus7" message="[-7.0]" action="selectOption" value="-7.0" />
@@ -250,7 +250,7 @@
 				</menu_item>
 
 				<menu_item name="saturation" message="Saturation" action="options" parent="imageAdjustments">
-					<setting>cam_saturation</setting>
+					<setting type="float">cam_saturation</setting>
 					<option_item name="zero" message="[0.0]" action="selectOption" value="0.0" />
 					<option_item name="plus05" message="[0.5]" action="selectOption" value="0.5" />
 					<option_item name="plus1" message="[1.0]" action="selectOption" value="1.0" />
@@ -319,7 +319,7 @@
 				</menu_item>
 
 				<menu_item name="sharpness" message="Sharpness" action="options" parent="imageAdjustments">
-					<setting>cam_sharpness</setting>
+					<setting type="float">cam_sharpness</setting>
 					<option_item name="zero" message="[0.0]" action="selectOption" value="0.0" />
 					<option_item name="plus05" message="[0.5]" action="selectOption" value="0.5" />
 					<option_item name="plus1" message="[1.0]" action="selectOption" value="1.0" />
@@ -360,7 +360,7 @@
 
 			<menu_item name="photoSettings" message="Photo Settings" action="submenu" parent="camera">
 				<menu_item name="photoInterval" message="Photo Interval" action="options" parent="photoSettings">
-					<setting>pic_interval</setting>
+					<setting type="int">pic_interval</setting>
 					<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
 					<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
 					<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
@@ -370,7 +370,7 @@
 				</menu_item>
 
 				<menu_item name="imageAnnotation" message="Photo Annotations" action="options" parent="photoSettings">
-					<setting>pic_annotations</setting>
+					<setting type="str">pic_annotations</setting>
 					<option_item name="none" message="[None]" action="selectOption" value="none" />
 					<option_item name="altstamp" message="[Altitude]" action="selectOption" value="alt" />
 					<option_item name="timestamp" message="[Timestamp]" action="selectOption" value="time" />
@@ -382,7 +382,7 @@
 
 			<menu_item name="videoSettings" message="Video Settings" action="submenu" parent="camera">
 				<menu_item name="videoLength" message="Video Length" action="options" parent="videoSettings">
-					<setting>vid_length</setting>
+					<setting type="int">vid_length</setting>
 					<option_item name="fifteen" message="Seconds: [15]" action="selectOption" value="15" />
 					<option_item name="thirty" message="Seconds: [30]" action="selectOption" value="30" />
 					<option_item name="sixty" message="Seconds: [60]" action="selectOption" value="60" />
@@ -392,13 +392,13 @@
 				</menu_item>
 				
 				<menu_item name="multipleVideos" message="Multiple Videos?" action="options" parent="videoSettings">
-					<setting>vid_multiple</setting>
+					<setting type="bool">vid_multiple</setting>
 					<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
 					<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 				</menu_item>
 
 				<menu_item name="videoInterval" message="Video Interval" action="options" parent="videoSettings">
-					<setting>vid_interval</setting>
+					<setting type="int">vid_interval</setting>
 					<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
 					<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
 					<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
@@ -415,7 +415,7 @@
 
 		<menu_item name="panTiltSettings" message="Pan/Tilt Settings" action="submenu" parent="settings">
 			<menu_item name="panTiltMode" message="Pan/Tilt Mode" action="options" parent="panTiltSettings">
-				<setting>pan_tilt_mode</setting>
+				<setting type="str">pan_tilt_mode</setting>
 				<option_item name="off" message="Mode: [Off]" action="selectOption" value="NONE" />
 				<option_item name="pan_30" message="Mode: [Pan 30°]" action="selectOption" value="pan_30" />
 				<option_item name="pan_45" message="Mode: [Pan 45°]" action="selectOption" value="pan_45" />
@@ -427,7 +427,7 @@
 			</menu_item>
 
 			<menu_item name="panTiltInterval" message="Pan Interval" action="options" parent="panTiltSettings">
-				<setting>pan_tilt_interval</setting>
+				<setting type="int">pan_tilt_interval</setting>
 				<option_item name="two" message="Seconds: [02]" action="selectOption" value="2" />
 				<option_item name="five" message="Seconds: [05]" action="selectOption" value="5" />
 				<option_item name="ten" message="Seconds: [10]" action="selectOption" value="10" />
@@ -441,19 +441,19 @@
 
 		<menu_item name="log" message="Error Logging" action="submenu" parent="settings">
 			<menu_item name="logToFile" message="Log to File?" action="options" parent="log">
-				<setting>log_to_file</setting>
+				<setting type="bool">log_to_file</setting>
 				<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
 				<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 			</menu_item>
 
 			<menu_item name="logToConsole" message="Log to Console?" action="options" parent="log">
-				<setting>log_to_console</setting>
+				<setting type="bool">log_to_console</setting>
 				<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
 				<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
 			</menu_item>
 
 			<menu_item name="logLevel" message="Set Log Level" action="options" parent="log">
-				<setting>log_level</setting>
+				<setting type="str">log_level</setting>
 				<option_item name="debug" message="Level: [DEBUG]" action="selectOption" value="DEBUG" />
 				<option_item name="info" message="Level: [INFO]" action="selectOption" value="INFO" />
 				<option_item name="warning" message="Level: [WARNING]" action="selectOption" value="WARNING" />
