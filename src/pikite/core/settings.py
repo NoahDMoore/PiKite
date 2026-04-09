@@ -112,6 +112,16 @@ class Settings:
         if read_after:
             self.config.read(self.config_path)
 
+    def format_as_dict(self) -> dict:
+        """
+        Format the current configuration as a dictionary.
+        
+        Returns:
+            dict: A representation of the current configuration, organized by section.
+        """
+        settings_dict = {section: dict(self.config.items(section)) for section in self.config.sections()}
+        return settings_dict
+
 # Function to get the section for a given setting
 def get_section(setting_key: str) -> str:
     """
