@@ -41,38 +41,54 @@ class ControllerServer:
         # Initialize Storage Manager
         self.storage = StorageManager()
 
+        # WebSocket Route
+        @self.app.route('/ws')
+        @with_websocket
+        async def ws(request: Request, ws: WebSocket):
+            """
+            Handle WebSocket connections for real-time communication.
+
+            Args:
+                request: The incoming request object.
+                ws: The WebSocket connection object.
+
+            Raises:
+                Exception: If there is an error during WebSocket connection or communication.
+            """
+            try:
+                token = request.headers.get('token')
+                if not token:
+                    logger.warning(f"WebSocket connection attempt without token from client: {request.client_addr}")
+                    return
+                
+                if token != "your-generated-token":
+                    logger.warning(f"WebSocket connection attempt with invalid token from client: {request.client_addr}")
+                    return
+
+                logger.info(f"WebSocket connection established with client: {request.client_addr}")
+                await self.register(ws) # Register the WebSocket connection
+            except Exception as e:
+                logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
+
+        # Web Server Routes
+        
         # MIME types for static files (images, css, js)
         MIME_TYPES = {
             '.png':  'image/png',
             '.jpg':  'image/jpeg',
             '.jpeg': 'image/jpeg',
             '.gif':  'image/gif',
+            '.svg':  'image/svg+xml',
             '.css':  'text/css',
             '.js':   'application/javascript',
             '.html': 'text/html'
         }
-
-
-        ''' Define Web Server Routes '''
-
-        # Web Server Routes
-        @self.app.route('/')
-        async def index(request: Request):
-            index_path = self.storage.WEB_ROOT / "index.html"
-            logger.debug(f"Serving index file for client ({request.client_addr}) request: {index_path}")
-            try:
-                return send_file(str(index_path))
-            except FileNotFoundError:
-                logger.error(f"Index File Not Found for client ({request.client_addr}) request.")
-                return "Error 404: Index file not found", 404
-            except Exception as e:
-                logger.error(f"Unknown error serving index file for client ({request.client_addr}) request: {e}")
-                return "Error 500: Internal Server Error", 500
-            
+        
         @self.app.route('/static/<path:path>')
-        def media(request: Request, path):
+        async def static(request: Request, path):
             """
             Serve static files from the 'static' directory.
+            
             Args:
                 request: The incoming request object.
                 path (str): The path to the requested static file.
@@ -106,25 +122,87 @@ class ControllerServer:
                 logger.error(f"Unknown error serving static file for client ({request.client_addr}) request: {file_path}: {e}")
                 return 'Error 500: Internal Server Error', 500
 
-        # WebSocket Route
-        @self.app.route('/ws')
-        @with_websocket
-        async def ws(request: Request, ws: WebSocket):
+        @self.app.route('/')
+        async def root(request: Request):
             """
-            Handle WebSocket connections for real-time communication.
+            Serve the root HTML file (index.html) for the web interface.
+            
+            Args:
+                request: The incoming request object.
+            
+            Returns:
+                The requested file with the appropriate content type, or an error message if not found.
+            
+            Raises:
+                FileNotFoundError: If the index.html file does not exist.
+                OSError: If there is an issue reading the file.
+                Exception: For any other unexpected errors.
+            """
+            # Default to index.html
+            file_path = self.storage.WEB_ROOT / 'index.html'
+            logger.debug(f"Serving root file for client ({request.client_addr}) request: {file_path}")
+            try:
+                return send_file(str(file_path))
+            except FileNotFoundError:
+                logger.error(f"Root File Not Found for client ({request.client_addr}) request.")
+                return "Error 404: File not found", 404
+            except Exception as e:
+                logger.error(f"Unknown error serving root file for client ({request.client_addr}) request: {e}")
+                return "Error 500: Internal Server Error", 500
+
+        @self.app.route('/<path:path>')
+        async def serve_html(request: Request, path: str):
+            """
+            Serve only HTML files from the web root directory.
+            
+            Args:
+                request: The incoming request object.
+                path (str): The path to the requested HTML file.
+            
+            Returns:
+                The requested HTML file, or an error message if not found or if the path is invalid
+            
+            Raises:
+                FileNotFoundError: If the requested HTML file does not exist.
+                OSError: If there is an issue reading the file.
+                Exception: For any other unexpected errors.
+            """
+            if not (path.endswith('.html') and '/' not in path and '\\' not in path):
+                return "Error 404: File not found", 404
+            file_path = self.storage.WEB_ROOT / path
+            logger.debug(f"Serving HTML file for client ({request.client_addr}) request: {file_path}")
+            try:
+                return send_file(str(file_path))
+            except FileNotFoundError:
+                logger.error(f"HTML File Not Found for client ({request.client_addr}) request: {file_path}")
+                return "Error 404: File not found", 404
+            except Exception as e:
+                logger.error(f"Unknown error serving HTML file for client ({request.client_addr}) request: {e}")
+                return "Error 500: Internal Server Error", 500
+
+        # Login Route
+        @self.app.route('/login', methods=['POST'])
+        async def login(request: Request):
+            """
+            Handle user login requests.
 
             Args:
                 request: The incoming request object.
-                ws: The WebSocket connection object.
 
-            Raises:
-                Exception: If there is an error during WebSocket connection or communication.
+            Returns:
+                A JSON response indicating the success or failure of the login attempt.
             """
-            try:
-                logger.info(f"WebSocket connection established with client: {request.client_addr}")
-                await self.register(ws) # Register the WebSocket connection
-            except Exception as e:
-                logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
+            data = request.json
+            username = data.get('username') # type: ignore
+            password = data.get('password') # type: ignore
+
+            # Placeholder for actual authentication logic
+            if username == "admin" and password == "password":
+                # Generate a simple token (in a real application, use a more secure method)
+                token = "your-generated-token"
+                return {"token": token}
+            else:
+                return {"Error": "Invalid Credentials. Login Failed."}, 401
 
     async def register(self, ws: WebSocket):
         """
