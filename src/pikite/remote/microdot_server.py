@@ -63,8 +63,6 @@ class ControllerServer:
                 Exception: If there is an error during WebSocket connection or communication.
             """
             try:
-                logger.info(f"Request Args: {request.args} from client: {request.client_addr}")
-                
                 token = request.args.get('token')
                 
                 if not token:
@@ -84,8 +82,10 @@ class ControllerServer:
                     await ws.send(json.dumps({"alert": "Expired Token. Connection Rejected."}))
                     await ws.close()
                     return
-
-                logger.info(f"WebSocket connection established with client: {request.client_addr}")
+                
+                time_left = int(self.active_tokens[token] - time.time())
+                expiration_str = f"{time_left // 60}m {time_left % 60}s" if time_left >= 60 else f"{time_left}s"
+                logger.info(f"WebSocket connection established with client: {request.client_addr}. Session token expires in {expiration_str}.")
                 await self.register(ws) # Register the WebSocket connection
             except Exception as e:
                 logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
