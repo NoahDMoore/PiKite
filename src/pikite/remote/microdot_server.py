@@ -8,8 +8,12 @@ Usage:
     message = server.get()  # Retrieve incoming messages from the client
 """
 
-import json
 import asyncio
+import bcrypt
+import json
+import os
+import secrets
+import time
 
 from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
@@ -41,6 +45,9 @@ class ControllerServer:
         # Initialize Storage Manager
         self.storage = StorageManager()
 
+        # Authentication
+        self.active_tokens = {}
+
         # WebSocket Route
         @self.app.route('/ws')
         @with_websocket
@@ -56,13 +63,26 @@ class ControllerServer:
                 Exception: If there is an error during WebSocket connection or communication.
             """
             try:
-                token = request.headers.get('token')
+                logger.info(f"Request Args: {request.args} from client: {request.client_addr}")
+                
+                token = request.args.get('token')
+                
                 if not token:
                     logger.warning(f"WebSocket connection attempt without token from client: {request.client_addr}")
+                    await ws.send(json.dumps({"alert": "No Token Provided. Connection Rejected."}))
+                    await ws.close()
                     return
                 
-                if token != "your-generated-token":
+                if token not in self.active_tokens:
                     logger.warning(f"WebSocket connection attempt with invalid token from client: {request.client_addr}")
+                    await ws.send(json.dumps({"alert": "Invalid Token. Connection Rejected."}))
+                    await ws.close()
+                    return
+                
+                if self.active_tokens[token] < time.time():
+                    logger.warning(f"WebSocket connection attempt with expired token from client: {request.client_addr}")
+                    await ws.send(json.dumps({"alert": "Expired Token. Connection Rejected."}))
+                    await ws.close()
                     return
 
                 logger.info(f"WebSocket connection established with client: {request.client_addr}")
@@ -194,15 +214,19 @@ class ControllerServer:
             """
             data = request.json
             username = data.get('username') # type: ignore
-            password = data.get('password') # type: ignore
+            password = data.get('password').encode() # type: ignore
+
+            stored_password_hash = os.environ.get('PIKITE_PASSWORD_HASH').encode() # type: ignore
 
             # Placeholder for actual authentication logic
-            if username == "admin" and password == "password":
-                # Generate a simple token (in a real application, use a more secure method)
-                token = "your-generated-token"
-                return {"token": token}
-            else:
-                return {"Error": "Invalid Credentials. Login Failed."}, 401
+            if not username == "pikite_admin" or not bcrypt.checkpw(password, stored_password_hash):
+                return {"alert": "Invalid Credentials. Login Failed."}, 401
+            
+            del(password) # Clear password from memory
+            
+            # Generate a Secure Token for the Client
+            token = self.register_auth_token()
+            return {"token": token}
 
     async def register(self, ws: WebSocket):
         """
@@ -257,7 +281,7 @@ class ControllerServer:
                 logger.error("Invalid Message Type: Messages must be a string or dict")
                 
             await asyncio.sleep(0)      # yield back to scheduler
-
+    
     def start(self):
         """
         Start the web server on the specified port.
@@ -284,3 +308,14 @@ class ControllerServer:
             The oldest message from the incoming_messages buffer, or None if the buffer is empty.
         """
         return self.incoming_messages.pop(0) if self.incoming_messages else None
+    
+    def register_auth_token(self) -> str:
+        """
+        Generate and register a new authentication token for websocket clients.
+        
+        Returns:
+            str: The generated authentication token.
+        """
+        token = secrets.token_urlsafe(32)
+        self.active_tokens[token] = time.time() + 1800  # Token valid for 30 minutes
+        return token
