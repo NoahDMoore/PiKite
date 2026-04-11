@@ -67,19 +67,19 @@ class ControllerServer:
                 
                 if not token:
                     logger.warning(f"WebSocket connection attempt without token from client: {request.client_addr}")
-                    await ws.send(json.dumps({"alert": "No Token Provided. Connection Rejected."}))
+                    await ws.send(json.dumps({"alert": "No Token Provided. Connection Rejected.", "force_logout": True}))
                     await ws.close()
                     return
                 
                 if token not in self.active_tokens:
                     logger.warning(f"WebSocket connection attempt with invalid token from client: {request.client_addr}")
-                    await ws.send(json.dumps({"alert": "Invalid Token. Connection Rejected."}))
+                    await ws.send(json.dumps({"alert": "Invalid Token. Connection Rejected.", "force_logout": True}))
                     await ws.close()
                     return
                 
                 if self.active_tokens[token] < time.time():
                     logger.warning(f"WebSocket connection attempt with expired token from client: {request.client_addr}")
-                    await ws.send(json.dumps({"alert": "Expired Token. Connection Rejected."}))
+                    await ws.send(json.dumps({"alert": "Expired Token. Connection Rejected.", "force_logout": True}))
                     await ws.close()
                     return
                 
