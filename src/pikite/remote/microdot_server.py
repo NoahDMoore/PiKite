@@ -220,6 +220,7 @@ class ControllerServer:
 
             # Placeholder for actual authentication logic
             if not username == "pikite_admin" or not bcrypt.checkpw(password, stored_password_hash):
+                logger.warning(f"Failed login attempt with username: '{username}' from client: {request.client_addr}")
                 return {"alert": "Invalid Credentials. Login Failed."}, 401
             
             del(password) # Clear password from memory
@@ -239,7 +240,7 @@ class ControllerServer:
         try:
             await asyncio.gather(self._rx_loop(ws), self._tx_loop(ws))
         except Exception as e:
-            logger.info(f"WebSocket connection closed: {e}")
+            logger.info(f"WebSocket Error: {e}")
 
     async def _rx_loop(self, ws: WebSocket):
         """
