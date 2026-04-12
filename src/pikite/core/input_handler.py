@@ -6,15 +6,25 @@ from .logger import get_logger
 logger = get_logger(__name__)
 
 class InputCommand(Enum):
+    # Navigation Commands
     NEXT = auto()
     PREVIOUS = auto()
     SELECT = auto()
+
+    # Capture Commands
     START_CAPTURE = auto()
     STOP_CAPTURE = auto()
+
+    # Pan/Tilt Commands
     PAN = auto()
     TILT = auto()
+
+    # System Commands
     SHUTDOWN = auto()
     REBOOT = auto()
+
+    # Remote Commands
+    FETCH_SETTINGS = auto()
 
 class InputSource(Enum):
     GPIO = auto()
