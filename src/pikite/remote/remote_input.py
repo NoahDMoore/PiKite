@@ -24,7 +24,7 @@ class RemoteInput:
             if isinstance(message, str):
                 message = json.loads(message)  # Parse JSON string to dict
             
-            if message.get("type") == "remote_command":
+            if message.get("type") == "input_command":
                 command_str = message.get("command")
                 try:
                     command = InputCommand[command_str]  # Convert string to InputCommand enum
