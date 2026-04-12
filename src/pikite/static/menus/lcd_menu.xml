@@ -228,11 +228,11 @@
 					<option_item name="minus2_5" message="[-2.5]" action="selectOption" value="-2.5"/>
 					<option_item name="minus2" message="[-2.0]" action="selectOption" value="-2.0"/>
 					<option_item name="minus1_5" message="[-1.5]" action="selectOption" value="-1.5"/>
-					<option_item name="minus1" message="[-1.0]" action= "selectOption" value="-1"/>
+					<option_item name="minus1" message="[-1.0]" action= "selectOption" value="-1.0"/>
 					<option_item name="minus0_5" message="[-0.5]" action= "selectOption" value="-0.5"/>
-					<option_item name="zero" message="[0.0]" action= "selectOption" value= "0"/>
+					<option_item name="zero" message="[0.0]" action= "selectOption" value= "0.0"/>
 					<option_item name="plus0_5" message="[+0.5]" action="selectOption" value="0.5" />
-					<option_item name="plus1" message="[+1.0]" action= "selectOption" value="1" />
+					<option_item name="plus1" message="[+1.0]" action= "selectOption" value="1.0" />
 					<option_item name="plus1_5" message="[+1.5]" action="selectOption" value="1.5" />
 					<option_item name="plus2" message="[+2.0]" action="selectOption" value="2.0" />
 					<option_item name="plus2_5" message="[+2.5]" action="selectOption" value="2.5" />
