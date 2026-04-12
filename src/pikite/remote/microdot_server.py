@@ -227,7 +227,7 @@ class ControllerServer:
             
             # Generate a Secure Token for the Client
             token = self.register_auth_token()
-            logger.info(f"User '{username}' logged in successfully. Issued session token: {token}")
+            logger.info(f"User '{username}' logged in successfully. Issued a new session token.")
             return {"token": token}
 
     async def register(self, ws: WebSocket):
