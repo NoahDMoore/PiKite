@@ -126,7 +126,6 @@ class ControllerServer:
                 Exception: For any other unexpected errors.
             """
             file_path = str(self.storage.WEB_ROOT / "static" / path)
-            logger.debug(f"Serving static file for client ({request.client_addr}) request: {file_path}")
 
             # Get extension without os.path
             dot = file_path.rfind('.')
@@ -164,7 +163,6 @@ class ControllerServer:
             """
             # Default to index.html
             file_path = self.storage.WEB_ROOT / 'index.html'
-            logger.debug(f"Serving root file for client ({request.client_addr}) request: {file_path}")
             try:
                 return send_file(str(file_path))
             except FileNotFoundError:
@@ -194,7 +192,6 @@ class ControllerServer:
             if not (path.endswith('.html') and '/' not in path and '\\' not in path):
                 return "Error 404: File not found", 404
             file_path = self.storage.WEB_ROOT / path
-            logger.debug(f"Serving HTML file for client ({request.client_addr}) request: {file_path}")
             try:
                 return send_file(str(file_path))
             except FileNotFoundError:
@@ -256,7 +253,7 @@ class ControllerServer:
         while True:
             message = await ws.receive()                    # Receive message from websocket client
             self.incoming_messages.append(message)          # Store message for retrieval in the incoming_messages buffer
-            logger.debug(f"RX: {message}")
+            logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
 
     async def _tx_loop(self, ws: WebSocket):
         """
@@ -281,7 +278,7 @@ class ControllerServer:
                     else:
                         raise TypeError
 
-                    logger.debug(f"TX: {payload}")
+                    logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
                     await ws.send(payload)  # Send message to websocket client
             except TypeError:
                 logger.error("Invalid Message Type: Messages must be a string or dict")

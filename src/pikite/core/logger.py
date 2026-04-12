@@ -106,6 +106,9 @@ class WebSocketHandler(logging.Handler):
         super().__init__()
         self.server = server
 
+    def filter(self, record):
+        return not getattr(record, "skip_remote", False)
+
     def emit(self, record):
         try:
             msg = self.format(record)
