@@ -25,6 +25,8 @@ class InputCommand(Enum):
 
     # Remote Commands
     FETCH_SETTINGS = auto()
+    UPDATE_SETTINGS = auto()
+    LOAD_DEFAULT_SETTINGS = auto()
 
 class InputSource(Enum):
     GPIO = auto()
