@@ -87,7 +87,6 @@ class InputHandler:
             f"Handler={callback.__qualname__}"
         )
 
-
     def handle(self, *, command: InputCommand, source: InputSource, **kwargs):
         """
         Handle an input command by invoking all registered callbacks for the current scope.
