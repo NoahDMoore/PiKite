@@ -18,6 +18,8 @@ class RemoteInput:
             if self.server.incoming_messages:
                 message = self.server.incoming_messages.pop(0)
                 await self.handle_message(message)
+            
+            await asyncio.sleep(0)      # yield back to scheduler
     
     async def handle_message(self, message):
         try:
