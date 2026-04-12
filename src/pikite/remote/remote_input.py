@@ -20,12 +20,11 @@ class RemoteInput:
                 await self.handle_message(message)
     
     async def handle_message(self, message):
-        # Expecting messages in the format: {"type": "input_command", "command": "NEXT"}
         try:
             if isinstance(message, str):
                 message = json.loads(message)  # Parse JSON string to dict
             
-            if message.get("type") == "input_command":
+            if message.get("type") == "remote_command":
                 command_str = message.get("command")
                 try:
                     command = InputCommand[command_str]  # Convert string to InputCommand enum
