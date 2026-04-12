@@ -1,0 +1,149 @@
+:root {
+  --md-primary: #007f66;
+  --md-secondary: #00bb6e;
+
+  --md-background: #afafaf;
+  --md-surface: #ffffff;
+
+  --md-on-primary: #ffffff;
+  --md-on-surface: #1e1e1e;
+
+  --md-error: #cf6679;
+}
+
+/* Global */
+body {
+  background-color: var(--md-primary);
+  color: var(--md-on-surface);
+}
+
+/* Navbar */
+.navbar-fixed {
+  height: calc(112px + 1rem); /* 64px for logo + 48px for tabs */
+}
+
+.nav-wrapper {
+  background-color: var(--md-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-content {
+  padding: 0 20px;
+  background-color: var(--md-surface);
+  color: var(--md-on-surface);
+}
+
+.brand-logo img {
+  height: 64px;
+  vertical-align: middle;
+}
+
+@media only screen and (max-width: 600px) {
+  .brand-logo img {
+    height: 48px;
+    vertical-align: middle;
+  }
+}
+
+/* Tabs */
+.tabs {
+  background-color: var(--md-surface);
+}
+
+.tabs .tab a {
+  color: var(--md-on-surface);
+}
+
+.tabs .tab a.active {
+  color: var(--md-secondary);
+}
+
+.tabs .indicator {
+  background-color: var(--md-secondary);
+}
+
+@media only screen and (max-width: 600px) {
+  i.center-on-small-only {
+    float: unset !important;
+    margin-right: unset !important;
+  }
+}
+/* Cards */
+.card {
+  background-color: var(--md-surface);
+  padding: 10px;
+}
+
+/* Buttons */
+.btn {
+  background-color: var(--md-secondary);
+}
+
+.btn.stop {
+  background-color: var(--md-error);
+}
+
+/* Typography */
+.section-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.telemetry {
+  font-size: 1.2rem;
+}
+
+/* Grid */
+.row {
+  margin-bottom: 0;
+}
+
+#camera-feed {
+  width: 100%;
+  height: auto;
+}
+
+/* Log Stream */
+#log [type="checkbox"] + span:not(.lever) {
+  padding-left: 24px;
+}
+
+#log-entries {
+  margin: 0 0.75rem;
+}
+
+#log-entries > span {
+  display: block;
+  text-align: center;
+}
+
+.log-message {
+    font-family: monospace;
+}
+
+.collection-item.log-debug {
+    background-color: #eceff1;
+}
+
+.collection-item.log-info {
+    background-color: #e3f2fd;
+}
+
+.collection-item.log-warning {
+  background-color: #fff3e0;
+}
+
+.collection-item.log-error {
+    background-color: #ffebee;
+}
+
+.collection-item.log-critical {
+    background-color: #ffebee;
+}
+
+/* Settings */
+.setting-content {
+  padding: 2em 0 0em 0 !important;
+}

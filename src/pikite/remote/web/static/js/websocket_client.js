@@ -1,20 +1,90 @@
-var connected = false
+
+var connected = false;
+var reconnectAttempts = 0;
+var maxReconnectAttempts = 5;
+var ws = null;
 
 function wsConnect() {
-	if (connected == false) {
+	if (!connected) {
 		connected = true;
+		reconnectAttempts = 0;
 		startWebsocket();
 	}
 }
 
 function startWebsocket() {
-    websocket_url = "ws://" + location.host + "/ws";
-	var ws = new WebSocket(websocket_url);
+	var websocket_url = "ws://" + location.host + "/ws?token=" + encodeURIComponent(localStorage.getItem("session_token"));
+	console.log("Connecting to WebSocket at: " + websocket_url);
+	ws = new WebSocket(websocket_url);
 
 	ws.onmessage = function (event) {
 		var obj = JSON.parse(event.data);
         if (obj.hasOwnProperty("alert")) {
-            alert(obj["alert"]);
-        }
+            console.log(obj["alert"]);
+        } else if (obj.hasOwnProperty("force_logout") && obj["force_logout"] === true) {
+            handleLogout("Server error received: " + obj["error"]);
+        } else if (obj.hasOwnProperty("type") && obj["type"] === "log") {
+			// Handle log message
+			console.log("Received log message: ", obj);
+			addLogEntry(obj);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "settings_update") {
+			// Handle settings update
+			loadSettings(obj);
+			console.log("Received settings update: ", obj);
+		} else {
+			console.warn("Received unknown WebSocket message: ", obj);
+		}
+	};
+
+	ws.onclose = function () {
+		onWebSocketClose();
+	};
+
+	ws.onerror = function (error) {
+		console.error("WebSocket error: ", error);
+		ws.close();
 	};
 }
+
+function onWebSocketClose() {
+	connected = false;
+	reconnectAttempts++;
+	if (reconnectAttempts >= maxReconnectAttempts) {
+		handleLogout("Maximum reconnect attempts reached.");
+	} else {
+		console.log("WebSocket connection closed. Attempting to reconnect in 5 seconds... (Attempt " + reconnectAttempts + "/" + maxReconnectAttempts + ")");
+		setTimeout(startWebsocket, 500);
+	}
+}
+
+function handleLogout(reason) {
+	console.warn("Logging out: " + reason);
+	localStorage.removeItem("session_token");
+	// Optionally, show a message to the user
+	alert("You have been logged out. " + reason);
+	setTimeout(function() {
+		window.location.href = "/login.html";
+	}, 1000);
+}
+
+function sendMessage(message) {
+	if (connected && ws && ws.readyState === WebSocket.OPEN) {
+		ws.send(JSON.stringify(message));
+	} else {
+		console.warn("WebSocket is not connected. Unable to send message: ", message);
+	}
+}
+
+function sendCommand(command) {
+	const message = {
+		type: "input_command",
+		command: command,
+	};
+
+	sendMessage(message);
+}
+
+// Start the WebSocket connection when the page loads
+window.addEventListener("load", function() {
+	wsConnect();
+});
