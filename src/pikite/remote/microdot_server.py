@@ -18,7 +18,7 @@ import time
 from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
 
-from ..core.logger import get_logger
+from ..core.logger import get_logger, register_websocket_handler
 from ..system.storage import StorageManager
 
 # Setup Logger
@@ -28,7 +28,7 @@ class ControllerServer:
     """
     A simple web server using Microdot to handle WebSocket connections for real-time communication and control.
     """
-    def __init__(self, port: int=5000):
+    def __init__(self, port: int=5000, remote_logging: bool=True):
         """
         Initialize the web server and set up routing.
 
@@ -44,6 +44,10 @@ class ControllerServer:
 
         # Initialize Storage Manager
         self.storage = StorageManager()
+
+        # Register Remote Logging Handler if enabled
+        if remote_logging:
+            register_websocket_handler(self) # Register this server as a handler for remote logging messages from the logger module
 
         # Authentication
         self.active_tokens = {}
