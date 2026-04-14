@@ -28,9 +28,13 @@ class RemoteInput:
             
             if message.get("type") == "input_command":
                 command_str = message.get("command")
+                args = message.get("args", None)
                 try:
                     command = InputCommand[command_str]  # Convert string to InputCommand enum
-                    self.input_handler.handle(command=command, source=InputSource.WEBSOCKET)
+                    if args:
+                        self.input_handler.handle(command=command, source=InputSource.WEBSOCKET, args=args)
+                    else:
+                        self.input_handler.handle(command=command, source=InputSource.WEBSOCKET)
                     logger.debug(f"Handled remote input command: {command}")
                 except KeyError:
                     logger.error(f"Invalid remote input command received: {command_str}")
