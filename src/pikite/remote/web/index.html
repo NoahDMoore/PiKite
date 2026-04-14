@@ -260,6 +260,7 @@
 
             document.getElementById('fetch-settings-btn').addEventListener('click', function() {
                 sendCommand('FETCH_SETTINGS');
+                M.toast({html: 'Settings fetched from PiKite!'});
             });
             document.getElementById('save-settings-btn').addEventListener('click', function() {
                 if (Object.keys(changedSettings).length === 0) {
@@ -279,6 +280,7 @@
             });
             document.getElementById('reset-settings-btn').addEventListener('click', function() {
                 sendCommand('LOAD_DEFAULT_SETTINGS');
+                M.toast({html: 'Default settings Restored!'});
             });
         </script>
     </body>
