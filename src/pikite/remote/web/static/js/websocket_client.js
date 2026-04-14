@@ -23,7 +23,7 @@ function startWebsocket() {
             console.log(obj["alert"]);
         } else if (obj.hasOwnProperty("force_logout") && obj["force_logout"] === true) {
             handleLogout("Server error received: " + obj["error"]);
-        } else if (obj.hasOwnProperty("type") && obj["type"] === "log") {
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "log") {
 			// Handle log message
 			console.log("Received log message: ", obj);
 			addLogEntry(obj);
@@ -52,8 +52,8 @@ function onWebSocketClose() {
 	if (reconnectAttempts >= maxReconnectAttempts) {
 		handleLogout("Maximum reconnect attempts reached.");
 	} else {
-		console.log("WebSocket connection closed. Attempting to reconnect in 5 seconds... (Attempt " + reconnectAttempts + "/" + maxReconnectAttempts + ")");
-		setTimeout(startWebsocket, 500);
+		console.log("WebSocket connection closed. Attempting to reconnect ... (Attempt " + reconnectAttempts + "/" + maxReconnectAttempts + ")");
+		setTimeout(startWebsocket, 2000);
 	}
 }
 
@@ -75,10 +75,11 @@ function sendMessage(message) {
 	}
 }
 
-function sendCommand(command) {
+function sendCommand(command, args = {}) {
 	const message = {
 		type: "input_command",
 		command: command,
+		args: args
 	};
 
 	sendMessage(message);
