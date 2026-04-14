@@ -112,7 +112,7 @@ class Settings:
 
         if read_after:
             self.config.read(self.config_path)
-            logger.info(f"Configuration reloaded after loading defaults.")
+            logger.info(f"Configuration reloaded after restoring defaults.")
 
     def format_as_dict(self) -> dict:
         """
