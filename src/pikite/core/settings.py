@@ -108,9 +108,11 @@ class Settings:
                 raise
         with open(self.default_path, "r") as src, open(self.config_path, "w") as dst:
             dst.write(src.read())
+            logger.info(f"Default settings loaded from {self.default_path} to {self.config_path}")
 
         if read_after:
             self.config.read(self.config_path)
+            logger.info(f"Configuration reloaded after loading defaults.")
 
     def format_as_dict(self) -> dict:
         """
@@ -121,6 +123,23 @@ class Settings:
         """
         settings_dict = {section: dict(self.config.items(section)) for section in self.config.sections()}
         return settings_dict
+    
+    def is_setting(self, setting_key: str) -> bool:
+        """
+        Check if a given setting key exists in the configuration.
+        
+        Args:
+            setting_key (str): The key of the setting to check.
+
+        Returns:
+            bool: True if the setting exists, False otherwise.
+        """
+        try:
+            section = get_section(setting_key)
+            return (section in self.config and setting_key in self.config[section])
+        except ValueError:
+            logger.error(f"Cannot determine section for setting key. Returning False.")
+            return False
 
 # Function to get the section for a given setting
 def get_section(setting_key: str) -> str:
@@ -141,9 +160,7 @@ def get_section(setting_key: str) -> str:
             return section
     
     try:
-        raise ValueError(f"""Key does not correspond a known section: {setting_key}. \n
-                        Ensure key is properly prefixed (See: core.settings.PREFIX_SECTION_MAP)""")
-    
+        raise ValueError(f"""Key does not correspond a known section: {setting_key}. Ensure key is properly prefixed (See: core.settings.PREFIX_SECTION_MAP)""")
     except ValueError as e:
         logger.error(e)
         raise
