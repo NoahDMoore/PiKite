@@ -130,10 +130,13 @@ class InputHandler:
                     f"(Source={source.name})"
                 )
                 callback(**kwargs)
-            except Exception:
+            except Exception as e:
                 logger.exception(
                     f"Error while handling Command: {command.name} "
                     f"in Scope:'{self.active_scope}' "
                     f"with {callback.__qualname__}"
                     f" (Source={source.name})"
+                    f" - {e}"
                 )
+
+                raise
