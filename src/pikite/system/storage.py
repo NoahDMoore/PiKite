@@ -42,7 +42,7 @@ class StorageManager:
         LOG_DIR (Path): Directory for log files.
         DATA_DIR (Path): Directory for data files.
         CONFIG_DIR (Path): Directory for configuration files.
-        USER_MEDIA_DIR (Path): Root directory for user media files.
+        MEDIA_OUTPUT_DIR (Path): Root directory for user media files.
         PHOTO_OUTPUT_DIR (Path): Directory for storing photos.
         VIDEO_OUTPUT_DIR (Path): Directory for storing videos.
     """
@@ -70,9 +70,9 @@ class StorageManager:
         self.LOG_DIR = self.USER_ROOT / "logs"
         self.DATA_DIR = self.USER_ROOT / "data"
         self.CONFIG_DIR = self.USER_ROOT / "config"
-        self.USER_MEDIA_DIR = self.USER_ROOT / "media"
-        self.PHOTO_OUTPUT_DIR = self.USER_MEDIA_DIR / "photos"
-        self.VIDEO_OUTPUT_DIR = self.USER_MEDIA_DIR / "videos"
+        self.MEDIA_OUTPUT_DIR = self.USER_ROOT / "media"
+        self.PHOTO_OUTPUT_DIR = self.MEDIA_OUTPUT_DIR / "photos"
+        self.VIDEO_OUTPUT_DIR = self.MEDIA_OUTPUT_DIR / "videos"
 
         # Web Server Paths
         self.WEB_ROOT = self.BASE_DIR / "remote" / "web"
@@ -196,6 +196,40 @@ class StorageManager:
             timestamp = get_timestamp()    # Date format: 2023-10-31_14-30-00
             return f"{base_name}_{timestamp}{extension}"
         return f"{base_name}{extension}"
+    
+    def get_capture_session_dirs(self, mode: CAPTURE_MODES) -> list[dict]:
+        """
+        Get a list of all existing capture session directories for the specified mode.
+
+        Args:
+            mode (CAPTURE_MODES): Type of Media (i.e., photo or video):
+                                  CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO
+        Returns:
+            list[dict]: List of session directories sorted by date (newest first).
+        """
+        if mode == CAPTURE_MODES.STILL:
+            output_dir = self.PHOTO_OUTPUT_DIR
+        elif mode == CAPTURE_MODES.VIDEO:
+            output_dir = self.VIDEO_OUTPUT_DIR
+        else:
+            raise ValueError("Mode must be CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO")
+        
+        session_dirs = []
+
+        for dir in output_dir.iterdir():
+            if not dir.is_dir():
+                continue
+            
+            readable_name = datetime.strptime(dir.name, "%Y-%m-%d_%H-%M-%S").strftime("%B %d, %Y %I:%M:%S %p")
+
+            dir_dict = {
+                "name": readable_name,
+                "path": dir.name,
+                "mode": mode.name
+            }
+            session_dirs.append(dir_dict)
+        session_dirs.sort(key=lambda x: x["path"], reverse=True)  # Sort by path timestamp, newest first
+        return session_dirs
     
 def get_timestamp() -> str:
     """Return the current date and time as a formatted string."""
