@@ -111,6 +111,8 @@ function loadSettings(settings_update) {
             el.addEventListener("input", handleSettingChange);
         }
     });
+
+    M.toast({html: 'Settings fetched from PiKite!'});
 }
 
 function handleSettingChange(e) {
