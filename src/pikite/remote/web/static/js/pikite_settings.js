@@ -8,8 +8,13 @@ function loadSettings(settings_update) {
     const container = document.getElementById('settings-content');
     container.innerHTML = ''; // Clear previous content
 
+    // Create column wrapper
+    const col = document.createElement('div');
+    col.className = 'col s12 m12';
+    container.appendChild(col);
+
     // For each section (e.g., camera_settings)
-    Object.entries(settings).forEach(([section, sectionSettings]) => {        
+    Object.entries(settings).forEach(([section, sectionSettings]) => {                
         // Create card
         const card = document.createElement('div');
         card.className = 'card';
@@ -87,7 +92,7 @@ function loadSettings(settings_update) {
         });
 
         card.appendChild(cardContent);
-        container.appendChild(card);
+        col.appendChild(card);
     });
 
     // Clear global changedSettings object to avoid stale changes after loading new settings
