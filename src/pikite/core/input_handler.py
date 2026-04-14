@@ -27,6 +27,7 @@ class InputCommand(Enum):
     FETCH_SETTINGS = auto()
     UPDATE_SETTINGS = auto()
     LOAD_DEFAULT_SETTINGS = auto()
+    FETCH_MEDIA_DIRS = auto()
 
 class InputSource(Enum):
     GPIO = auto()
