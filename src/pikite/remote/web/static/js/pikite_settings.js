@@ -1,4 +1,5 @@
 var settings_select_instances = null;
+const changedSettings = {};
 
 function loadSettings(settings_update) {
     const settings = settings_update.current_settings;
@@ -89,8 +90,39 @@ function loadSettings(settings_update) {
         container.appendChild(card);
     });
 
+    // Clear global changedSettings object to avoid stale changes after loading new settings
+    Object.keys(changedSettings).forEach(key => delete changedSettings[key]);
+
     // Initialize Materialize selects
     if (M && M.FormSelect) {
         settings_select_instances = M.FormSelect.init(document.querySelectorAll('select'));
     }
+
+    document.querySelectorAll("[data-setting]").forEach(el => {
+        el.addEventListener("change", handleSettingChange);
+
+        // For sliders / text inputs (real-time updates)
+        if (el.tagName === "INPUT" && el.type !== "checkbox") {
+            el.addEventListener("input", handleSettingChange);
+        }
+    });
+}
+
+function handleSettingChange(e) {
+    const el = e.target;
+    const key = el.dataset.setting;
+
+    if (!key) return;
+
+    let value;
+
+    if (el.type === "checkbox") {
+        value = el.checked;
+    } else {
+        value = el.value;
+    }
+
+    changedSettings[key] = value;
+
+    console.log("Changed:", key, value);
 }

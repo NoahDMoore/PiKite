@@ -213,18 +213,13 @@
                 </a>
                 <ul>
                     <li>
-                        <a class="btn-floating red tooltipped" data-position="left" data-tooltip="Save Settings">
+                        <a class="btn-floating green tooltipped" data-position="left" data-tooltip="Save Settings" id="save-settings-btn">
                             <i class="material-icons">save</i>
                         </a>
                     </li>
                     <li>
-                        <a class="btn-floating yellow darken-1 tooltipped" data-position="left" data-tooltip="Reset to Default Settings">
+                        <a class="btn-floating yellow darken-1 tooltipped" data-position="left" data-tooltip="Reset to Default Settings" id="reset-settings-btn">
                             <i class="material-icons">settings_backup_restore</i>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="btn-floating green tooltipped" data-position="left" data-tooltip="Undo Changes">
-                            <i class="material-icons">undo</i>
                         </a>
                     </li>
                     <li>
@@ -265,6 +260,19 @@
 
             document.getElementById('fetch-settings-btn').addEventListener('click', function() {
                 sendCommand('FETCH_SETTINGS');
+            });
+            document.getElementById('save-settings-btn').addEventListener('click', function() {
+                if (Object.keys(changedSettings).length === 0) {
+                    alert("No changes to save.");
+                    return;
+                } else {
+                    console.log("Saving changed settings:", changedSettings);
+                    args = {settings_to_update: changedSettings};
+                    sendCommand('UPDATE_SETTINGS', args);
+                }
+            });
+            document.getElementById('reset-settings-btn').addEventListener('click', function() {
+                sendCommand('LOAD_DEFAULT_SETTINGS');
             });
         </script>
     </body>
