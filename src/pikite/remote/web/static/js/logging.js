@@ -5,6 +5,13 @@ function addLogEntry(log) {
     logs.push(log);
     loggerSet.add(log.logger);
     renderLogs();
+
+    // Notify user immediately for error/critical logs
+    if (log.level === "CRITICAL") {
+        M.toast({html: `CRITICAL: ${log.message}`, classes: 'red darken-3'});
+    } else if (log.level === "ERROR") {
+        M.toast({html: `ERROR: ${log.message}`, classes: 'red'});
+    }
 }
 
 function getSelectedLevels() {
