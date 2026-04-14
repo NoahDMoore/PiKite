@@ -263,12 +263,18 @@
             });
             document.getElementById('save-settings-btn').addEventListener('click', function() {
                 if (Object.keys(changedSettings).length === 0) {
-                    alert("No changes to save.");
+                    M.toast({html: 'No changes to save!'});
                     return;
                 } else {
-                    console.log("Saving changed settings:", changedSettings);
-                    args = {settings_to_update: changedSettings};
-                    sendCommand('UPDATE_SETTINGS', args);
+                    confirmation = confirm("Are you sure you want to upload changed settings to PiKite?");
+                    if (confirmation) {
+                        console.log("Saving changed settings:", changedSettings);
+                        args = {settings_to_update: changedSettings};
+                        sendCommand('UPDATE_SETTINGS', args);
+                        M.toast({html: 'Settings saved!'});
+                    } else {
+                        M.toast({html: 'Save cancelled.'});
+                    }
                 }
             });
             document.getElementById('reset-settings-btn').addEventListener('click', function() {
