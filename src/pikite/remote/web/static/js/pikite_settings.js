@@ -24,8 +24,8 @@ function loadSettings(settings_update) {
         cardContent.className = 'card-content';
 
         // Card title
-        const cardTitle = document.createElement('span');
-        cardTitle.className = 'card-title';
+        const cardTitle = document.createElement('p');
+        cardTitle.className = 'section-title';
         cardTitle.textContent = section.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
         cardContent.appendChild(cardTitle);
@@ -65,6 +65,7 @@ function loadSettings(settings_update) {
                     input = document.createElement('div');
                     const select = document.createElement('select');
                     select.setAttribute('data-setting', setting);
+                    select.classList.add('setting-select');
 
                     options.forEach(opt => {
                         const option = document.createElement('option');
@@ -100,7 +101,7 @@ function loadSettings(settings_update) {
 
     // Initialize Materialize selects
     if (M && M.FormSelect) {
-        settings_select_instances = M.FormSelect.init(document.querySelectorAll('select'));
+        settings_select_instances = M.FormSelect.init(document.querySelectorAll('.setting-select'));
     }
 
     document.querySelectorAll("[data-setting]").forEach(el => {
