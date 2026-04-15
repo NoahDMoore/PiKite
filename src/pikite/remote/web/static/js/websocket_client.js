@@ -6,7 +6,6 @@ var ws = null;
 
 function wsConnect() {
 	if (!connected) {
-		connected = true;
 		reconnectAttempts = 0;
 		startWebsocket();
 	}
@@ -17,24 +16,15 @@ function startWebsocket() {
 	console.log("Connecting to WebSocket at: " + websocket_url);
 	ws = new WebSocket(websocket_url);
 
-	ws.onmessage = function (event) {
-		var obj = JSON.parse(event.data);
-        if (obj.hasOwnProperty("alert")) {
-            console.log(obj["alert"]);
-        } else if (obj.hasOwnProperty("force_logout") && obj["force_logout"] === true) {
-            handleLogout("Server error received: " + obj["error"]);
-		} else if (obj.hasOwnProperty("type") && obj["type"] === "log") {
-			// Handle log message
-			console.log("Received log message: ", obj);
-			addLogEntry(obj);
-		} else if (obj.hasOwnProperty("type") && obj["type"] === "settings_update") {
-			// Handle settings update
-			loadSettings(obj);
-			console.log("Received settings update: ", obj);
-		} else {
-			console.warn("Received unknown WebSocket message: ", obj);
-		}
-	};
+	ws.onopen = function () {
+		console.log("WebSocket connection established.");
+		connected = true;
+		reconnectAttempts = 0;
+
+		// Load Settings and Media sections on connect
+		sendCommand('FETCH_SETTINGS');
+		sendCommand('FETCH_MEDIA_DIRS');
+	}
 
 	ws.onclose = function () {
 		onWebSocketClose();
@@ -43,6 +33,24 @@ function startWebsocket() {
 	ws.onerror = function (error) {
 		console.error("WebSocket error: ", error);
 		ws.close();
+	};
+
+	ws.onmessage = function (event) {
+		var obj = JSON.parse(event.data);
+        if (obj.hasOwnProperty("force_logout") && obj["force_logout"] === true) {
+            handleLogout("Server error received: " + obj["error"]);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "log") {
+			// Handle log message
+			addLogEntry(obj);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "settings_update") {
+			// Handle settings update
+			loadSettings(obj);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "media_dirs_update") {
+			// Handle media directories update
+			loadMediaSessionDirectories(obj);
+		} else {
+			console.warn("Received unknown WebSocket message: ", obj);
+		}
 	};
 }
 
