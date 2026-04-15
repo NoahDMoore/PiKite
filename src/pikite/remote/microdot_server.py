@@ -71,19 +71,19 @@ class ControllerServer:
                 
                 if not token:
                     logger.warning(f"WebSocket connection attempt without token from client: {request.client_addr}")
-                    await ws.send(json.dumps({"alert": "No Token Provided. Connection Rejected.", "force_logout": True}))
+                    await ws.send(json.dumps({"error": "No Token Provided. Connection Rejected.", "force_logout": True}))
                     await ws.close()
                     return
                 
                 if token not in self.active_tokens:
                     logger.warning(f"WebSocket connection attempt with invalid token from client: {request.client_addr}")
-                    await ws.send(json.dumps({"alert": "Invalid Token. Connection Rejected.", "force_logout": True}))
+                    await ws.send(json.dumps({"error": "Invalid Token. Connection Rejected.", "force_logout": True}))
                     await ws.close()
                     return
                 
                 if self.active_tokens[token] < time.time():
                     logger.warning(f"WebSocket connection attempt with expired token from client: {request.client_addr}")
-                    await ws.send(json.dumps({"alert": "Expired Token. Connection Rejected.", "force_logout": True}))
+                    await ws.send(json.dumps({"error": "Expired Token. Connection Rejected.", "force_logout": True}))
                     await ws.close()
                     return
                 
@@ -222,7 +222,7 @@ class ControllerServer:
             # Placeholder for actual authentication logic
             if not username == "pikite_admin" or not bcrypt.checkpw(password, stored_password_hash):
                 logger.warning(f"Failed login attempt with username: '{username}' from client: {request.client_addr}")
-                return {"alert": "Invalid Credentials. Login Failed."}, 401
+                return {"error": "Invalid Credentials. Login Failed."}, 401
             
             del(password) # Clear password from memory
             
