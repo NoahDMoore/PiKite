@@ -134,7 +134,16 @@
 
     <!-- MEDIA -->
         <div id="media" class="container">
-            
+            <div class="row" id="media-content">
+                <div class="col s12 m12">
+                    <div class="card">
+                        <div class="section-title">PiKite Media Gallery</div>
+                        <div>
+                            <span id="media-not-connected">Connect to PiKite to browse media from past capture sessions.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Log -->
@@ -142,53 +151,55 @@
             <div class="row">
                 <div class="col s12 m12">
                     <div class="card">
-                        <div class="section-title">PiKite Log</div>
-                        <div class="row" style="margin-bottom: 0;">
-                            <!-- Log Level Filter -->
-                            <div class="input-field col s12 m12">
-                                <div class="row" style="margin-bottom: 0;">
-                                    <div class="col s12">
-                                        <label>Log Levels</label>
-                                        <p>
-                                            <label class="col s4 m2">
-                                                <input type="checkbox" class="level-filter filled-in" value="DEBUG" checked />
-                                                <span>DEBUG</span>
-                                            </label>
-                                            <label class="col s4 m2">
-                                                <input type="checkbox" class="level-filter filled-in" value="INFO" checked />
-                                                <span>INFO</span>
-                                            </label>
-                                            <label class="col s4 m2">
-                                                <input type="checkbox" class="level-filter filled-in" value="WARNING" checked />
-                                                <span>WARNING</span>
-                                            </label>
-                                            <label class="col s4 m2">
-                                                <input type="checkbox" class="level-filter filled-in" value="ERROR" checked />
-                                                <span>ERROR</span>
-                                            </label>
-                                            <label class="col s4 m2">
-                                                <input type="checkbox" class="level-filter filled-in" value="CRITICAL" checked />
-                                                <span>CRITICAL</span>
-                                            </label>
-                                            <label class="col s4 m2">
-                                                <input type="checkbox" class="filled-in" id="toggle-all" checked />
-                                                <span>Select All</span>
-                                            </label>
-                                        </p>
+                        <div class="card-content">
+                            <div class="section-title">PiKite Log</div>
+                            <div class="row" style="margin-bottom: 0;">
+                                <!-- Log Level Filter -->
+                                <div class="input-field col s12 m12">
+                                    <div class="row" style="margin-bottom: 0;">
+                                        <div class="col s12">
+                                            <label>Log Levels</label>
+                                            <p style="padding: 0.5em 0 0.5em 0; text-wrap: nowrap;">
+                                                <label class="col s4 m2">
+                                                    <input type="checkbox" class="level-filter filled-in" value="DEBUG" checked />
+                                                    <span>DEBUG</span>
+                                                </label>
+                                                <label class="col s4 m2">
+                                                    <input type="checkbox" class="level-filter filled-in" value="INFO" checked />
+                                                    <span>INFO</span>
+                                                </label>
+                                                <label class="col s4 m2">
+                                                    <input type="checkbox" class="level-filter filled-in" value="WARNING" checked />
+                                                    <span>WARNING</span>
+                                                </label>
+                                                <label class="col s4 m2">
+                                                    <input type="checkbox" class="level-filter filled-in" value="ERROR" checked />
+                                                    <span>ERROR</span>
+                                                </label>
+                                                <label class="col s4 m2">
+                                                    <input type="checkbox" class="level-filter filled-in" value="CRITICAL" checked />
+                                                    <span>CRITICAL</span>
+                                                </label>
+                                                <label class="col s4 m2">
+                                                    <input type="checkbox" class="filled-in" id="toggle-all" checked />
+                                                    <span>Select All</span>
+                                                </label>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Logger Filter -->
-                        <div class="input-field col s12 m12">
-                            <input id="filter-logger" class="autocomplete" type="text" placeholder="e.g. PiKite.camera">
-                            <label for="filter-logger">Logger Filter</label>
-                        </div>
+                            <!-- Logger Filter -->
+                            <div class="input-field col s12 m12">
+                                <input id="filter-logger" class="autocomplete" type="text" placeholder="e.g. PiKite.camera">
+                                <label for="filter-logger">Logger Filter</label>
+                            </div>
 
-                        <ul id="log-entries" class="collection">
-                            <span id="log-not-connected">Connect to PiKite to receive logs.</span>
-                        </ul>
+                            <ul id="log-entries" class="collection">
+                                <span id="log-not-connected">Connect to PiKite to receive logs.</span>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -233,8 +244,10 @@
 
         <!-- JS -->
         <script type="text/javascript" src="static/js/materialize.js"></script>
-        <script type="text/javascript" src="static/js/pikite_settings.js"></script>
+        <script type="text/javascript" src="static/js/dashboard.js"></script>
+        <script type="text/javascript" src="static/js/media.js"></script>
         <script type="text/javascript" src="static/js/logging.js"></script>
+        <script type="text/javascript" src="static/js/pikite_settings.js"></script>
         <script type="text/javascript" src="static/js/websocket_client.js"></script>
         
         <script>
@@ -260,7 +273,6 @@
 
             document.getElementById('fetch-settings-btn').addEventListener('click', function() {
                 sendCommand('FETCH_SETTINGS');
-                M.toast({html: 'Settings fetched from PiKite!'});
             });
             document.getElementById('save-settings-btn').addEventListener('click', function() {
                 if (Object.keys(changedSettings).length === 0) {
