@@ -197,9 +197,9 @@ class StorageManager:
             return f"{base_name}_{timestamp}{extension}"
         return f"{base_name}{extension}"
     
-    def get_capture_session_dirs(self, mode: CAPTURE_MODES) -> list[dict]:
+    def get_capture_session_dirs(self, mode: CAPTURE_MODES | None = None) -> list[dict]:
         """
-        Get a list of all existing capture session directories for the specified mode.
+        Get a list of all existing capture session directories. May be limted to a specific mode.
 
         Args:
             mode (CAPTURE_MODES): Type of Media (i.e., photo or video):
@@ -212,7 +212,14 @@ class StorageManager:
         elif mode == CAPTURE_MODES.VIDEO:
             output_dir = self.VIDEO_OUTPUT_DIR
         else:
-            raise ValueError("Mode must be CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO")
+            # If no mode specified, return all session directories sorted by date (newest first)
+            photo_session_dirs = self.get_capture_session_dirs(CAPTURE_MODES.STILL)
+            video_session_dirs = self.get_capture_session_dirs(CAPTURE_MODES.VIDEO)
+
+            session_dirs = photo_session_dirs + video_session_dirs
+            session_dirs.sort(key=lambda x: x["path"], reverse=True)  # Sort by path timestamp, newest first
+
+            return session_dirs
         
         session_dirs = []
 
