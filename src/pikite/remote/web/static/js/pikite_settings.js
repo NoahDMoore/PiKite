@@ -8,11 +8,6 @@ function loadSettings(settings_update) {
     const container = document.getElementById('settings-content');
     container.innerHTML = ''; // Clear previous content
 
-    // Create column wrapper
-    const col = document.createElement('div');
-    col.className = 'col s12 m12';
-    container.appendChild(col);
-
     // For each section (e.g., camera_settings)
     Object.entries(settings).forEach(([section, sectionSettings]) => {                
         // Create card
@@ -24,7 +19,7 @@ function loadSettings(settings_update) {
         cardContent.className = 'card-content';
 
         // Card title
-        const cardTitle = document.createElement('p');
+        const cardTitle = document.createElement('div');
         cardTitle.className = 'section-title';
         cardTitle.textContent = section.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
@@ -93,7 +88,7 @@ function loadSettings(settings_update) {
         });
 
         card.appendChild(cardContent);
-        col.appendChild(card);
+        container.appendChild(card);
     });
 
     // Clear global changedSettings object to avoid stale changes after loading new settings
