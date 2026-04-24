@@ -36,7 +36,7 @@ class StorageManager:
         MEDIA_DIR (Path): Directory for static media files.
         MENU_DIR (Path): Directory for menu XML files.
         MENU_FILE (Path): Path to the main menu XML file.
-        USER_HOME (Path): Root directory for user-specific output files.
+        USER_ROOT (Path): Root directory for user-specific output files.
         LOG_FILE (Path): Path to the main log file.
         CONFIG_FILE (Path): Path to the configuration file.
         LOG_DIR (Path): Directory for log files.
@@ -238,6 +238,52 @@ class StorageManager:
         session_dirs.sort(key=lambda x: x["path"], reverse=True)  # Sort by path timestamp, newest first
         return session_dirs
     
+    def get_capture_session_file_names(self, mode: CAPTURE_MODES, dir: str):
+        """
+        Get a list of all file names in a given capture session directory.
+
+        Args:
+            mode (CAPTURE_MODES): Type of Media (i.e., photo or video):
+                                  CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO
+            dir (str): Capture session directory name
+
+        Returns:
+            list[str]: List of file names in the given directory.
+        """
+
+        if mode == CAPTURE_MODES.STILL:
+            output_dir = self.PHOTO_OUTPUT_DIR
+        elif mode == CAPTURE_MODES.VIDEO:
+            output_dir = self.VIDEO_OUTPUT_DIR
+        else:
+            raise ValueError('Mode must be either CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO')
+
+        capture_session_dir = resolve_safe_path(output_dir, dir)
+
+        file_list = []
+
+        for file in capture_session_dir.iterdir():
+            if not file.is_file():
+                continue
+            elif file.suffix not in [MEDIA_EXTENSIONS.JPG, MEDIA_EXTENSIONS.PNG, MEDIA_EXTENSIONS.MP4]:
+                continue
+            
+            file_list.append(f"/media/{self.PHOTO_OUTPUT_DIR.name}/{capture_session_dir.name}/{file.name}")
+            
+        return file_list
+
+    
 def get_timestamp() -> str:
     """Return the current date and time as a formatted string."""
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+def resolve_safe_path(base_dir: Path, user_input: str) -> Path:
+    base = base_dir.resolve()
+    
+    unsafe_path = base / user_input
+    safe_path = unsafe_path.resolve()
+    
+    if not safe_path.relative_to(base):
+        raise ValueError("Invalid Path: possible path traversal detected!")
+    
+    return safe_path
