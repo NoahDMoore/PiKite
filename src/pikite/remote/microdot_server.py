@@ -19,7 +19,7 @@ from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
 
 from ..core.logger import get_logger, register_websocket_handler
-from ..system.storage import StorageManager
+from ..system.storage import StorageManager, resolve_safe_path
 
 # Setup Logger
 logger = get_logger(__name__)
@@ -125,7 +125,11 @@ class ControllerServer:
                 OSError: If there is an issue reading the file.
                 Exception: For any other unexpected errors.
             """
-            file_path = str(self.storage.WEB_ROOT / "static" / path)
+            try:
+                file_path = str(resolve_safe_path(self.storage.WEB_ROOT / "static", path))
+            except ValueError as e:
+                logger.error(f"Unauthorized Static File Request: {e} from client ({request.client_addr})")
+                return
 
             # Get extension without os.path
             dot = file_path.rfind('.')
@@ -143,6 +147,48 @@ class ControllerServer:
                 return 'Error 500: Could not read file', 500
             except Exception as e:
                 logger.error(f"Unknown error serving static file for client ({request.client_addr}) request: {file_path}: {e}")
+                return 'Error 500: Internal Server Error', 500
+            
+        @self.app.route('/media/<path:path>')
+        async def serve_capture_session_media(request: Request, path: str):
+            """
+            Serve media files from PiKite's media output directory.
+            
+            Args:
+                request: The incoming request object.
+                path (str): The path to the requested media file.
+            
+            Returns:
+                The requested file with the appropriate content type, or an error message if not found.
+
+            Raises:
+                FileNotFoundError: If the requested file does not exist.
+                OSError: If there is an issue reading the file.
+                Exception: For any other unexpected errors.
+            """
+            request_path = path.strip().removeprefix("/media/")
+            try:
+                file_path = str(resolve_safe_path(self.storage.MEDIA_OUTPUT_DIR, request_path))
+            except ValueError as e:
+                logger.error(f"Unauthorized Media Request: {e} from client ({request.client_addr})")
+                return
+
+            # Get extension without os.path
+            dot = file_path.rfind('.')
+            ext = file_path[dot:].lower() if dot != -1 else ''
+            content_type = MIME_TYPES.get(ext, 'application/octet-stream')
+
+            try:
+                with open(file_path, 'rb') as f:
+                    return f.read(), 200, {'Content-Type': content_type}
+            except FileNotFoundError:
+                logger.error(f"Media File Not Found for client ({request.client_addr}) request: {file_path}")
+                return 'Error 404: File not found', 404
+            except OSError:
+                logger.error(f"OS Error reading media file for client ({request.client_addr}) request: {file_path}")
+                return 'Error 500: Could not read file', 500
+            except Exception as e:
+                logger.error(f"Unknown error serving media file for client ({request.client_addr}) request: {file_path}: {e}")
                 return 'Error 500: Internal Server Error', 500
 
         @self.app.route('/')
