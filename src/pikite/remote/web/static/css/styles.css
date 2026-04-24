@@ -106,13 +106,32 @@ body {
   height: auto;
 }
 
+
+/* Media */
+
+#media label {
+  position: relative;
+}
+
+#media-content {
+  margin-bottom: 2em;
+}
+
+.materialboxed {
+  padding: 0.5em !important;
+}
+
 /* Log Stream */
 #log [type="checkbox"] + span:not(.lever) {
   padding-left: 24px;
 }
 
+#log label {
+  padding: 0 1em 0 0;
+}
+
 #log-entries {
-  margin: 0 0.75rem;
+  margin: -24px;
 }
 
 #log-entries > span {
