@@ -48,6 +48,9 @@ function startWebsocket() {
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "media_dirs_update") {
 			// Handle media directories update
 			loadMediaSessionDirectories(obj);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "media_file_paths") {
+			// Handle media file path receipt
+			loadMedia(obj);
 		} else {
 			console.warn("Received unknown WebSocket message: ", obj);
 		}
