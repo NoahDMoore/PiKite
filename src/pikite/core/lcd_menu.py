@@ -11,7 +11,18 @@ from .constants import XMLTAG, XMLATTRIB, MENUACTION
 from ..core.input_handler import InputHandler, InputCommand, InputSource
 from .logger import get_logger
 from .settings import Settings
-from ..hardware.display_controller import DisplayController, display_system_info # type: ignore
+
+# Mock hardware controller class for testing on non-RPi system; remove when done testing
+try:
+	from ..hardware.display_controller import DisplayController, display_system_info # type: ignore
+except:
+	class DisplayController:
+		"""
+		Placeholder DisplayController class for type hinting. Replace with actual implementation.
+		"""
+		def print_message(self, message: str):
+			print(f"Display Message: {message}")
+
 from ..system import power_management
 from ..system.storage import StorageManager
 
@@ -57,6 +68,7 @@ class MenuElement:
 		setting_elem = self.element.find(XMLTAG.SETTING)
 		if setting_elem is not None:
 			self.setting = setting_elem.text
+			self.setting_type = setting_elem.attrib.get("type", "str") # Default to string if type not specified
 		else:
 			self.setting = None
 		
@@ -75,10 +87,10 @@ class MenuElement:
 		self.submenu = [MenuElement(menu_item, parent=self) for menu_item in menu_item_elems] if menu_item_elems is not None else None
 
 	def __repr__(self):
-		return f"<{self.tag} name={self.name}, self.message={self.message}, action={self.action}, parent_name={self.parent.name}>"
+		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, parent_name={self.parent.name}>"
 
 	def __str__(self):
-		return f"<{self.tag} name={self.name}, self.message={self.message}, action={self.action}, parent_name={self.parent.name}>"
+		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, parent_name={self.parent.name}>"
 
 
 class Menu:
@@ -95,21 +107,21 @@ class Menu:
 		settings (Settings): Instance of Settings to manage application settings.
 		input_handler (InputHandler): Instance of InputHandler to manage input commands.
 	"""
-	def __init__(self, display_controller: DisplayController, settings: Settings, input_handler: InputHandler, menu_file: Path=MENU_FILE):
+	def __init__(self, display_controller: DisplayController | None, settings: Settings, input_handler: InputHandler | None, menu_file: Path=MENU_FILE):
 		"""
 		Initializes the Menu instance by loading the menu structure from an XML file.
 		
 		Args:
-			display_controller (DisplayController): Instance of DisplayController to manage display output.
+			display_controller (DisplayController | None): Instance of DisplayController to manage display output.
 			settings (Settings): Instance of Settings to manage application settings.
-			input_handler (InputHandler): Instance of InputHandler to manage input commands.
+			input_handler (InputHandler | None): Instance of InputHandler to manage input commands.
 			menu_file (Path): Path to the XML file defining the menu structure.
 							  Defaults to utils.StorageManager.MENU_FILE
 
 		Raises:
 			AssertionError: If the root menu does not contain any submenu items.
 		"""
-		self.root = MenuElement(ET.parse(MENU_FILE).getroot())
+		self.root = MenuElement(ET.parse(menu_file).getroot())
 		try:
 			assert self.root.submenu is not None, "Root menu must not be empty"
 		except AssertionError as e:
@@ -165,7 +177,12 @@ class Menu:
 		if ".jpg" in message or ".png" in message:
 			message = str(storage_manager.MEDIA_DIR / message)
 		
-		self.display_controller.print_message(message)
+		if self.display_controller is None:
+			logger.warning("No display controller available to print menu message")
+			return
+		else:
+			self.display_controller.print_message(message)
+		
 		logger.debug(f"Menu Updated: {self.current_element}")
 
 	def increment_element(self):
@@ -242,9 +259,74 @@ class Menu:
 				# Handle the input command via the input handler
 				self.input_handler.handle(command=command, source=InputSource.SYSTEM, **kwargs)
 			case MENUACTION.DISPLAY_SYSTEM_INFO:
-				display_system_info(self.display_controller)
+				if self.display_controller is None:
+					logger.warning("No display controller available for displaying system info")
+					return
+				else:
+					display_system_info(self.display_controller)
 			case _:
 				logger.warning(f"No action defined for menu element: {self.current_element}")
 				return
 		
 		self.update_menu()
+
+	def get_all_option_elements(self) -> list[MenuElement]:
+		"""
+		Get a list of all MenuElements in the menu structure that have the 'option' action.
+
+		Returns:
+			list[MenuElement]: A list of MenuElements with the 'option' action.
+		"""
+		option_elements = []
+
+		def traverse(element: MenuElement):
+			if element.options:
+				option_elements.append(element)
+			if element.submenu is not None:
+				for sub in element.submenu:
+					traverse(sub)
+			if element.options is not None:
+				for opt in element.options:
+					traverse(opt)
+
+		traverse(self.root)
+		return option_elements
+	
+	def format_settings_and_options_as_dict(self) -> dict[str, dict]:
+		"""
+		Formats the menu settings and their associated option elements into
+		a JSON-serializable dictionary for websocket clients, including type info.
+
+		Returns:
+			dict[str, dict]: A dictionary where keys are setting names and values are dicts with 'type' and 'options' keys.
+		"""
+		settings_options_dict = {}
+		option_elements = self.get_all_option_elements()
+
+		for element in option_elements:
+			if element.setting is None:
+				logger.warning(f"Option element '{element}' does not have an associated setting and will be skipped in the settings-options dictionary.")
+				continue
+
+			# Prepare a list of option dicts for this setting
+			options_list = []
+			if element.options:
+				for opt in element.options:
+					message = opt.message.replace("[", "").replace("]", "")
+					options_list.append({
+						"name": opt.name,
+						"value": opt.value,
+						"message": message,
+					})
+			# Compose the setting entry with type and options
+			setting_type = getattr(element, "setting_type", "str")
+			if element.setting not in settings_options_dict:
+				settings_options_dict[element.setting] = {
+					"type": setting_type,
+					"options": options_list
+				}
+			else:
+				# If multiple option elements share the same setting, extend the list of options
+				settings_options_dict[element.setting]["options"].extend(options_list)
+
+		return settings_options_dict
