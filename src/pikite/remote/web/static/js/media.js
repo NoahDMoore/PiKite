@@ -90,9 +90,10 @@ function loadMedia(media_file_paths) {
 
     for (const file_path of file_paths) {
         const image = document.createElement('img');
-        image.classList.add("materialboxed", "col", "m6", "s12");
+        image.classList.add("materialboxed", "col", "m4", "s12");
         image.src = file_path;
         image.loading = "lazy"
+        image.dataset.caption = file_path
 
         container.appendChild(image);
     }
