@@ -15,6 +15,9 @@
 body {
   background-color: var(--md-primary);
   color: var(--md-on-surface);
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Navbar */
@@ -106,6 +109,48 @@ body {
   height: auto;
 }
 
+/* Dashboard */
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.slider-control .range-field {
+    flex: 1;
+    margin: 0;
+}
+
+.step-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+}
+
+.idle-control-btns {
+  text-align: center;
+  letter-spacing: 1em;
+  margin-top: 0;
+}
+
+#status-badge {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+}
+
+#status-badge.offline {
+  background-color: var(--md-error);
+}
+
+#status-badge.capture {
+  background-color: var(--md-secondary);
+}
+
+#status-badge.idle {
+  background-color: var(--md-background);
+}
 
 /* Media */
 
