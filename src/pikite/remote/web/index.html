@@ -73,18 +73,58 @@
     <!-- DASHBOARD -->
         <div id="dashboard" class="container">
             <div class="row">
-
-                <!-- Camera -->
-                <div class="col s12 m8">
+                <div class="col">
                     <div class="card">
-                        <div class="section-title">Camera</div>
+                        <div class="section-title">Capture Preview</div>
                         <img id="camera-feed" src="static/images/placeholder.png" alt="Camera Feed">
-                        <a class="btn" onclick="takePhoto()">Take Photo</a>
-                        <a class="btn stop" onclick="stopCapture()">Stop</a>
                     </div>
                 </div>
+            </div>
 
-                <div class="col s12 m4">
+            <div class="row">
+                <div class="col s12 m9">
+                    <div class="card">
+                        <div class="section-title">PiKite Controls</div>
+                        <span id="status-badge" class="new badge idle" data-badge-caption="Idle">Status: </span>
+                            <div id="idle-controls">
+                                <div>
+                                    <!-- PAN -->
+                                    <div class="slider-control">
+                                        <a class="btn btn-small step-btn" data-target="pan-slider" data-step="-30">-30&deg</a>
+
+                                        <p class="range-field">
+                                            <label for="pan-slider">Pan Angle</label>
+                                            <input type="range" id="pan-slider" value="0" min="0" max="360" step="30" />
+                                        </p>
+
+                                        <a class="btn btn-small step-btn" data-target="pan-slider" data-step="30">+30&deg</a>
+                                    </div>
+
+                                    <!-- TILT -->
+                                    <div class="slider-control">
+                                        <a class="btn btn-small step-btn" data-target="tilt-slider" data-step="-15">-15&deg</a>
+
+                                        <p class="range-field">
+                                            <label for="tilt-slider">Tilt Angle</label>
+                                            <input type="range" id="tilt-slider" value="0" min="0" max="90" step="15" />
+                                        </p>
+
+                                        <a class="btn btn-small step-btn" data-target="tilt-slider" data-step="15">+15&deg</a>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="idle-control-btns">
+                                        <a class="btn waves-effect waves-light center">
+                                            <i class="material-icons left">linked_camera</i>
+                                            Take Photo
+                                        </a>
+                                        <a class="btn waves-effect waves-light">Start Capture Session</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div id="capture-session-controls">
+                            </div>
+                        </div>
                     <div class="card">
                         <div class="section-title">Capture Session Info</div>
                         <ul class="collection">
@@ -99,9 +139,7 @@
                         </ul>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
                 <div class="col s6 m3">
                     <div class="card">
                         <div class="section-title">Runtime</div>
@@ -119,14 +157,14 @@
                 <div class="col s6 m3">
                     <div class="card">
                         <div class="section-title">Pan/Tilt</div>
-                        <p>Pan: <span id="pan">--</span> ° Tilt: <span id="tilt">--</span> °</p>
+                        <p>Pan: <span id="pan">--</span>&deg Tilt: <span id="tilt">--</span>&deg</p>
                     </div>
                 </div>
 
                 <div class="col s6 m3">
                     <div class="card">
-                        <div class="section-title">Status</div>
-                        <p><span id="status">Idle</span></p>
+                        <div class="section-title">Capture Count</div>
+                        <p><span id="capture-count">--</span>&nbsp<span id="capture-media-type">--</span></p>
                     </div>
                 </div>
             </div>
@@ -224,7 +262,7 @@
             </div>
 
             <div class="fixed-action-btn">
-                <a class="btn-floating btn-large red">
+                <a class="btn-floating btn-large red waves-effect waves-light">
                     <i class="large material-icons">settings</i>
                 </a>
                 <ul>
