@@ -1,6 +1,7 @@
 import bcrypt
 import os
 from dotenv import load_dotenv, set_key, dotenv_values
+from getpass import getpass
 
 from ..system.storage import StorageManager
 
@@ -42,8 +43,8 @@ def get_new_password():
     Raises:
         ValueError: If the password confirmation does not match.
     """
-    new_password = input("Enter new password: ")
-    if new_password != input("Confirm new password: "):
+    new_password = getpass("Enter new password: ")
+    if new_password != getpass("Confirm new password: "):
         print("Passwords do not match. Aborting.")
         raise ValueError("Passwords do not match.")
     
@@ -51,7 +52,7 @@ def get_new_password():
 
     # Store hash in .env
     set_key(ENV_PATH, "PIKITE_PASSWORD_HASH", new_hash.decode('utf-8'))
-    
+
     load_dotenv(ENV_PATH, override=True)  # Reload .env to get new hash
     print("Password updated successfully.")
 
@@ -66,7 +67,7 @@ def reset_password():
         return
 
     # Verify current password before allowing reset
-    entered_password = input("Enter current password: ")
+    entered_password = getpass("Enter current password: ")
     if not verify_password(entered_password, current_hash.encode('utf-8')):
         print("Incorrect password. Aborting.")
         return
