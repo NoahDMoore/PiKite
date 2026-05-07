@@ -39,14 +39,11 @@ def verify_password(password: str, hashed: bytes) -> bool:
 def get_new_password():
     """
     Prompt the user to enter a new password and confirm it. If the passwords match, hash it and store in .env.
-
-    Raises:
-        ValueError: If the password confirmation does not match.
     """
     new_password = getpass("Enter new password: ")
     if new_password != getpass("Confirm new password: "):
         print("Passwords do not match. Aborting.")
-        raise ValueError("Passwords do not match.")
+        return
     
     new_hash = hash_password(new_password)
 
@@ -57,6 +54,7 @@ def get_new_password():
     print("Password updated successfully.")
 
 def reset_password():
+    """Reset the password by verifying the current password and then allowing the user to set a new one."""
     load_dotenv(ENV_PATH, override=True)
     current_hash = os.getenv('PIKITE_PASSWORD_HASH')
 
