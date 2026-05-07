@@ -15,6 +15,7 @@ import os
 import secrets
 import time
 
+from dotenv import load_dotenv
 from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
 
@@ -44,6 +45,9 @@ class ControllerServer:
 
         # Initialize Storage Manager
         self.storage = StorageManager()
+
+        # Load password hash from .env
+        load_dotenv(self.storage.BASE_DIR / ".env", override=True)
 
         # Register Remote Logging Handler if enabled
         if remote_logging:
