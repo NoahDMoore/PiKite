@@ -43,7 +43,7 @@ class MENUACTION (str, Enum):
     INPUT_COMMAND = "input_command"
     DISPLAY_SYSTEM_INFO = "display_system_info"
 
-# Constandts for Camera
+# Constants for Camera
 class CAPTURE_MODES(str, Enum):
     """
     Camera capture modes supported by PiKite
