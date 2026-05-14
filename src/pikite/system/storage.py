@@ -132,8 +132,8 @@ class StorageManager:
         Returns:
             Path: Path to the newly created session directory, or None if mode is invalid.
         """
-        if mode not in (CAPTURE_MODES.STILL, CAPTURE_MODES.VIDEO):
-            return None
+        if mode not in [CAPTURE_MODES.STILL, CAPTURE_MODES.VIDEO]:
+            raise ValueError("Cannot create session directory: Mode must be CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO")
             
         output_dir = self.PHOTO_OUTPUT_DIR if mode == CAPTURE_MODES.STILL else self.VIDEO_OUTPUT_DIR
         session_dir = output_dir / get_timestamp()
@@ -144,7 +144,7 @@ class StorageManager:
         self,
         mode: CAPTURE_MODES,
         extension: MEDIA_EXTENSIONS,
-        base_name: str = "capture",
+        base_name: str = "",
         use_timestamp: bool = True,
         session_dir: Path | None = None
     ) -> Path:
@@ -168,9 +168,7 @@ class StorageManager:
         current_session_dir = session_dir or self.new_session_dir(mode) or self.PHOTO_OUTPUT_DIR
         filename = self.get_filename(base_name, extension, use_timestamp)
 
-        if mode == CAPTURE_MODES.STILL:
-            return current_session_dir / filename
-        elif mode == CAPTURE_MODES.VIDEO:
+        if mode in [CAPTURE_MODES.STILL, CAPTURE_MODES.VIDEO]:
             return current_session_dir / filename
         else:
             raise ValueError("Mode must be CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO")
@@ -271,7 +269,6 @@ class StorageManager:
             file_list.append(f"/media/{self.PHOTO_OUTPUT_DIR.name}/{capture_session_dir.name}/{file.name}")
             
         return file_list
-
     
 def get_timestamp() -> str:
     """Return the current date and time as a formatted string."""
