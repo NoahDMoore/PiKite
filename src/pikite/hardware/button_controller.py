@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 from typing import Optional
 
-from ..core.input_handler import InputHandler, InputCommand, InputSource
+from ..core.input_handler import InputHandler, InputCommand, InputSource, InputScope
 from ..core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -48,9 +48,9 @@ class ButtonController:
         self.select_command = select_command
         
         # Scope-aware command mappings: scope -> (next_command, select_command)
-        self._scope_commands: dict[str, tuple[InputCommand, InputCommand]] = {}
+        self._scope_commands: dict[InputScope, tuple[InputCommand, InputCommand]] = {}
         # Store initial commands for default scope
-        self._scope_commands[input_handler._active_scope] = (next_command, select_command)
+        self._scope_commands[input_handler.active_scope] = (next_command, select_command)
 
         GPIO.setmode(GPIO.BCM)
 
@@ -115,7 +115,7 @@ class ButtonController:
         GPIO.remove_event_detect(self.pin_next)
         GPIO.remove_event_detect(self.pin_select)
 
-    def set_commands(self, *, next_command: Optional[InputCommand] = None, select_command: Optional[InputCommand] = None, scope: Optional[str] = None):
+    def set_commands(self, *, next_command: Optional[InputCommand] = None, select_command: Optional[InputCommand] = None, scope: Optional[InputScope] = None):
         """
         Dynamically update the commands emitted by button presses.
         
@@ -124,9 +124,9 @@ class ButtonController:
         Args:
             next_command (InputCommand, optional): New command for NEXT button. If None, unchanged.
             select_command (InputCommand, optional): New command for SELECT button. If None, unchanged.
-            scope (str, optional): Scope to update. If None, uses current active scope.
+            scope (InputScope, optional): Scope to update. If None, uses current active scope.
         """
-        target_scope = scope or self.input_handler._active_scope
+        target_scope = scope or self.input_handler.active_scope
         
         # Get existing commands for this scope, or use current if not yet set
         existing_next, existing_select = self._scope_commands.get(
@@ -142,7 +142,7 @@ class ButtonController:
         self._scope_commands[target_scope] = (new_next, new_select)
         
         # If updating current scope, apply immediately
-        if target_scope == self.input_handler._active_scope:
+        if target_scope == self.input_handler.active_scope:
             self.next_command = new_next
             self.select_command = new_select
             
@@ -153,7 +153,7 @@ class ButtonController:
         else:
             logger.info(f"Stored button commands for scope '{target_scope}' (not yet active)")
 
-    def sync_scope(self, new_scope: str):
+    def sync_scope(self, new_scope: InputScope):
         """
         Synchronize button commands with a scope change in the InputHandler.
         
@@ -161,7 +161,7 @@ class ButtonController:
         to restore the button mappings for that scope.
         
         Args:
-            new_scope (str): The new active scope from InputHandler.
+            new_scope (InputScope): The new active scope from InputHandler.
         """
         if new_scope in self._scope_commands:
             self.next_command, self.select_command = self._scope_commands[new_scope]

@@ -6,11 +6,11 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 import asyncio
 
 from pikite.core.constants import CAPTURE_MODES
-from pikite.core.input_handler import InputCommand, InputSource, InputHandler
+from pikite.core.input_handler import InputCommand, InputSource, InputScope, InputHandler
 from pikite.core.lcd_menu import Menu
 from pikite.core.logger import set_log_level
 from pikite.remote.microdot_server import ControllerServer
-from pikite.remote.remote_input import RemoteInput
+from pikite.core.input_handler import RemoteInput
 from pikite.core.settings import Settings
 from pikite.system.storage import StorageManager
 
@@ -65,11 +65,11 @@ def fetch_media(args):
     }
     server.send(file_paths_payload)
 
-input_handler.register("default", InputCommand.FETCH_SETTINGS, fetch_settings)
-input_handler.register("default", InputCommand.UPDATE_SETTINGS, update_settings)
-input_handler.register("default", InputCommand.LOAD_DEFAULT_SETTINGS, default_settings)
-input_handler.register("default", InputCommand.FETCH_MEDIA_DIRS, fetch_media_dirs)
-input_handler.register("default", InputCommand.FETCH_MEDIA, fetch_media)
+input_handler.register(InputScope.DEFAULT, InputCommand.FETCH_SETTINGS, fetch_settings)
+input_handler.register(InputScope.DEFAULT, InputCommand.UPDATE_SETTINGS, update_settings)
+input_handler.register(InputScope.DEFAULT, InputCommand.LOAD_DEFAULT_SETTINGS, default_settings)
+input_handler.register(InputScope.DEFAULT, InputCommand.FETCH_MEDIA_DIRS, fetch_media_dirs)
+input_handler.register(InputScope.DEFAULT, InputCommand.FETCH_MEDIA, fetch_media)
 
 async def main():
     await asyncio.gather(

@@ -1,6 +1,11 @@
-from enum import Enum, auto
+import asyncio
 from collections import defaultdict
+from enum import Enum, auto
+import json
 from typing import Callable
+
+
+from ..remote.microdot_server import ControllerServer
 from .logger import get_logger
 
 logger = get_logger(__name__)
@@ -33,7 +38,12 @@ class InputCommand(Enum):
 class InputSource(Enum):
     GPIO = auto()
     WEBSOCKET = auto()
-    SYSTEM = auto() 
+    SYSTEM = auto()
+
+class InputScope(str, Enum):
+    DEFAULT = "default"
+    MENU = "menu"
+    CAPTURE_LOOP = "capture_loop"
 
 class InputHandler:
     """
@@ -44,15 +54,16 @@ class InputHandler:
         """Initialize the InputHandler with empty listener mappings and default scope."""
 
         self._listeners: dict[str, dict[InputCommand, list[Callable]]] = defaultdict(lambda: defaultdict(list))
-        self.active_scope = "default"
+        self._scope_change_listeners: list[Callable] = []
+        self.active_scope = InputScope.DEFAULT
         logger.info(f"InputHandler initialized with scope '{self.active_scope}'")
 
-    def set_scope(self, scope: str):
+    def set_scope(self, scope: InputScope):
         """
         Set the active input scope.
         
           Args:
-            scope (str): The scope to set as active.
+            scope (InputScope): The scope to set as active.
         """
 
         if scope == self.active_scope:
@@ -63,12 +74,21 @@ class InputHandler:
 
         self.active_scope = scope
 
-    def clear_scope(self, scope: str):
+        for callback in self._scope_change_listeners:
+            try:
+                callback()
+            except Exception as e:
+                logger.exception(
+                    f"Error while calling scope change listener {callback.__qualname__} "
+                    f" - {e}"
+                )
+
+    def clear_scope(self, scope: InputScope):
         """
         Clear all input bindings for a given scope.
 
         Args:
-            scope (str): The scope to clear.
+            scope (InputScope): The scope to clear.
         """
 
         if scope in self._listeners:
@@ -78,12 +98,26 @@ class InputHandler:
         else:
             logger.debug(f"Tried to clear non-existent scope '{scope}'")
 
-    def register(self, scope: str, command: InputCommand, callback: Callable):
+    def add_scope_change_listener(self, callback: Callable):
+        """
+        Register a listener to be called when the input scope changes.
+
+        Args:
+            callback (Callable): A function to call on scope change.
+        """
+        if callback in self._scope_change_listeners:
+            logger.debug(f"Duplicate scope change listener ignored: {callback.__qualname__}")
+            return
+
+        self._scope_change_listeners.append(callback)
+        logger.debug(f"Registered scope change listener: {callback.__qualname__}")
+
+    def register(self, scope: InputScope, command: InputCommand, callback: Callable):
         """
         Register a callback for a specific input command within a given scope.
         
         Args:
-            scope (str): The scope for the input command.
+            scope (InputScope): The scope for the input command.
             command (InputCommand): The input command to register.
             callback (Callable): The function to call when the command is received.
         """
@@ -142,3 +176,38 @@ class InputHandler:
                 )
 
                 raise
+
+class RemoteInput:
+    def __init__(self, server: ControllerServer, input_handler: InputHandler):
+        self.server = server
+        self.input_handler = input_handler
+
+    async def start_listening(self):
+        while True:
+            if self.server.incoming_messages:
+                message = self.server.incoming_messages.pop(0)
+                await self.handle_message(message)
+            
+            await asyncio.sleep(0)      # yield back to scheduler
+    
+    async def handle_message(self, message):
+        try:
+            if isinstance(message, str):
+                message = json.loads(message)  # Parse JSON string to dict
+            
+            if message.get("type") == "input_command":
+                command_str = message.get("command")
+                args = message.get("args", None)
+                try:
+                    command = InputCommand[command_str]  # Convert string to InputCommand enum
+                    if args:
+                        self.input_handler.handle(command=command, source=InputSource.WEBSOCKET, args=args)
+                    else:
+                        self.input_handler.handle(command=command, source=InputSource.WEBSOCKET)
+                    logger.debug(f"Handled remote input command: {command}")
+                except KeyError:
+                    logger.error(f"Invalid remote input command received: {command_str}")
+            else:
+                logger.error(f"Unknown message type received: {message.get('type')}")
+        except Exception as e:
+            logger.error(f"Error handling remote message: {e}")
