@@ -240,6 +240,37 @@ class Timer:
         else:
             return False
         
+    def interval_remaining(self, interval: float, name: str = "_default") -> float | None:
+        """Returns the remaining time until the specified interval has passed since the last check.
+
+        Args:
+            interval (float): The interval in seconds to check against.
+            name (str): The name of the interval to check. Defaults to "_default".
+
+        Returns:
+            float | None: Remaining time in seconds until the interval elapses, or None if the timer is stopped or paused.
+        """
+        if self.stopped or self.paused:
+            logger.warning("Timer is not running or paused. Cannot check interval remaining time.")
+            return None
+
+        last_interval_time = self.named_intervals.get(name, None)
+
+        if last_interval_time is None:
+            logger.debug(f"Interval '{name}' does not exist. Creating a new one.")
+            self.set_named_interval(name)
+            return interval
+        
+        elapsed_time = self.elapsed()
+
+        if elapsed_time is None:
+            logger.warning("Timer is not running or paused. Cannot check interval remaining time.")
+            return None
+        
+        remaining_time = max(0.0, interval - (elapsed_time - last_interval_time))
+        logger.debug(f"Interval '{name}' remaining time: {remaining_time:.3f}s")
+        return remaining_time
+        
     def format_elapsed_time(self, time_in_seconds):
         """
         Converts elapsed time, given in seconds, to a string with format hh:mm:ss
