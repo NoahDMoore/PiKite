@@ -390,12 +390,6 @@
 					<option_item name="onetwenty" message="Seconds: [120]" action="selectOption" value="120" />
 					<option_item name="oneeighty" message="Seconds: [180]" action="selectOption" value="180" />
 				</menu_item>
-				
-				<menu_item name="multipleVideos" message="Multiple Videos?" action="options" parent="videoSettings">
-					<setting type="bool">vid_multiple</setting>
-					<option_item name="yes" message="[Yes]     No" action="selectOption" value="True" />
-					<option_item name="no" message="Yes     [No]" action="selectOption" value="False" />
-				</menu_item>
 
 				<menu_item name="videoInterval" message="Video Interval" action="options" parent="videoSettings">
 					<setting type="int">vid_interval</setting>
