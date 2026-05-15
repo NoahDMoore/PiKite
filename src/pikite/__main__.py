@@ -63,7 +63,7 @@ class PiKiteApp:
         initialization_progress_bar.advance(10)
 
         # Initialize Remote Controller Server
-        self.remote_server = ControllerServer(port=5000, remote_logging=False)
+        self.remote_server = ControllerServer(port=5000)
         
         # Initialize Remote Input Handler
         self.remote_input = RemoteInput(self.remote_server, self.input_handler)
