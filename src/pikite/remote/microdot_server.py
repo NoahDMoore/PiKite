@@ -300,10 +300,17 @@ class ControllerServer:
         Args:
             ws: The WebSocket connection object.
         """
+        import datetime
         while True:
+            t0 = datetime.datetime.now()
             message = await ws.receive()                    # Receive message from websocket client
+            t1 = datetime.datetime.now()
             self.incoming_messages.append(message)          # Store message for retrieval in the incoming_messages buffer
-            logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
+            t2 = datetime.datetime.now()
+            logger.debug(
+                f"RX: {message} | ws.receive() took {(t1-t0).total_seconds():.6f}s, append took {(t2-t1).total_seconds():.6f}s | incoming_messages size: {len(self.incoming_messages)}",
+                extra={"skip_remote": True}
+            ) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
 
     async def _tx_loop(self, ws: WebSocket):
         """
@@ -315,9 +322,12 @@ class ControllerServer:
         Raises:
             TypeError: If the message type is not string or dict.
         """
+        import datetime
         while True:
+            t0 = datetime.datetime.now()
             try:
                 if self.outgoing_messages:
+                    t1 = datetime.datetime.now()
                     raw = self.outgoing_messages.pop(0) # Get the oldest message from the outgoing_messages buffer
 
                     # If the raw message is a string, wrap it in JSON object
@@ -328,11 +338,16 @@ class ControllerServer:
                     else:
                         raise TypeError
 
-                    logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
+                    t2 = datetime.datetime.now()
+                    logger.debug(f"TX: {payload} | pop took {(t2-t1).total_seconds():.6f}s | outgoing_messages size: {len(self.outgoing_messages)}", extra={"skip_remote": True})
+                    t3 = datetime.datetime.now()
                     await ws.send(payload)  # Send message to websocket client
+                    t4 = datetime.datetime.now()
+                    logger.debug(f"TX: ws.send() took {(t4-t3).total_seconds():.6f}s", extra={"skip_remote": True})
             except TypeError:
                 logger.error("Invalid Message Type: Messages must be a string or dict")
-                
+            t5 = datetime.datetime.now()
+            logger.debug(f"TX: loop total time: {(t5-t0).total_seconds():.6f}s", extra={"skip_remote": True})
             await asyncio.sleep(0)      # yield back to scheduler
     
     def start(self):
