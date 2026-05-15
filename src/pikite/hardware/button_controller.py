@@ -153,7 +153,7 @@ class ButtonController:
         else:
             logger.info(f"Stored button commands for scope '{target_scope}' (not yet active)")
 
-    def sync_scope(self, new_scope: InputScope):
+    def sync_scope(self, new_scope: InputScope, **kwargs):
         """
         Synchronize button commands with a scope change in the InputHandler.
         

@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 from enum import Enum, auto
+from functools import partial
 import json
 from typing import Callable
 
@@ -76,7 +77,7 @@ class InputHandler:
 
         for callback in self._scope_change_listeners:
             try:
-                callback()
+                callback(new_scope=scope)
             except Exception as e:
                 logger.exception(
                     f"Error while calling scope change listener {callback.__qualname__} "
@@ -98,13 +99,15 @@ class InputHandler:
         else:
             logger.debug(f"Tried to clear non-existent scope '{scope}'")
 
-    def add_scope_change_listener(self, callback: Callable):
+    def add_scope_change_listener(self, callback: Callable, **kwargs):
         """
         Register a listener to be called when the input scope changes.
 
         Args:
             callback (Callable): A function to call on scope change.
         """
+        callback = partial(callback, **kwargs) if kwargs else callback
+
         if callback in self._scope_change_listeners:
             logger.debug(f"Duplicate scope change listener ignored: {callback.__qualname__}")
             return
