@@ -42,6 +42,7 @@ class ControllerServer:
         # Message Buffers
         self.incoming_messages = []
         self.outgoing_messages = []
+        self.websocket_connected = False
 
         # Initialize Storage Manager
         self.storage = StorageManager()
@@ -94,7 +95,12 @@ class ControllerServer:
                 time_left = int(self.active_tokens[token] - time.time())
                 expiration_str = f"{time_left // 60}m {time_left % 60}s" if time_left >= 60 else f"{time_left}s"
                 logger.info(f"WebSocket connection established with client: {request.client_addr}. Session token expires in {expiration_str}.")
-                await self.register(ws) # Register the WebSocket connection
+                self.websocket_connected = True
+                try:
+                    await self.register(ws) # Register the WebSocket connection
+                finally:
+                    self.websocket_connected = False
+                    self.outgoing_messages.clear()  # Purge queue when client disconnects
             except Exception as e:
                 logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
 
@@ -347,11 +353,15 @@ class ControllerServer:
     def send(self, message: str | dict):
         """
         Add a message to the outgoing_messages buffer to be sent to the WebSocket client.
+        Only queue if a websocket client is connected.
         
         Args:
             message (str | dict): The message to send. Can be a string or a dictionary.
         """
-        self.outgoing_messages.append(message)
+        if self.websocket_connected:
+            self.outgoing_messages.append(message)
+        else:
+            logger.debug("No websocket client connected; message not queued.", extra={"skip_remote": True})
 
     def get(self):
         """
