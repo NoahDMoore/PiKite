@@ -295,6 +295,7 @@ class ControllerServer:
             ws: The WebSocket connection object.
         """
         try:
+            #await asyncio.gather(self._rx_loop(ws), self._tx_loop(ws))
             await asyncio.gather(self._tx_loop(ws))
         except Exception as e:
             logger.info(f"WebSocket Error: {e}")
@@ -341,7 +342,7 @@ class ControllerServer:
             except TypeError:
                 logger.error("Invalid Message Type: Messages must be a string or dict")
                 
-            await asyncio.sleep(0)      # yield back to scheduler
+            await asyncio.sleep(0.01)      # yield back to scheduler
     
     def start(self):
         """
