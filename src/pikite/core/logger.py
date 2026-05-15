@@ -111,7 +111,7 @@ class WebSocketHandler(logging.Handler):
 
     def emit(self, record):
         try:
-            if self.server.websocket_connected:
+            if not self.server.websocket_connected:
                 raise ConnectionError("WebSocket connection is not established.")
 
             msg = self.format(record)
