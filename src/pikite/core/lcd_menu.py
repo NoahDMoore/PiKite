@@ -230,7 +230,7 @@ class Menu:
 				if self.input_handler is None:
 					logger.error("No input handler available for input menu action")
 					return
-
+				logger.debug(f"Handling input command for menu element: {self.current_element}")
 				command_name = self.current_element.__getattribute__("command")  # use command attribute for command name (enum NAME)
 				if not command_name:
 					logger.error("Input action with no command specified")
