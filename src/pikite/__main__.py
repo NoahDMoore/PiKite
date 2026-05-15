@@ -63,10 +63,7 @@ class PiKiteApp:
         initialization_progress_bar.advance(10)
 
         # Initialize Remote Controller Server
-        self.remote_server = ControllerServer(port=5000)
-        
-        # Add WebSocket Handler for Remote Logging
-        #logger_module.register_websocket_handler(self.remote_server)
+        self.remote_server = ControllerServer(port=5000, remote_logging=False)
         
         # Initialize Remote Input Handler
         self.remote_input = RemoteInput(self.remote_server, self.input_handler)
