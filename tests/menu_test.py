@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from pikite.core.input_handler import InputHandler, InputCommand
+from pikite.core.input_handler import InputHandler, InputCommand, InputScope
 from pikite.core.logger import get_logger
 from pikite.core.lcd_menu import Menu
 from pikite.core.settings import Settings
@@ -20,14 +20,14 @@ logger.info("Starting Menu Tests")
 def test_menu_initialization():
     settings = Settings()
     display_controller = DisplayController()
-    menu = Menu(display_controller, settings)
+    menu = Menu(display_controller, settings, None) # type: ignore
     assert menu is not None
     logger.info("Menu initialized successfully")
 
 def test_menu_navigation():
     settings = Settings()
     display_controller = DisplayController()
-    menu = Menu(display_controller, settings)
+    menu = Menu(display_controller, settings, None) # type: ignore
 
     initial_element = menu.current_element
     logger.info(f"Initial Menu Element: {initial_element.name}")
@@ -62,25 +62,27 @@ def test_menu_navigation_with_buttons():
 
     settings = Settings()
     display_controller = DisplayController()
-    menu = Menu(display_controller, settings)
-    logger.info("Menu initialized for button navigation test")
 
     input_handler = InputHandler()
-    input_handler.set_scope("MENU")
+
+    menu = Menu(display_controller, settings, None) # type: ignore
+    logger.info("Menu initialized for button navigation test")
+
+    input_handler.set_scope(InputScope.MENU)
     input_handler.register(
-        scope="MENU",
+        scope=InputScope.MENU,
         command=InputCommand.NEXT,
         callback=menu.increment_element
     )
 
     input_handler.register(
-        scope="MENU",
+        scope=InputScope.MENU,
         command=InputCommand.PREVIOUS,
         callback=menu.decrement_element
     )
 
     input_handler.register(
-        scope="MENU",
+        scope=InputScope.MENU,
         command=InputCommand.SELECT,
         callback=menu.do_action
     )
