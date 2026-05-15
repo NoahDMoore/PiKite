@@ -61,6 +61,7 @@ class MenuElement:
 		self.name = self.element.attrib.get("name", f"Tag: {self.tag}")
 		self.message = self.element.attrib.get("message", f"Tag: {self.tag}")
 		self.action = self.element.attrib.get("action", "pass")
+		self.command = self.element.attrib.get("command", None)
 		self.parent = parent if parent is not None else self
 		self.value = self.element.attrib.get(XMLATTRIB.VALUE, None)
 
@@ -87,10 +88,10 @@ class MenuElement:
 		self.submenu = [MenuElement(menu_item, parent=self) for menu_item in menu_item_elems] if menu_item_elems is not None else None
 
 	def __repr__(self):
-		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, parent_name={self.parent.name}>"
+		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, command={self.command}, value={self.value}, parent_name={self.parent.name}>"
 
 	def __str__(self):
-		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, parent_name={self.parent.name}>"
+		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, command={self.command}, value={self.value}, parent_name={self.parent.name}>"
 
 
 class Menu:
