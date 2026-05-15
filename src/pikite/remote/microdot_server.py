@@ -295,7 +295,8 @@ class ControllerServer:
             ws: The WebSocket connection object.
         """
         try:
-            await asyncio.gather(self._rx_loop(ws), self._tx_loop(ws))
+            #await asyncio.gather(self._rx_loop(ws), self._tx_loop(ws))
+            pass
         except Exception as e:
             logger.info(f"WebSocket Error: {e}")
 
