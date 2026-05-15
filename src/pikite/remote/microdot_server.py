@@ -41,7 +41,7 @@ class ControllerServer:
 
         # Message Buffers
         self.incoming_messages = []
-        self.outgoing_messages = []
+        self.outgoing_messages = asyncio.Queue()
         self.websocket_connected = False
 
         # Initialize Storage Manager
@@ -100,7 +100,8 @@ class ControllerServer:
                     await self.register(ws) # Register the WebSocket connection
                 finally:
                     self.websocket_connected = False
-                    self.outgoing_messages.clear()  # Purge queue when client disconnects
+                    self.outgoing_messages = asyncio.Queue() # Clear outgoing messages buffer when client disconnects
+                    logger.info(f"WebSocket connection closed for client: {request.client_addr}")
             except Exception as e:
                 logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
 
@@ -295,8 +296,7 @@ class ControllerServer:
             ws: The WebSocket connection object.
         """
         try:
-            #await asyncio.gather(self._rx_loop(ws), self._tx_loop(ws))
-            await asyncio.gather(self._tx_loop(ws))
+            await asyncio.gather(self._rx_loop(ws), self._tx_loop(ws))
         except Exception as e:
             logger.info(f"WebSocket Error: {e}")
 
@@ -325,24 +325,22 @@ class ControllerServer:
             TypeError: If the message type is not string or dict.
         """
         while True:
+            message = await self.outgoing_messages.get() # Wait for a message to be available in the outgoing_messages queue
             try:
-                if self.outgoing_messages:
-                    raw = self.outgoing_messages.pop(0) # Get the oldest message from the outgoing_messages buffer
+                # If the raw message is a string, wrap it in JSON object
+                if isinstance(message, str):
+                    payload = json.dumps({"state": "Message: " + message})
+                elif isinstance(message, dict):
+                    payload = json.dumps(message)
+                else:
+                    raise TypeError
 
-                    # If the raw message is a string, wrap it in JSON object
-                    if isinstance(raw, str):
-                        payload = json.dumps({"state": "Message: " + raw})
-                    elif isinstance(raw, dict):
-                        payload = json.dumps(raw)
-                    else:
-                        raise TypeError
-
-                    logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
-                    await ws.send(payload)  # Send message to websocket client
+                logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
+                await ws.send(payload)  # Send message to websocket client
             except TypeError:
                 logger.error("Invalid Message Type: Messages must be a string or dict")
                 
-            await asyncio.sleep(0.01)      # yield back to scheduler
+            await asyncio.sleep(0)      # yield back to scheduler
     
     def start(self):
         """
@@ -361,10 +359,13 @@ class ControllerServer:
         Args:
             message (str | dict): The message to send. Can be a string or a dictionary.
         """
-        if self.websocket_connected:
-            self.outgoing_messages.append(message)
-        else:
-            logger.debug("No websocket client connected; message not queued.", extra={"skip_remote": True})
+        try:
+            if self.websocket_connected:
+                self.outgoing_messages.put_nowait(message) # Add message to the outgoing_messages queue to be sent to the client
+            else:
+                logger.debug("No websocket client connected; message not queued.", extra={"skip_remote": True})
+        except asyncio.QueueFull as e:
+            logger.error(f"Outgoing message queue is full. Message not sent: {message}. Error: {e}")
 
     def get(self):
         """
