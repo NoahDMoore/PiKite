@@ -125,5 +125,7 @@ class WebSocketHandler(logging.Handler):
                 "timestamp": record.created
             })
 
+        except ConnectionError as e:
+            logger.warning(f"WebSocketHandler: {e} - Log message not sent to remote clients.")
         except Exception:
             self.handleError(record)
