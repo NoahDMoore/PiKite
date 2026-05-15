@@ -432,7 +432,7 @@ class PiKiteApp:
         logger.info("Starting PiKite Application")
 
         await asyncio.gather(
-            #self.remote_server.start(),
+            self.remote_server.start(),
             #self.remote_input.start_listening(),
             self.main_loop()
         )
