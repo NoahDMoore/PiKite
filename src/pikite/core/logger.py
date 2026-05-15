@@ -111,6 +111,9 @@ class WebSocketHandler(logging.Handler):
 
     def emit(self, record):
         try:
+            if self.server.websocket_connected:
+                raise ConnectionError("WebSocket connection is not established.")
+
             msg = self.format(record)
 
             # Push into your existing TX pipeline
