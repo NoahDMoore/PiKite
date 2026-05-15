@@ -89,6 +89,9 @@ class Settings:
         self.config[section][setting_key] = str(value)
         with open(self.config_path, "w") as configfile:
             self.config.write(configfile)
+        
+        self.config.read(self.config_path) # Refresh config to ensure changes are loaded
+        logger.info(f"Setting updated: {setting_key} = {value} (Section: {section})")
 
     def load_defaults(self, read_after=True):
         """
