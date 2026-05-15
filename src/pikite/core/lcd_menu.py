@@ -211,7 +211,10 @@ class Menu:
 			case MENUACTION.OPTIONS:
 				if self.current_element.options is not None and self.current_element.setting is not None:
 					current_setting = self.settings.get(self.current_element.setting)
-					self.current_element = next((option for option in self.current_element.options if option.value == current_setting), self.current_element)
+					self.current_element = next(
+						(option for option in self.current_element.options if str(option.value) == str(current_setting)),
+						self.current_element.options[0] if self.current_element.options else self.current_element
+					)
 				else:
 					logger.error(f"'Options' action called, but no options and/or setting exists for element: {self.current_element}")
 					return
