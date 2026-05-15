@@ -311,6 +311,8 @@ class ControllerServer:
             self.incoming_messages.append(message)          # Store message for retrieval in the incoming_messages buffer
             logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
 
+            await asyncio.sleep(0)      # yield back to scheduler
+
     async def _tx_loop(self, ws: WebSocket):
         """
         Send messages from the outgoing_messages buffer to the WebSocket client.
