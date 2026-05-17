@@ -366,6 +366,8 @@ class ControllerServer:
                 logger.debug("No websocket client connected; message not queued.", extra={"skip_remote": True})
         except asyncio.QueueFull as e:
             logger.error(f"Outgoing message queue is full. Message not sent: {message}. Error: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error while sending message: {message}. Error: {e}")
 
     def get(self):
         """
