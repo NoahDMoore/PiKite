@@ -570,7 +570,7 @@ class CaptureSession:
             "type": "session_info",
             "session_start": self.session_start_time,
             "capture_mode": self.capture_mode.name,
-            "media_extension": self.media_extension.value if self.media_extension else None,
+            "media_type": self.media_extension.value if self.media_extension else None,
             "video_length": self.video_length,
             "capture_interval": self.capture_interval,
             "altitude_interval": self.altitude_interval,

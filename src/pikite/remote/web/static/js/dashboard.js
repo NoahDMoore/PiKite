@@ -70,6 +70,7 @@ var pikite_scope = null
 function loadSessionInfo(info) {
     document.getElementById("session-start").textContent = info.session_start || "N/A";
     document.getElementById("capture-mode").textContent = info.capture_mode || "N/A";
+    document.getElementById("media-type").textContent = info.media_type || "N/A";
     document.getElementById("video-length").textContent = info.video_length !== undefined ? info.video_length + "s" : "N/A";
     document.getElementById("capture-interval").textContent = info.capture_interval !== undefined ? info.capture_interval + "s" : "N/A";
     document.getElementById("altitude-interval").textContent = info.altitude_interval !== undefined ? info.altitude_interval + "s" : "N/A";
