@@ -285,7 +285,7 @@ class Timer:
         hours, minutes = divmod(minutes, 60)
 
         # Format with leading zeros (padding) using f-string
-        time_string = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        time_string = f"{hours:02d}h:{round(minutes):02d}m:{round(seconds):02d}s"
 
         return time_string
     
