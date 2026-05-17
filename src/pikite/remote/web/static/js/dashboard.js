@@ -63,3 +63,27 @@ document.querySelectorAll("input[type=range]").forEach(slider => {
 });
 
 updateButtonStates()
+
+// Session Info
+var pikite_scope = null
+
+function loadSessionInfo(info) {
+    document.getElementById("session-start").textContent = info.session_start || "N/A";
+    document.getElementById("capture-mode").textContent = info.capture_mode || "N/A";
+    document.getElementById("video-length").textContent = info.video_length !== undefined ? info.video_length + "s" : "N/A";
+    document.getElementById("capture-interval").textContent = info.capture_interval !== undefined ? info.capture_interval + "s" : "N/A";
+    document.getElementById("altitude-interval").textContent = info.altitude_interval !== undefined ? info.altitude_interval + "m" : "N/A";
+    document.getElementById("pan-tilt-mode").textContent = info.pan_tilt_mode || "N/A";
+    document.getElementById("pan-tilt-interval").textContent = info.pan_tilt_interval !== undefined ? info.pan_tilt_interval + "s" : "N/A";
+}
+
+function updateSessionInfo(info) {
+    if (info.scope == "CAPTURE_LOOP" && pikite_scope !== "CAPTURE_LOOP") {
+        pikite_scope = info.scope;
+        sendCommand("request_session_info");  // Request full session info when scope changes to capture loop
+    }
+
+    document.getElementById("session-capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
+    document.getElementById("session-runtime").textContent = info.runtime || "N/A";
+    document.getElementById("session-recording-status").textContent = info.is_recording ? "Recording" : "Not Recording";
+}

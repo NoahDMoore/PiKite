@@ -35,6 +35,7 @@ class InputCommand(Enum):
     LOAD_DEFAULT_SETTINGS = auto()
     FETCH_MEDIA_DIRS = auto()
     FETCH_MEDIA = auto()
+    REQUEST_SESSION_INFO = auto()
 
 class InputSource(Enum):
     GPIO = auto()
@@ -137,6 +138,28 @@ class InputHandler:
             f"Registered input: Scope='{scope}', Command={command.name}, "
             f"Handler={callback.__qualname__}"
         )
+
+    def unregister(self, scope: InputScope, command: InputCommand, callback: Callable):
+        """
+        Unregister a callback for a specific input command within a given scope.
+
+        Args:
+            scope (InputScope): The scope for the input command.
+            command (InputCommand): The input command to unregister.
+            callback (Callable): The function to remove from the handlers list.
+        """
+
+        if callback in self._listeners[scope][command]:
+            self._listeners[scope][command].remove(callback)
+            logger.debug(
+                f"Unregistered input: Scope='{scope}', Command={command.name}, "
+                f"Handler={callback.__qualname__}"
+            )
+        else:
+            logger.debug(
+                f"Tried to unregister non-existent handler: Scope='{scope}', "
+                f"Command={command.name} -> {callback.__qualname__}"
+            )
 
     def handle(self, *, command: InputCommand, source: InputSource, **kwargs):
         """

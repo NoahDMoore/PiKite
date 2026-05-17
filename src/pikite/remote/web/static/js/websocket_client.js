@@ -42,6 +42,12 @@ function startWebsocket() {
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "log") {
 			// Handle log message
 			addLogEntry(obj);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "session_update") {
+			// Handle session update
+			updateSessionInfo(obj);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "session_info") {
+			// Handle full session info receipt
+			loadSessionInfo(obj);
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "settings_update") {
 			// Handle settings update
 			loadSettings(obj);

@@ -359,6 +359,13 @@ class PiKiteApp:
         self.capturing = True   # Set capturing flag to True at the start of the loop        
         
         session = CaptureSession(self)
+        session.tx_session_info()  # Send initial session info to remote clients
+
+        self.input_handler.register(
+            scope=InputScope.CAPTURE_LOOP,
+            command=InputCommand.REQUEST_SESSION_INFO,
+            callback=session.tx_session_info
+        )
 
         self.pressure_sensor.get_baseline_pressure(num_samples=80, display_controller=display_controller)
 
@@ -417,7 +424,7 @@ class PiKiteApp:
 
                     # Update session info on remote clients at regular intervals
                     if self.timer.interval_elapsed(5.0, "session_info_update"):
-                        session.tx_session_info()
+                        session.tx_session_update()
         finally:
             logger.info("Exiting Capture Loop, performing cleanup")
 
@@ -427,6 +434,13 @@ class PiKiteApp:
 
             # Home the Pan/Tilt Servos
             self.home_pan_tilt()
+
+            # Unregister capture loop specific input handlers
+            self.input_handler.unregister(
+                scope=InputScope.CAPTURE_LOOP,
+                command=InputCommand.REQUEST_SESSION_INFO,
+                callback=session.tx_session_info
+            )
 
             # Reset input scope to MENU when capture loop exits
             self.input_handler.set_scope(InputScope.MENU)   # Ensure scope is reset to MENU when capture loop exits
@@ -552,7 +566,7 @@ class CaptureSession:
         session_info_payload = {
             "type": "session_info",
             "session_start": self.session_start_time,
-            "media_type": self.capture_mode.name,
+            "capture_mode": self.capture_mode.name,
             "media_extension": self.media_extension.value if self.media_extension else None,
             "video_length": self.video_length,
             "capture_interval": self.capture_interval,
@@ -566,6 +580,7 @@ class CaptureSession:
         """Send capture session update to remote clients."""
         session_update_payload = {
             "type": "session_update",
+            "scope": self.app.input_handler.active_scope.name,
             "capture_count": self.capture_count,
             "runtime": self.app.timer.format_elapsed_time(self.app.timer.since_mark("capture_loop_start")),
             "is_recording": self.app.camera_controller.is_recording
