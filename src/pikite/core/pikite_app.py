@@ -554,6 +554,7 @@ class CaptureSession:
     
     def _create_pan_tilt_pattern(self) -> PanTiltPattern:
         """Create a PanTiltPattern instance based on application settings."""
+        logger.debug(f"Creating pan/tilt pattern for capture session: {self.app.settings.get('pan_tilt_mode')}")
         pan_tilt_mode = PanTiltPattern.PAN_TILT_MODES(self.app.settings.get("pan_tilt_mode"))
         pan_tilt_pattern = PanTiltPattern(
             mode=pan_tilt_mode,
