@@ -38,6 +38,7 @@ class PiKiteApp:
 
         # Load Settings
         self.settings = Settings()
+        self.settings.add_change_listener(self._on_setting_change)
         initialization_progress_bar.advance(10)
 
         # Configure Logger from Settings
@@ -85,6 +86,15 @@ class PiKiteApp:
         self.capturing = False
 
         logger.info("PiKite Application Initialized")
+
+    def _on_setting_change(self, setting_key, section, new_value):
+        logger.info(f"Setting Change Detected: {setting_key} changed to {new_value} in section {section}")
+        
+        if section == "logging_settings":
+            self.configure_logger()
+
+        if section == "camera_settings":
+            self.camera_controller.reconfigure_camera()
 
     def configure_logger(self):
         """

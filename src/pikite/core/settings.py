@@ -48,6 +48,9 @@ class Settings:
         self.config = configparser.ConfigParser()
         self.config.read(self.config_path)
 
+        self._setting_change_listeners = []
+
+
     def get(self, setting_key: str, default: Any=None) -> Any:
         """
         Retrieves the value for a given setting key from the configuration file.
@@ -75,23 +78,33 @@ class Settings:
         except Exception: # Fallback to returning the raw string value
             return self.config[section][setting_key]
 
-    def set(self, setting_key, value):
+    def set(self, setting_key, new_value):
         """
         Sets the value for a given setting key in the configuration file.
         Args:
             setting_key (str): The key of the setting to set.
-            value (Any): The value to set for the setting.
+            new_value (Any): The new value for the setting.
         
         Raises:
             ValueError: If the setting_key does not correspond to a known section.
         """
+        current_value = self.get(setting_key)
+
+        if current_value == new_value:
+            logger.info(f"Setting '{setting_key}' is already set to the desired value: {new_value}. No change made.")
+            return
+
         section = get_section(setting_key)
-        self.config[section][setting_key] = str(value)
+
+        self.config[section][setting_key] = str(new_value)
         with open(self.config_path, "w") as configfile:
             self.config.write(configfile)
         
         self.config.read(self.config_path) # Refresh config to ensure changes are loaded
-        logger.info(f"Setting updated: {setting_key} = {value} (Section: {section})")
+
+        self._notify_change_listeners(setting_key, section, new_value)
+
+        logger.info(f"Setting updated: {setting_key} = {new_value} (Section: {section})")
 
     def load_defaults(self, read_after=True):
         """
@@ -143,6 +156,35 @@ class Settings:
         except ValueError:
             logger.error(f"Cannot determine section for setting key. Returning False.")
             return False
+        
+    def add_change_listener(self, callback):
+        """
+        Add a callback function that will be run whenever a setting is changed.
+        
+        Args:
+            callback (callable): A function that takes three arguments (setting_key, setting_section, new_value) and will be called on setting changes.
+        """
+        if callable(callback):
+            self._setting_change_listeners.append(callback)
+            logger.info(f"Added new setting change listener: {callback}")
+        else:
+            logger.error(f"Attempted to add non-callable setting change listener: {callback}")
+
+    def _notify_change_listeners(self, setting_key, setting_section, new_value):
+        """
+        Notify all registered change listeners of a setting change.
+        
+        Args:
+            setting_key (str): The key of the setting that changed.
+            setting_section (str): The section of the setting that changed.
+            new_value (Any): The new value of the setting.
+        """
+        for callback in self._setting_change_listeners:
+            try:
+                callback(setting_key, setting_section, new_value)
+                logger.info(f"Notified listener {callback} of setting change: {setting_key} = {new_value} (Section: {setting_section})")
+            except Exception as e:
+                logger.error(f"Error notifying listener {callback} of setting change: {e}")
 
 # Function to get the section for a given setting
 def get_section(setting_key: str) -> str:
