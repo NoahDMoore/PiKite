@@ -211,9 +211,7 @@ class RemoteInput:
     async def start_listening(self):
         while True:
             if self.server.incoming_messages:
-                logger.debug(f"Processing incoming message: {self.server.incoming_messages[0]}")
                 message = self.server.incoming_messages.pop(0)
-                logger.debug(f"Popped message from queue: {message}")
                 await self.handle_message(message)
             
             await asyncio.sleep(0)      # yield back to scheduler
