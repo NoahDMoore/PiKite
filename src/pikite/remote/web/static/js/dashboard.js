@@ -72,7 +72,7 @@ function loadSessionInfo(info) {
     document.getElementById("capture-mode").textContent = info.capture_mode || "N/A";
     document.getElementById("video-length").textContent = info.video_length !== undefined ? info.video_length + "s" : "N/A";
     document.getElementById("capture-interval").textContent = info.capture_interval !== undefined ? info.capture_interval + "s" : "N/A";
-    document.getElementById("altitude-interval").textContent = info.altitude_interval !== undefined ? info.altitude_interval + "m" : "N/A";
+    document.getElementById("altitude-interval").textContent = info.altitude_interval !== undefined ? info.altitude_interval + "s" : "N/A";
     document.getElementById("pan-tilt-mode").textContent = info.pan_tilt_mode || "N/A";
     document.getElementById("pan-tilt-interval").textContent = info.pan_tilt_interval !== undefined ? info.pan_tilt_interval + "s" : "N/A";
 }
