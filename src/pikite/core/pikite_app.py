@@ -208,15 +208,16 @@ class PiKiteApp:
         }
 
         self.remote_server.send(settings_payload)
+        logger.debug("Sent current settings and menu options to remote clients")
 
     def rx_settings_update(self, args):
         for new_setting, new_setting_value in args.get("settings_to_update", {}).items():
             if self.settings.is_setting(new_setting):
-                print(f"Updating setting '{new_setting}' from {self.settings.get(new_setting)} to new value '{new_setting_value}'")
+                logger.debug(f"Remotely updating setting '{new_setting}' from {self.settings.get(new_setting)} to new value '{new_setting_value}'")
                 self.settings.set(new_setting, new_setting_value)
                 self.tx_settings()  # Send updated settings back to client
             else:
-                print(f"Attempted to update unknown setting: {new_setting}")
+                logger.info(f"Remote user attempted to update unknown setting: {new_setting}")
 
     def rx_default_settings_request(self, **kwargs):
         self.settings.load_defaults()
