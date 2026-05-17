@@ -53,7 +53,7 @@ class PiKiteApp:
         initialization_progress_bar.advance(5)
 
         # Initialize Servo Controllers
-        offset = self.settings.get("pan_tilt_zero_angle_offset", 0)
+        offset = int(self.settings.get("pan_tilt_zero_angle_offset", 0))
         self.tilt_servo = TiltServo(zero_angle_offset=offset) # Adjust zero angle offset to ensure camera is level when tilt angle is set to 0
         initialization_progress_bar.advance(5)
 
