@@ -430,6 +430,41 @@
 				<option_item name="sixty" message="Seconds: [60]" action="selectOption" value="60" />
 			</menu_item>
 
+			<menu_item name="panTiltZeroAngleOffset" message="Zero Angle Offset" action="options" parent="panTiltSettings">
+				<setting type="int">pan_tilt_zero_angle_offset</setting>
+				<option_item name="zero" message="Angle Offset: [0]" action="selectOption" value="0" />
+				<option_item name="one" message="Angle Offset: [1]" action="selectOption" value="1" />
+				<option_item name="two" message="Angle Offset: [2]" action="selectOption" value="2" />
+				<option_item name="three" message="Angle Offset: [3]" action="selectOption" value="3" />
+				<option_item name="four" message="Angle Offset: [4]" action="selectOption" value="4" />
+				<option_item name="five" message="Angle Offset: [5]" action="selectOption" value="5" />
+				<option_item name="six" message="Angle Offset: [6]" action="selectOption" value="6" />
+				<option_item name="seven" message="Angle Offset: [7]" action="selectOption" value="7" />
+				<option_item name="eight" message="Angle Offset: [8]" action="selectOption" value="8" />
+				<option_item name="nine" message="Angle Offset: [9]" action="selectOption" value="9" />
+				<option_item name="ten" message="Angle Offset: [10]" action="selectOption" value="10" />
+				<option_item name="eleven" message="Angle Offset: [11]" action="selectOption" value="11" />
+				<option_item name="twelve" message="Angle Offset: [12]" action="selectOption" value="12" />
+				<option_item name="thirteen" message="Angle Offset: [13]" action="selectOption" value="13" />
+				<option_item name="fourteen" message="Angle Offset: [14]" action="selectOption" value="14" />
+				<option_item name="fifteen" message="Angle Offset: [15]" action="selectOption" value="15" />
+				<option_item name="sixteen" message="Angle Offset: [16]" action="selectOption" value="16" />
+				<option_item name="seventeen" message="Angle Offset: [17]" action="selectOption" value="17" />
+				<option_item name="eighteen" message="Angle Offset: [18]" action="selectOption" value="18" />
+				<option_item name="nineteen" message="Angle Offset: [19]" action="selectOption" value="19" />
+				<option_item name="twenty" message="Angle Offset: [20]" action="selectOption" value="20" />
+				<option_item name="twentyOne" message="Angle Offset: [21]" action="selectOption" value="21" />
+				<option_item name="twentyTwo" message="Angle Offset: [22]" action="selectOption" value="22" />
+				<option_item name="twentyThree" message="Angle Offset: [23]" action="selectOption" value="23" />
+				<option_item name="twentyFour" message="Angle Offset: [24]" action="selectOption" value="24" />
+				<option_item name="twentyFive" message="Angle Offset: [25]" action="selectOption" value="25" />
+				<option_item name="twentySix" message="Angle Offset: [26]" action="selectOption" value="26" />
+				<option_item name="twentySeven" message="Angle Offset: [27]" action="selectOption" value="27" />
+				<option_item name="twentyEight" message="Angle Offset: [28]" action="selectOption" value="28" />
+				<option_item name="twentyNine" message="Angle Offset: [29]" action="selectOption" value="29" />
+				<option_item name="thirty" message="Angle Offset: [30]" action="selectOption" value="30" />
+			</menu_item>
+
 			<menu_item name="panTiltReturn" message="[Exit Pan/Tilt Settings]" action="return" parent="panTiltSettings"/>
 		</menu_item>
 
