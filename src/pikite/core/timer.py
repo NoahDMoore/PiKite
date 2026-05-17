@@ -284,6 +284,8 @@ class Timer:
         minutes, seconds = divmod(time_in_seconds, 60)
         hours, minutes = divmod(minutes, 60)
 
+        logger.debug(f"Hours Raw: {hours}, Minutes Raw: {minutes}, Seconds Raw: {seconds}")
+
         # Format with leading zeros (padding) using f-string
         time_string = f"{hours:02d}h:{round(minutes):02d}m:{round(seconds):02d}s"
 
