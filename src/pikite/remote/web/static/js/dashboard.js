@@ -84,7 +84,15 @@ function updateSessionInfo(info) {
         sendCommand("request_session_info");  // Request full session info when scope changes to capture loop
     }
 
-    document.getElementById("session-capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
-    document.getElementById("session-runtime").textContent = info.runtime || "N/A";
-    document.getElementById("session-recording-status").textContent = info.is_recording ? "Recording" : "Not Recording";
+    document.getElementById("capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
+    document.getElementById("runtime").textContent = info.runtime || "N/A";
+}
+
+function updateAltitudeInfo(info) {
+    document.getElementById("altitude").textContent = info.altitude !== undefined ? info.altitude + "m" : "N/A";
+}
+
+function updatePanTiltInfo(info) {
+    document.getElementById("pan").textContent = info.pan_angle !== undefined ? info.pan_angle + "°" : "N/A";
+    document.getElementById("tilt").textContent = info.tilt_angle !== undefined ? info.tilt_angle + "°" : "N/A";
 }

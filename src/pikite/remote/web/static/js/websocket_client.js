@@ -48,6 +48,12 @@ function startWebsocket() {
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "session_info") {
 			// Handle full session info receipt
 			loadSessionInfo(obj);
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "altitude_update") {
+			// Handle altitude update
+			updateAltitudeInfo(obj); 
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "pan_tilt_update") {
+			// Handle pan/tilt update
+			updatePanTiltInfo(obj);
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "settings_update") {
 			// Handle settings update
 			loadSettings(obj);
