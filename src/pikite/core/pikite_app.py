@@ -368,7 +368,7 @@ class PiKiteApp:
             callback=session.tx_session_info
         )
 
-        self.pressure_sensor.get_baseline_pressure(num_samples=80, display_controller=display_controller)
+        self.pressure_sensor.get_baseline_pressure(num_samples=80, display_controller=self.display_controller)
 
         self.display_controller.clear()
 
@@ -492,7 +492,7 @@ class CaptureSession:
 
         # Initialize altitude logging
         self.alt_csv, self.csv_writer = self._open_altitude_csv()
-        self.altitude_interval = self.app.settings.get("alt_interval", self.capture_interval)
+        self.altitude_interval = self.app.settings.get("alt_reading_interval", self.capture_interval)
 
         # Initialize pan/tilt pattern
         self.pan_tilt_pattern = self._create_pan_tilt_pattern()
