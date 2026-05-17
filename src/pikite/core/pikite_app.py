@@ -1,5 +1,6 @@
 import asyncio
 import csv
+from datetime import datetime
 
 import pikite.core.constants as CONSTANTS
 from pikite.core.input_handler import InputHandler, InputCommand, InputScope, RemoteInput
@@ -474,7 +475,7 @@ class CaptureSession:
 
         # Mark the start of the capture session for runtime tracking
         self.app.timer.mark("capture_loop_start")
-        self.session_start_time = self.app.timer.marks["capture_loop_start"]
+        self.session_start_time = datetime.now()
         
         # Determine capture mode based on application settings
         self.capture_mode = self._get_capture_mode()
@@ -568,7 +569,7 @@ class CaptureSession:
         """Send capture session info to remote clients."""
         session_info_payload = {
             "type": "session_info",
-            "session_start": self.session_start_time,
+            "session_start": self.session_start_time.strftime("%I:%M:%S %p") ,
             "capture_mode": self.capture_mode.name,
             "media_type": self.media_extension.value if self.media_extension else None,
             "video_length": self.video_length,
