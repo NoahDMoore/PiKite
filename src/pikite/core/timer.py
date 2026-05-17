@@ -5,6 +5,7 @@ and check if specific intervals have passed. Uses the `time.perf_counter()`
 function for high-resolution timing.
 """
 
+from math import floor
 import time
 import datetime
 from enum import Enum, auto
@@ -284,10 +285,8 @@ class Timer:
         minutes, seconds = divmod(time_in_seconds, 60)
         hours, minutes = divmod(minutes, 60)
 
-        logger.debug(f"Hours Raw: {hours}, Minutes Raw: {minutes}, Seconds Raw: {seconds}")
-
         # Format with leading zeros (padding) using f-string
-        time_string = f"{hours:02d}h:{round(minutes):02d}m:{round(seconds):02d}s"
+        time_string = f"{floor(hours):02d}h:{floor(minutes):02d}m:{floor(seconds):02d}s"
 
         return time_string
     
