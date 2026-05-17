@@ -500,7 +500,8 @@ class CaptureSession:
 
     def _get_capture_mode(self) -> CONSTANTS.CAPTURE_MODES:
         """Determine the capture mode based on application settings."""
-        capture_mode = self.app.settings.get("cam_capture_mode", CONSTANTS.CAPTURE_MODES.NONE)
+        capture_mode_key = self.app.settings.get("cam_capture_mode", "none")
+        capture_mode = CONSTANTS.CAPTURE_MODES(capture_mode_key)
         if capture_mode is CONSTANTS.CAPTURE_MODES.NONE:
             logger.info("Capture mode is NONE; no media capture will be performed.")
         return capture_mode
