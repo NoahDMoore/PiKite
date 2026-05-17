@@ -325,9 +325,7 @@ class ControllerServer:
             TypeError: If the message type is not string or dict.
         """
         while True:
-            logger.debug("Waiting for message to send...", extra={"skip_remote": True}) # Log that we're waiting for a message to send, but don't send via the remote logging handler to avoid infinite loops.
             message = await self.outgoing_messages.get() # Wait for a message to be available in the outgoing_messages queue
-            logger.debug(f"Preparing to send message: {message}", extra={"skip_remote": True}) # Log the message being prepared to send, but don't send via the remote logging handler to avoid infinite loops.
             try:
                 # If the raw message is a string, wrap it in JSON object
                 if isinstance(message, str):
