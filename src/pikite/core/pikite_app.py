@@ -463,7 +463,7 @@ class PiKiteApp:
 
         await asyncio.gather(
             self.remote_server.start(),
-            #self.remote_input.start_listening(),
+            self.remote_input.start_listening(),
             self.main_loop()
         )
 
