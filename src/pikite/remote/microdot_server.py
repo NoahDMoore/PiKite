@@ -40,7 +40,7 @@ class ControllerServer:
         self.port = port
 
         # Message Buffers
-        self.incoming_messages = []
+        self.incoming_messages = asyncio.Queue()
         self.outgoing_messages = asyncio.Queue()
         self.websocket_connected = False
 
@@ -97,7 +97,7 @@ class ControllerServer:
                 logger.info(f"WebSocket connection established with client: {request.client_addr}. Session token expires in {expiration_str}.")
                 self.websocket_connected = True
                 try:
-                    await self.register(ws) # Register the WebSocket connection
+                    await self.register_websocket_client(ws) # Register the WebSocket connection
                 finally:
                     self.websocket_connected = False
                     self.outgoing_messages = asyncio.Queue() # Clear outgoing messages buffer when client disconnects
@@ -105,8 +105,6 @@ class ControllerServer:
             except Exception as e:
                 logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
 
-        # Web Server Routes
-        
         # MIME types for static files (images, css, js)
         MIME_TYPES = {
             '.png':  'image/png',
@@ -118,6 +116,8 @@ class ControllerServer:
             '.js':   'application/javascript',
             '.html': 'text/html'
         }
+
+        # Web Server Routes
         
         @self.app.route('/static/<path:path>')
         async def static(request: Request, path):
@@ -288,7 +288,7 @@ class ControllerServer:
             logger.info(f"User '{username}' logged in successfully. Issued a new session token.")
             return {"token": token}
 
-    async def register(self, ws: WebSocket):
+    async def register_websocket_client(self, ws: WebSocket):
         """
         Register a WebSocket connection and start RX and TX loops.
 
@@ -300,6 +300,17 @@ class ControllerServer:
         except Exception as e:
             logger.info(f"WebSocket Error: {e}")
 
+    def register_auth_token(self) -> str:
+        """
+        Generate and register a new authentication token for websocket clients.
+        
+        Returns:
+            str: The generated authentication token.
+        """
+        token = secrets.token_urlsafe(32)
+        self.active_tokens[token] = time.time() + 1800  # Token valid for 30 minutes
+        return token
+
     async def _rx_loop(self, ws: WebSocket):
         """
         Receive messages from the WebSocket client and store them in the incoming_messages buffer.
@@ -308,8 +319,8 @@ class ControllerServer:
             ws: The WebSocket connection object.
         """
         while True:
-            message = await ws.receive()                    # Receive message from websocket client
-            self.incoming_messages.append(message)          # Store message for retrieval in the incoming_messages buffer
+            message = await ws.receive() # Receive message from websocket client
+            await self.incoming_messages.put(message) # Store message for retrieval in the incoming_messages buffer
             logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
 
             await asyncio.sleep(0)      # yield back to scheduler
@@ -341,15 +352,15 @@ class ControllerServer:
                 logger.error("Invalid Message Type: Messages must be a string or dict")
                 
             await asyncio.sleep(0)      # yield back to scheduler
-    
-    def start(self):
+
+    async def get(self):
         """
-        Start the web server on the specified port.
-        
+        Retrieve the oldest message from the incoming_messages buffer.
+
         Returns:
-            An asyncio Task that runs the web server.
+            The oldest message from the incoming_messages queue.
         """
-        return asyncio.create_task(self.app.start_server(port=self.port))
+        return await self.incoming_messages.get()
     
     def send(self, message: str | dict):
         """
@@ -368,23 +379,12 @@ class ControllerServer:
             logger.error(f"Outgoing message queue is full. Message not sent: {message}. Error: {e}")
         except Exception as e:
             logger.error(f"Unexpected error while sending message: {message}. Error: {e}")
-
-    def get(self):
-        """
-        Retrieve the oldest message from the incoming_messages buffer.
-
-        Returns:
-            The oldest message from the incoming_messages buffer, or None if the buffer is empty.
-        """
-        return self.incoming_messages.pop(0) if self.incoming_messages else None
     
-    def register_auth_token(self) -> str:
+    def start(self):
         """
-        Generate and register a new authentication token for websocket clients.
+        Start the web server on the specified port.
         
         Returns:
-            str: The generated authentication token.
+            An asyncio Task that runs the web server.
         """
-        token = secrets.token_urlsafe(32)
-        self.active_tokens[token] = time.time() + 1800  # Token valid for 30 minutes
-        return token
+        return asyncio.create_task(self.app.start_server(port=self.port))
