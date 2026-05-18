@@ -357,26 +357,11 @@ class PiKiteApp:
         """
         Main capture loop for handling image capture and processing.
         """
-        logger.info("Initializing Capture Loop")
-        self.capturing = True   # Set capturing flag to True at the start of the loop        
-        
-        session = CaptureSession(self)
-        session.tx_session_info()  # Send initial session info to remote clients
-
-        self.input_handler.register(
-            scope=InputScope.CAPTURE_LOOP,
-            command=InputCommand.REQUEST_SESSION_INFO,
-            callback=session.tx_session_info
-        )
-
-        self.pressure_sensor.get_baseline_pressure(num_samples=80, display_controller=self.display_controller)
-
-        self.display_controller.clear()
-
         try:
             logger.info("Starting Capture Loop")
+            self.capturing = True   # Set capturing flag to True at the start of the loop
 
-            with session.alt_csv:
+            with CaptureSession(self) as session:
                 while self.capturing or self.is_recording:
                     if self.input_handler.active_scope != InputScope.CAPTURE_LOOP:
                         self.capturing = False
@@ -429,9 +414,6 @@ class PiKiteApp:
         finally:
             logger.info("Exiting Capture Loop, performing cleanup")
 
-            # TX final session update to remote clients to indicate capture loop has ended
-            session.tx_session_end()
-
             # Clear Capture Intervals
             for key in ["runtime", "capture_interval", "altitude_interval", "pan_tilt_interval", "time_remaining_check"]:
                 self.timer.named_intervals.pop(key, None)
@@ -439,19 +421,9 @@ class PiKiteApp:
             # Home the Pan/Tilt Servos
             self.home_pan_tilt()
 
-            # Unregister capture loop specific input handlers
-            self.input_handler.unregister(
-                scope=InputScope.CAPTURE_LOOP,
-                command=InputCommand.REQUEST_SESSION_INFO,
-                callback=session.tx_session_info
-            )
-
             # Reset input scope to MENU when capture loop exits
             self.input_handler.set_scope(InputScope.MENU)   # Ensure scope is reset to MENU when capture loop exits
             self.menu.update_menu()
-
-            # Close the session
-            session.close()
 
     async def main_loop(self):
         application_running = True
@@ -504,6 +476,25 @@ class CaptureSession:
         # Initialize pan/tilt pattern
         self.pan_tilt_pattern = self._create_pan_tilt_pattern()
         self.pan_tilt_interval = self.app.settings.get("pan_tilt_interval", 30)
+
+        # Initialize handlers for remote session info requests
+        self.handler = {
+            "scope":InputScope.CAPTURE_LOOP,
+            "command":InputCommand.REQUEST_SESSION_INFO,
+            "callback":self.tx_session_info
+        }
+
+        self.app.input_handler.register(**self.handler)
+
+        self.tx_session_info()  # Send initial session info to remote clients
+
+    def __enter__(self):
+        logger.debug("Entering CaptureSession context manager")
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        logger.debug("Exiting CaptureSession context manager")
+        self.close()
 
     def _get_capture_mode(self) -> CONSTANTS.CAPTURE_MODES:
         """Determine the capture mode based on application settings."""
@@ -618,4 +609,13 @@ class CaptureSession:
 
     def close(self):
         """Perform cleanup for the capture session."""
+        # Close altitude CSV file
         self.alt_csv.close()
+        
+        # TX final session update to remote clients to indicate capture loop has ended
+        self.tx_session_end()
+
+        # Unregister capture loop specific input handlers
+        self.app.input_handler.unregister(**self.handler)
+
+        logger.info("Capture session closed. Cleanup complete.")
