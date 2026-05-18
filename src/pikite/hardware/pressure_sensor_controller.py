@@ -111,3 +111,6 @@ class PressureSensorController:
                     loader.advance()
 
         self.baseline_pressure = baseline_pressure / num_samples
+
+        if loader is not None and display_controller is not None:
+            display_controller.clear()
