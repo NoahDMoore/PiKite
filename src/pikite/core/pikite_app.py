@@ -382,8 +382,7 @@ class PiKiteApp:
                         self.capturing = False
 
                     if self.timer.interval_elapsed(1.0, "runtime"):
-                        runtime = self.timer.format_elapsed_time(self.timer.since_mark('capture_loop_start'))
-                        self.display_controller.print_message(f"PiKite Running: {runtime}")
+                        self.display_controller.print_message(f"PiKite Running: {session.runtime_string}")
 
                     if self.timer.interval_elapsed(session.altitude_interval, "altitude_interval"):
                         self.log_altitude(session.csv_writer)
@@ -430,6 +429,9 @@ class PiKiteApp:
         finally:
             logger.info("Exiting Capture Loop, performing cleanup")
 
+            # TX final session update to remote clients to indicate capture loop has ended
+            session.tx_session_end()
+
             # Clear Capture Intervals
             for key in ["runtime", "capture_interval", "altitude_interval", "pan_tilt_interval", "time_remaining_check"]:
                 self.timer.named_intervals.pop(key, None)
@@ -447,6 +449,9 @@ class PiKiteApp:
             # Reset input scope to MENU when capture loop exits
             self.input_handler.set_scope(InputScope.MENU)   # Ensure scope is reset to MENU when capture loop exits
             self.menu.update_menu()
+
+            # Close the session
+            session.close()
 
     async def main_loop(self):
         application_running = True
@@ -566,11 +571,21 @@ class CaptureSession:
         )
         return pan_tilt_pattern
     
+    @property
+    def runtime(self):
+        """Calculate the runtime of the capture session."""
+        return self.app.timer.since_mark("capture_loop_start")
+
+    @property
+    def runtime_string(self):
+        """Return the runtime as a formatted string."""
+        return self.app.timer.format_elapsed_time(self.runtime)
+
     def tx_session_info(self):
         """Send capture session info to remote clients."""
         session_info_payload = {
             "type": "session_info",
-            "session_start": self.session_start_time.strftime("%I:%M:%S %p") ,
+            "session_start": self.session_start_time.strftime("%I:%M:%S %p"),
             "capture_mode": self.capture_mode.name,
             "media_type": self.media_extension.value if self.media_extension else None,
             "video_length": self.video_length,
@@ -587,10 +602,19 @@ class CaptureSession:
             "type": "session_update",
             "scope": self.app.input_handler.active_scope.name,
             "capture_count": self.capture_count,
-            "runtime": self.app.timer.format_elapsed_time(self.app.timer.since_mark("capture_loop_start")),
+            "runtime": self.runtime,
             "is_recording": self.app.camera_controller.is_recording
         }
         self.app.remote_server.send(session_update_payload)
+
+    def tx_session_end(self):
+        """Send session end notification to remote clients."""
+        session_end_payload = {
+            "type": "session_end",
+            "capture_count": self.capture_count,
+            "final_runtime": self.runtime_string
+        }
+        self.app.remote_server.send(session_end_payload)
 
     def close(self):
         """Perform cleanup for the capture session."""
