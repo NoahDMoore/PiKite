@@ -446,6 +446,7 @@ class PiKiteApp:
 
             # Reset input scope to MENU when capture loop exits
             self.input_handler.set_scope(InputScope.MENU)   # Ensure scope is reset to MENU when capture loop exits
+            self.menu.update_menu()
 
     async def main_loop(self):
         application_running = True
