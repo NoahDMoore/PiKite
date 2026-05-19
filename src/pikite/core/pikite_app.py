@@ -374,11 +374,7 @@ class PiKiteApp:
 
                     if self.timer.interval_elapsed(session.capture_interval, "capture_interval") and not self.is_recording:
                         # Get media path for capture
-                        media_path = self.get_media_path(
-                            capture_mode=session.capture_mode,
-                            media_extension=session.media_extension,
-                            session_dir=session.session_dir
-                        )
+                        media_path = self.get_media_path(**session.media_path_args)
 
                         # Capture media based on mode
                         match session.capture_mode:
@@ -402,8 +398,7 @@ class PiKiteApp:
                         if not self.capturing:
                             if self.timer.interval_elapsed(1.0, "time_remaining_check"):
                                 time_remaining = self.timer.interval_remaining(session.video_length, "video_length")
-                                logger.info("Capture stopped but video is still recording. Waiting for video to finish...")
-                                logger.info(f"Finishing Video... {time_remaining:.1f}s remaining")
+                                logger.info("Capture loop ending, but video is still recording. Waiting for recording to finish... {time_remaining:.1f}s remaining.")
 
                     if self.timer.interval_elapsed(session.pan_tilt_interval, "pan_tilt_interval") and not self.is_recording:
                         await self.step_pan_tilt(session.pan_tilt_pattern)
@@ -478,13 +473,20 @@ class CaptureSession:
         self.pan_tilt_interval = self.app.settings.get("pan_tilt_interval", 30)
 
         # Initialize handlers for remote session info requests
-        self.handler = {
+        self.info_handler = {
             "scope":InputScope.CAPTURE_LOOP,
             "command":InputCommand.REQUEST_SESSION_INFO,
             "callback":self.tx_session_info
         }
 
-        self.app.input_handler.register(**self.handler)
+        self.app.input_handler.register(**self.info_handler)
+
+        # Initialize media path arguments
+        self.media_path_args = {
+            "capture_mode":self.capture_mode,
+            "media_extension":self.media_extension,
+            "session_dir":self.session_dir
+        }
 
         self.tx_session_info()  # Send initial session info to remote clients
 
@@ -616,6 +618,6 @@ class CaptureSession:
         self.tx_session_end()
 
         # Unregister capture loop specific input handlers
-        self.app.input_handler.unregister(**self.handler)
+        self.app.input_handler.unregister(**self.info_handler)
 
         logger.info("Capture session closed. Cleanup complete.")
