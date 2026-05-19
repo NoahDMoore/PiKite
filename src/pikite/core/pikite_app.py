@@ -404,7 +404,7 @@ class PiKiteApp:
                         await self.step_pan_tilt(session.pan_tilt_pattern)
 
                     # Update session info on remote clients at regular intervals
-                    if self.timer.interval_elapsed(5.0, "session_info_update"):
+                    if self.timer.interval_elapsed(1.0, "session_info_update"):
                         session.tx_session_update()
 
                     await asyncio.sleep(0.01)
@@ -412,7 +412,7 @@ class PiKiteApp:
             logger.info("Exiting Capture Loop, performing cleanup")
 
             # Clear Capture Intervals
-            for key in ["runtime", "capture_interval", "altitude_interval", "pan_tilt_interval", "time_remaining_check"]:
+            for key in ["runtime", "capture_interval", "altitude_interval", "pan_tilt_interval", "time_remaining_check", "session_info_update"]:
                 self.timer.named_intervals.pop(key, None)
 
             # Home the Pan/Tilt Servos
