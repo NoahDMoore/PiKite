@@ -597,7 +597,7 @@ class CaptureSession:
             "type": "session_update",
             "scope": self.app.input_handler.active_scope.name,
             "capture_count": self.capture_count,
-            "runtime": self.runtime,
+            "runtime": self.runtime_string,
             "is_recording": self.app.camera_controller.is_recording
         }
         self.app.remote_server.send(session_update_payload)
