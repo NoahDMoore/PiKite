@@ -406,6 +406,8 @@ class PiKiteApp:
                     # Update session info on remote clients at regular intervals
                     if self.timer.interval_elapsed(5.0, "session_info_update"):
                         session.tx_session_update()
+
+                    await asyncio.sleep(0.01)
         finally:
             logger.info("Exiting Capture Loop, performing cleanup")
 
