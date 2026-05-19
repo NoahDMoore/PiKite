@@ -81,7 +81,7 @@ function loadSessionInfo(info) {
 function updateSessionInfo(info) {
     if (info.scope == "CAPTURE_LOOP" && pikite_scope !== "CAPTURE_LOOP") {
         pikite_scope = info.scope;
-        sendCommand("request_session_info");  // Request full session info when scope changes to capture loop
+        sendCommand("REQUEST_SESSION_INFO");  // Request full session info when scope changes to capture loop
     }
 
     document.getElementById("capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
@@ -89,10 +89,10 @@ function updateSessionInfo(info) {
 }
 
 function updateAltitudeInfo(info) {
-    document.getElementById("altitude").textContent = info.altitude !== undefined ? info.altitude + "m" : "N/A";
+    document.getElementById("altitude").textContent = info.altitude !== undefined ? info.altitude: "N/A";
 }
 
 function updatePanTiltInfo(info) {
-    document.getElementById("pan").textContent = info.pan_angle !== undefined ? info.pan_angle + "°" : "N/A";
-    document.getElementById("tilt").textContent = info.tilt_angle !== undefined ? info.tilt_angle + "°" : "N/A";
+    document.getElementById("pan").textContent = info.pan_angle !== undefined ? info.pan_angle: "N/A";
+    document.getElementById("tilt").textContent = info.tilt_angle !== undefined ? info.tilt_angle: "N/A";
 }
