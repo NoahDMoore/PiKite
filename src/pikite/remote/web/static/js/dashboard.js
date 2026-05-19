@@ -106,4 +106,6 @@ function endCaptureSession(info) {
     status_badge.classList.remove("capture");
     status_badge.classList.add("idle");
     status_badge.dataset["data-badge-caption"] = "Idle";
+
+    sendCommand('FETCH_MEDIA_DIRS')
 }
