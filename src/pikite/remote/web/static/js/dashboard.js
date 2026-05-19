@@ -86,7 +86,7 @@ function updateSessionInfo(info) {
 
         status_badge.classList.remove("idle");
         status_badge.classList.add("capture");
-        status_badge.dataset["data-badge-caption"] = "Capture";
+        status_badge.dataset.badgeCaption = "Capture";
     }
 
     document.getElementById("capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
@@ -105,7 +105,7 @@ function updatePanTiltInfo(info) {
 function endCaptureSession(info) {
     status_badge.classList.remove("capture");
     status_badge.classList.add("idle");
-    status_badge.dataset["data-badge-caption"] = "Idle";
+    status_badge.dataset.badgeCaption = "Idle";
 
     sendCommand('FETCH_MEDIA_DIRS')
 }
