@@ -66,6 +66,7 @@ updateButtonStates()
 
 // Session Info
 var pikite_scope = null
+status_badge = document.getElementById("status-badge");
 
 function loadSessionInfo(info) {
     document.getElementById("session-start").textContent = info.session_start || "N/A";
@@ -82,6 +83,10 @@ function updateSessionInfo(info) {
     if (info.scope == "CAPTURE_LOOP" && pikite_scope !== "CAPTURE_LOOP") {
         pikite_scope = info.scope;
         sendCommand("REQUEST_SESSION_INFO");  // Request full session info when scope changes to capture loop
+
+        status_badge.classList.remove("idle");
+        status_badge.classList.add("capture");
+        status_badge.dataset["data-badge-caption"] = "Capture";
     }
 
     document.getElementById("capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
@@ -95,4 +100,10 @@ function updateAltitudeInfo(info) {
 function updatePanTiltInfo(info) {
     document.getElementById("pan").textContent = info.pan_angle !== undefined ? info.pan_angle: "N/A";
     document.getElementById("tilt").textContent = info.tilt_angle !== undefined ? info.tilt_angle: "N/A";
+}
+
+function endCaptureSession(info) {
+    status_badge.classList.remove("capture");
+    status_badge.classList.add("idle");
+    status_badge.dataset["data-badge-caption"] = "Idle";
 }

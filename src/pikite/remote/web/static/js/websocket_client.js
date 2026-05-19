@@ -54,7 +54,10 @@ function startWebsocket() {
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "pan_tilt_update") {
 			// Handle pan/tilt update
 			updatePanTiltInfo(obj);
-		} else if (obj.hasOwnProperty("type") && obj["type"] === "settings_update") {
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "session_end") {
+			// Handle session end
+			endCaptureSession(obj);
+		}  else if (obj.hasOwnProperty("type") && obj["type"] === "settings_update") {
 			// Handle settings update
 			loadSettings(obj);
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "media_dirs_update") {
