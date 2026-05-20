@@ -145,14 +145,13 @@ function updateCapturePreview(obj) {
 }
 
 function toggleCapturePreviewEnable() {
-    is_enabled = document.getElementById("capture-preview-enable").dataset.enable;
-    if (is_enabled == "True") {
+    if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
         document.getElementById("capture-preview-pause").style.display = "none";
         document.getElementById("capture-preview-play").style.display = "inline";
-        is_enabled = "False"
-    } else if (is_enabled == "False") {
+        document.getElementById("capture-preview-enable").dataset.enable = "False"
+    } else if (document.getElementById("capture-preview-enable").dataset.enable == "False") {
         document.getElementById("capture-preview-pause").style.display = "inline";
         document.getElementById("capture-preview-play").style.display = "none";
-        is_enabled = "True"
+        document.getElementById("capture-preview-enable").dataset.enable = "True"
     }
 }
