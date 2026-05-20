@@ -96,6 +96,22 @@ function updateSessionInfo(info) {
     document.getElementById("runtime").textContent = info.runtime || "N/A";
 }
 
+function resetSessionInfo() {
+    document.getElementById("session-start").textContent = "--";
+    document.getElementById("capture-mode").textContent = "--";
+    document.getElementById("media-type").textContent = "--";
+    document.getElementById("video-length").textContent = "--";
+    document.getElementById("capture-interval").textContent = "--";
+    document.getElementById("altitude-interval").textContent = "--";
+    document.getElementById("pan-tilt-mode").textContent = "--";
+    document.getElementById("pan-tilt-interval").textContent = "--";
+    document.getElementById("runtime").textContent = "--:--:--";
+    document.getElementById("altitude").textContent = "--";
+    document.getElementById("pan").textContent = "--";
+    document.getElementById("tilt").textContent = "--";
+    document.getElementById("capture-count").textContent = "--";
+}
+
 function updateAltitudeInfo(info) {
     document.getElementById("altitude").textContent = info.altitude !== undefined ? info.altitude: "N/A";
 }
@@ -109,6 +125,8 @@ function endCaptureSession(info) {
     status_badge.classList.remove("capture");
     status_badge.classList.add("idle");
     status_badge.dataset.badgeCaption = "Idle";
+
+    resetSessionInfo();
 
     document.getElementById("idle-controls").style.display = "block";
     document.getElementById("capture-session-controls").style.display = "none";
