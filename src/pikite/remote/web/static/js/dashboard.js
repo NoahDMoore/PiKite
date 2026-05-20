@@ -122,6 +122,8 @@ function updatePanTiltInfo(info) {
 }
 
 function endCaptureSession(info) {
+    pikite_scope = "MENU"
+    
     status_badge.classList.remove("capture");
     status_badge.classList.add("idle");
     status_badge.dataset.badgeCaption = "Idle";
