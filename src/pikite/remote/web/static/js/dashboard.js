@@ -143,3 +143,16 @@ function updateCapturePreview(obj) {
     file_path = obj.file_path;
     capturePreview.src = file_path + "?" + new Date().getTime();
 }
+
+function toggleCapturePreviewEnable() {
+    is_enabled = document.getElementById("capture-preview-enable").dataset.enable;
+    if (is_enabled == "True") {
+        document.getElementById("capture-preview-pause").style.display = "none";
+        document.getElementById("capture-preview-play").style.display = "inline";
+        is_enabled = "False"
+    } else if (is_enabled == "False") {
+        document.getElementById("capture-preview-pause").style.display = "inline";
+        document.getElementById("capture-preview-play").style.display = "none";
+        is_enabled = "True"
+    }
+}
