@@ -307,7 +307,7 @@ class PiKiteApp:
         file_path = f"/media/{self.storage_manager.PHOTO_OUTPUT_DIR.name}/{media_path.parent.name}/{media_path.name}"
         file_paths_payload = {
             "type": "last_captured_photo",
-            "file_paths": file_path
+            "file_path": file_path
         }
         self.remote_server.send(file_paths_payload)
 

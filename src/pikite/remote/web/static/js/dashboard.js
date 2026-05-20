@@ -68,6 +68,8 @@ updateButtonStates()
 var pikite_scope = null
 status_badge = document.getElementById("status-badge");
 
+capturePreview = document.getElementById("camera-feed");
+
 function loadSessionInfo(info) {
     document.getElementById("session-start").textContent = info.session_start || "N/A";
     document.getElementById("capture-mode").textContent = info.capture_mode || "N/A";
@@ -123,7 +125,7 @@ function updatePanTiltInfo(info) {
 
 function endCaptureSession(info) {
     pikite_scope = "MENU"
-    
+
     status_badge.classList.remove("capture");
     status_badge.classList.add("idle");
     status_badge.dataset.badgeCaption = "Idle";
@@ -134,4 +136,9 @@ function endCaptureSession(info) {
     document.getElementById("capture-session-controls").style.display = "none";
 
     sendCommand('FETCH_MEDIA_DIRS')
+}
+
+function updateCapturePreview(obj) {
+    file_path = obj.file_path;
+    capturePreview.src = file_path + "?" + new Date().getTime();
 }
