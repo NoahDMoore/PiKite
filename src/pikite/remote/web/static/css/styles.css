@@ -134,6 +134,12 @@ body {
   margin-top: 0;
 }
 
+#capture-preview-enable {
+  position: absolute;
+  right: 2em;
+  bottom: 2.25em;
+}
+
 #status-badge {
   position: absolute;
   top: 12px;
