@@ -147,10 +147,10 @@ function updateCapturePreview(obj) {
 function toggleCapturePreviewEnable() {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
         document.getElementById("capture-preview-pause").style.display = "none";
-        document.getElementById("capture-preview-play").style.display = "inline";
+        document.getElementById("capture-preview-play").style.display = "inline-block";
         document.getElementById("capture-preview-enable").dataset.enable = "False"
     } else if (document.getElementById("capture-preview-enable").dataset.enable == "False") {
-        document.getElementById("capture-preview-pause").style.display = "inline";
+        document.getElementById("capture-preview-pause").style.display = "inline-block";
         document.getElementById("capture-preview-play").style.display = "none";
         document.getElementById("capture-preview-enable").dataset.enable = "True"
     }
