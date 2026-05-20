@@ -139,9 +139,11 @@ function endCaptureSession(info) {
 }
 
 function updateCapturePreview(obj) {
-    document.getElementById("capture-preview-enable-btn");
-    file_path = obj.file_path;
-    capturePreview.src = file_path + "?" + new Date().getTime();
+    if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
+        document.getElementById("capture-preview-enable-btn");
+        file_path = obj.file_path;
+        capturePreview.src = file_path + "?" + new Date().getTime();
+    }
 }
 
 function toggleCapturePreviewEnable() {
