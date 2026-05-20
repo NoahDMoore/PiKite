@@ -118,14 +118,14 @@
                                             <i class="material-icons left">linked_camera</i>
                                             Take Photo
                                         </a>
-                                        <a class="btn waves-effect waves-light">Start Capture Session</a>
+                                        <a id="start-capture-btn" class="btn waves-effect waves-light">Start Capture Session</a>
                                     </p>
                                 </div>
                             </div>
-                            <div id="capture-session-controls">
+                            <div id="capture-session-controls" style="display: none;">
                                 <div>
                                     <p class="pikite-control-btns">
-                                        <a class="btn waves-effect waves-light red">Stop Capture Session</a>
+                                        <a id="stop-capture-btn" class="btn waves-effect waves-light red">Stop Capture Session</a>
                                     </p>
                                 </div>
                             </div>
@@ -335,6 +335,18 @@
                     behavior: 'smooth'
                 });
             }
+
+            
+            // Dashboard
+            document.getElementById('start-capture-btn').addEventListener('click', function() {
+                sendCommand('START_CAPTURE');
+            });
+
+            document.getElementById('stop-capture-btn').addEventListener('click', function() {
+                sendCommand('STOP_CAPTURE');
+            });
+
+            // Settings
 
             document.getElementById('fetch-settings-btn').addEventListener('click', function() {
                 sendCommand('FETCH_SETTINGS');
