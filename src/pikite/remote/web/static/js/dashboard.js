@@ -89,7 +89,7 @@ function updateSessionInfo(info) {
         status_badge.dataset.badgeCaption = "Capture";
 
         document.getElementById("idle-controls").style.display = "none";
-        document.getElementById("capture-session-controls").style.display = "display";
+        document.getElementById("capture-session-controls").style.display = "block";
     }
 
     document.getElementById("capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
