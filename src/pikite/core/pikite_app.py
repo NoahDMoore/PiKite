@@ -190,7 +190,7 @@ class PiKiteApp:
         self.input_handler.register(
             scope=InputScope.MENU,
             command=InputCommand.DISPLAY_SYSTEM_INFO,
-            callback=self.system_info
+            callback=lambda: asyncio.create_task(self.system_info())
         )
 
         self.input_handler.register(
