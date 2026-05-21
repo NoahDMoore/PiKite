@@ -149,10 +149,6 @@ class PiKiteApp:
 
         return button_controller
     
-    async def system_info(self):
-        display_system_info(self.display_controller) # type: ignore
-        await asyncio.sleep(4)
-
     def initialize_menu(self) -> Menu:
         """
         Initialize the menu system and register input commands.
@@ -190,7 +186,7 @@ class PiKiteApp:
         self.input_handler.register(
             scope=InputScope.MENU,
             command=InputCommand.DISPLAY_SYSTEM_INFO,
-            callback=lambda: asyncio.create_task(self.system_info())
+            callback=lambda: self.input_handler.set_scope(InputScope.SYSTEM_INFO)
         )
 
         self.input_handler.register(
@@ -431,10 +427,6 @@ class PiKiteApp:
             # Home the Pan/Tilt Servos
             self.home_pan_tilt()
 
-            # Reset input scope to MENU when capture loop exits
-            self.input_handler.set_scope(InputScope.MENU)   # Ensure scope is reset to MENU when capture loop exits
-            self.menu.update_menu()
-
     async def main_loop(self):
         application_running = True
         while application_running:
@@ -443,6 +435,16 @@ class PiKiteApp:
                 pass
             elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
                 await self.capture_loop()
+
+                # Reset input scope to MENU when capture loop exits
+                self.input_handler.set_scope(InputScope.MENU)   # Ensure scope is reset to MENU when capture loop exits
+                self.menu.update_menu()
+
+            elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
+                display_system_info(self.display_controller) # type: ignore
+                await asyncio.sleep(4)
+                self.input_handler.set_scope(InputScope.MENU)
+                self.menu.update_menu()
 
         # Cleanup at End of Runtime
         self.button_controller.cleanup()

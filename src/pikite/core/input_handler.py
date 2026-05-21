@@ -47,6 +47,7 @@ class InputScope(str, Enum):
     DEFAULT = "default"
     MENU = "menu"
     CAPTURE_LOOP = "capture_loop"
+    SYSTEM_INFO = "system_info"
 
 class InputHandler:
     """
