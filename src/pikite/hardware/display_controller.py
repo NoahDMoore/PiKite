@@ -1,5 +1,3 @@
-import os
-import subprocess
 import time
 
 import board        # type: ignore
@@ -364,40 +362,6 @@ class PreLoader:
     def play(self):
         """Play the preloader GIF animation."""
         self.image.play()
-
-def display_system_info(display_controller: DisplayController):
-    lcd_image, canvas = display_controller.new_image()
-
-    padding = 5
-
-    cmd = "hostname -I"
-    ip = "IP: "+subprocess.check_output(cmd, shell=True).decode("utf-8").split(" ")[0]
-
-    cmd = "df -h | grep /dev/mmcblk0p2 | awk '{printf $3\"/\"$2}'"
-    disk = subprocess.check_output(cmd, shell=True).decode("utf-8").split("G")
-    disk[1] += " GB"
-    disk = "Disk: "+"".join(disk)
-
-    cmd = "iwconfig wlan0 | grep wlan0"
-    network = "SSID: "+subprocess.check_output(cmd, shell=True).decode("utf-8").split("ESSID:")[1]
-
-    #try:
-        #response = urllib.request.urlopen('http://localhost')
-        #apache = "Apache: [OK]"
-    #except:
-        #apache = "Apache: [ERROR]"
-
-    y = padding
-    x = padding
-    canvas.text((x, y), ip, font=display_controller.FONT25, fill="#FF2002")
-    y += display_controller.FONT25.getsize(ip)[1] + padding                         # Replace getsize with getbbox
-    canvas.text((x, y), disk, font=display_controller.FONT25, fill="#C70096")
-    y += display_controller.FONT25.getsize(disk)[1] + padding                       # Replace getsize with getbbox
-    canvas.text((x, y), network, font=display_controller.FONT25, fill="#6BB800")
-    #y += font25.getsize(network)[1] + padding                                      # Replace getsize with getbbox
-    #canvas.text((x, y), apache, font=font25, fill="#2121FF")
-
-    display_controller.display.image(lcd_image)
 
 def get_image_width(bbox: tuple[int, int, int, int]) -> int:
     """Calculate the width of an image given its bounding box.
