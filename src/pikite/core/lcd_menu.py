@@ -11,11 +11,9 @@ from .constants import XMLTAG, XMLATTRIB, MENUACTION
 from ..core.input_handler import InputHandler, InputCommand, InputSource
 from .logger import get_logger
 from .settings import Settings
-from ..system.system_info import display_system_info
-
 # Mock hardware controller class for testing on non-RPi system; remove when done testing
 try:
-	from ..hardware.display_controller import DisplayController, display_system_info # type: ignore
+	from ..hardware.display_controller import DisplayController # type: ignore
 except:
 	class DisplayController:
 		"""
@@ -267,8 +265,16 @@ class Menu:
 				if self.display_controller is None:
 					logger.warning("No display controller available for displaying system info")
 					return
-				else:
-					display_system_info(self.display_controller) # type: ignore
+
+				if self.input_handler is None:
+					logger.error("No input handler available for input menu action")
+					return
+			
+				self.input_handler.handle(
+					command=InputCommand.DISPLAY_SYSTEM_INFO,
+					source=InputSource.SYSTEM
+				)
+					
 			case _:
 				logger.warning(f"No action defined for menu element: {self.current_element}")
 				return

@@ -17,6 +17,7 @@ from pikite.hardware.servo_controller import TiltServo, PanServo, PanTiltPattern
 from pikite.remote.microdot_server import ControllerServer
 from pikite.system.storage import StorageManager, get_timestamp
 import pikite.system.power_management as PowerManagement
+from ..system.system_info import display_system_info
 
 # Setup Logger
 logger = logger_module.get_logger(__name__)
@@ -147,6 +148,10 @@ class PiKiteApp:
         )
 
         return button_controller
+    
+    async def system_info(self):
+        display_system_info(self.display_controller) # type: ignore
+        await asyncio.sleep(4)
 
     def initialize_menu(self) -> Menu:
         """
@@ -180,6 +185,12 @@ class PiKiteApp:
             scope=InputScope.MENU,
             command=InputCommand.START_CAPTURE,
             callback=lambda: self.input_handler.set_scope(InputScope.CAPTURE_LOOP)
+        )
+
+        self.input_handler.register(
+            scope=InputScope.MENU,
+            command=InputCommand.DISPLAY_SYSTEM_INFO,
+            callback=self.system_info
         )
 
         self.input_handler.register(

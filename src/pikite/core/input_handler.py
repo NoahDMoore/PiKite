@@ -26,6 +26,7 @@ class InputCommand(Enum):
     TILT = auto()
 
     # System Commands
+    DISPLAY_SYSTEM_INFO = auto()
     SHUTDOWN = auto()
     REBOOT = auto()
 
