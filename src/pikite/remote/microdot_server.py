@@ -373,8 +373,6 @@ class ControllerServer:
         try:
             if self.websocket_connected:
                 self.outgoing_messages.put_nowait(message) # Add message to the outgoing_messages queue to be sent to the client
-            else:
-                logger.debug("No websocket client connected; message not queued.", extra={"skip_remote": True})
         except asyncio.QueueFull as e:
             logger.error(f"Outgoing message queue is full. Message not sent: {message}. Error: {e}")
         except Exception as e:

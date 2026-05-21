@@ -126,6 +126,7 @@ class WebSocketHandler(logging.Handler):
             })
 
         except ConnectionError as e:
-            logger.debug(f"WebSocketHandler: {e} - Log message not sent to remote clients.", extra={"skip_remote": True})
+            pass
+            #logger.debug(f"WebSocketHandler: {e} - Log message not sent to remote clients.", extra={"skip_remote": True})
         except Exception:
             self.handleError(record)
