@@ -23,7 +23,7 @@ def display_system_info(display_controller: DisplayController):
     ).decode("utf-8").split("ESSID:")[1]
 
     # Strings to Display
-    hostname_info = f"Hostname: {hostname}.local"
+    hostname_info = f"Host: {hostname}.local"
     ip_info = f"IP: {socket.gethostbyname(hostname)}"
     disk_used = f"Disk Used: {disk_usage.used // (2**30)} GB"
     disk_free = f"Disk Free: {disk_usage.free // (2**30)} GB"
