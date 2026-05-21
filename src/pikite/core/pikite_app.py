@@ -8,7 +8,6 @@ from pikite.core.lcd_menu import Menu
 import pikite.core.logger as logger_module
 from pikite.core.settings import Settings
 from pikite.core.timer import Timer
-from pikite.hardware import display_controller
 from pikite.hardware.camera_controller import CameraController
 from pikite.hardware.button_controller import ButtonController
 from pikite.hardware.display_controller import DisplayController, LoadingBar, PreLoader
