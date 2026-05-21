@@ -29,10 +29,10 @@ def display_system_info(display_controller: DisplayController):
     ssid_info = f"SSID: {network_ssid}"
 
     def add_line(text, color):
+        nonlocal y
         canvas.text((x, y), text, font=font, fill=color)
 
         # Move cursor down one line
-        nonlocal y
         y += get_image_height(font.getbbox(text)) + padding
 
     # Prepare System Info Display
