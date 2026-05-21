@@ -171,6 +171,8 @@ class PiKiteApp:
 
         self.input_handler.set_scope(InputScope.MENU)
 
+        self.input_handler.add_scope_change_listener(self._on_enter_menu_scope)
+
         self.input_handler.register(
             scope=InputScope.MENU,
             command=InputCommand.NEXT,
@@ -220,6 +222,12 @@ class PiKiteApp:
         )
 
         return menu
+    
+    def _on_enter_menu_scope(self, new_scope: InputScope):
+        if not new_scope == InputScope.MENU:
+            return
+        self.menu.update_menu()
+
 
     """Remote Command Handlers"""
 
@@ -448,25 +456,20 @@ class PiKiteApp:
     async def main_loop(self):
         application_running = True
         while application_running:
-            await asyncio.sleep(0.1)
             if self.input_handler.active_scope == InputScope.MENU:
                 pass
+
             elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
                 await self.capture_loop()
-
-                # Reset input scope to MENU when capture loop exits
-                self.input_handler.set_scope(InputScope.MENU)   # Ensure scope is reset to MENU when capture loop exits
-                self.menu.update_menu()
 
             elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
                 display_system_info(self.display_controller) # type: ignore
 
                 while self.input_handler.active_scope == InputScope.SYSTEM_INFO:
                     await asyncio.sleep(0.1)
-                
-                # Return to Menu
-                self.menu.update_menu()
 
+            await asyncio.sleep(0.1)
+            
         # Cleanup at End of Runtime
         self.button_controller.cleanup()
 
