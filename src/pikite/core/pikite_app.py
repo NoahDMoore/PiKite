@@ -147,6 +147,12 @@ class PiKiteApp:
             scope=InputScope.CAPTURE_LOOP
         )
 
+        button_controller.set_commands(
+            next_command=InputCommand.NEXT,
+            select_command=InputCommand.SELECT,
+            scope=InputScope.SYSTEM_INFO
+        )
+
         return button_controller
     
     def initialize_menu(self) -> Menu:
@@ -199,6 +205,18 @@ class PiKiteApp:
             scope=InputScope.MENU,
             command=InputCommand.REBOOT,
             callback=PowerManagement.reboot
+        )
+
+        self.input_handler.register(
+            scope=InputScope.SYSTEM_INFO,
+            command=InputCommand.NEXT,
+            callback=lambda: self.input_handler.set_scope(InputScope.MENU)
+        )
+
+        self.input_handler.register(
+            scope=InputScope.SYSTEM_INFO,
+            command=InputCommand.SELECT,
+            callback=lambda: self.input_handler.set_scope(InputScope.MENU)
         )
 
         return menu
@@ -442,8 +460,11 @@ class PiKiteApp:
 
             elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
                 display_system_info(self.display_controller) # type: ignore
-                await asyncio.sleep(4)
-                self.input_handler.set_scope(InputScope.MENU)
+
+                while self.input_handler.active_scope == InputScope.SYSTEM_INFO:
+                    await asyncio.sleep(0.1)
+                
+                # Return to Menu
                 self.menu.update_menu()
 
         # Cleanup at End of Runtime
