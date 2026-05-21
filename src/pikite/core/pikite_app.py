@@ -16,7 +16,7 @@ from pikite.hardware.servo_controller import TiltServo, PanServo, PanTiltPattern
 from pikite.remote.microdot_server import ControllerServer
 from pikite.system.storage import StorageManager, get_timestamp
 import pikite.system.power_management as PowerManagement
-from ..system.system_info import display_system_info
+from pikite.system.system_info import display_system_info
 
 # Setup Logger
 logger = logger_module.get_logger(__name__)
