@@ -23,9 +23,10 @@ def display_system_info(display_controller: DisplayController):
     ).decode("utf-8").split("ESSID:")[1]
 
     # Strings to Display
-    ip_info = "IP: " + socket.gethostbyname(hostname)
+    hostname_info = f"Hostname: {hostname}.local"
+    ip_info = f"IP: {socket.gethostbyname(hostname)}"
     disk_used = f"Disk Used: {disk_usage.used // (2**30)} GB"
-    disk_free = f"Free: {disk_usage.free // (2**30)} GB"
+    disk_free = f"Disk Free: {disk_usage.free // (2**30)} GB"
     ssid_info = f"SSID: {network_ssid}"
 
     def add_line(text, color):
@@ -36,6 +37,7 @@ def display_system_info(display_controller: DisplayController):
         y += get_image_height(font.getbbox(text)) + padding
 
     # Prepare System Info Display
+    add_line(hostname_info, "#FF7C02")
     add_line(ip_info, "#FF2002")
     add_line(disk_used, "#C70096")
     add_line(disk_free, "#6BB800")
