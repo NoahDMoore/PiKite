@@ -1,11 +1,14 @@
 import csv
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import pikite.core.constants as CONSTANTS
 from pikite.core.input_handler import InputCommand, InputScope
 import pikite.core.logger as logger_module
 from pikite.hardware.servo_controller import PanTiltPattern
-from pikite.core.pikite_app import PiKiteApp
+
+if TYPE_CHECKING:
+    from pikite.core.pikite_app import PiKiteApp
 
 # Setup Logger
 logger = logger_module.get_logger(__name__)
