@@ -273,6 +273,20 @@ class PiKiteApp:
         }
         self.remote_server.send(file_paths_payload)
 
+    def rx_pan_command(self, args):
+        angle = args.get("angle")
+        self.pan_servo.rotate_to(
+            speed = 0.5,
+            target_angle = angle,
+            margin = 4
+        )
+        self.timer.wait(0.5)
+
+    def rx_tilt_command(self, args):
+        angle = args.get("angle")
+        self.tilt_servo.angle = angle
+        self.timer.wait(0.5)
+
     def register_remote_handlers(self):
         self.input_handler.register(
             scope=InputScope.MENU,
@@ -302,6 +316,18 @@ class PiKiteApp:
             scope=InputScope.MENU,
             command=InputCommand.FETCH_MEDIA,
             callback=self.tx_media_file_paths
+        )
+
+        self.input_handler.register(
+            scope=InputScope.MENU,
+            command=InputCommand.PAN,
+            callback=self.rx_pan_command
+        )
+
+        self.input_handler.register(
+            scope=InputScope.MENU,
+            command=InputCommand.TILT,
+            callback=self.rx_tilt_command
         )
 
         self.input_handler.register(

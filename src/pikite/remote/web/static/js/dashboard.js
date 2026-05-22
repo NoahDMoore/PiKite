@@ -62,6 +62,18 @@ document.querySelectorAll("input[type=range]").forEach(slider => {
     slider.addEventListener("input", updateButtonStates);
 });
 
+document.querySelectorAll("#pan-slider").forEach(slider => {
+    slider.addEventListener("change", () => {
+        sendCommand("PAN", {angle: slider.value})
+    });
+});
+
+document.querySelectorAll("#tilt-slider").forEach(slider => {
+    slider.addEventListener("change", () => {
+        sendCommand("TILT", {angle: slider.value})
+    });
+});
+
 updateButtonStates()
 
 // Session Info
