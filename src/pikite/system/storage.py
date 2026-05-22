@@ -192,7 +192,9 @@ class StorageManager:
         """
         if use_timestamp:
             timestamp = get_timestamp()    # Date format: 2023-10-31_14-30-00
-            return f"{base_name}_{timestamp}{extension}"
+            if base_name != "":
+                base_name = base_name + "_"
+            return f"{base_name}{timestamp}{extension}"
         return f"{base_name}{extension}"
     
     def get_capture_session_dirs(self, mode: CAPTURE_MODES | None = None) -> list[dict]:
