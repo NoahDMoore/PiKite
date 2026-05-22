@@ -75,7 +75,6 @@ class CaptureSession:
             logger.info("Capture mode is NONE; no media capture will be performed.")
         return capture_mode
 
-    
     def _get_media_extension(self) -> CONSTANTS.MEDIA_EXTENSIONS | None:
         """Determine the media file extension based on the current capture mode."""
         if self.capture_mode == CONSTANTS.CAPTURE_MODES.STILL:
