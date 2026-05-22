@@ -20,7 +20,7 @@ class CaptureSession:
         Initialization for a PiKiteApp CaptureSession
 
         Args:
-            app (PiKiteApp): The main application instance.
+            app (PiKiteApp): The main PiKiteApp application instance.
         """
         self.app = app
 
