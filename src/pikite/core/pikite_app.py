@@ -277,14 +277,14 @@ class PiKiteApp:
         angle = args.get("angle")
         self.pan_servo.rotate_to(
             speed = 0.5,
-            target_angle = angle,
+            target_angle = int(angle),
             margin = 4
         )
         self.timer.wait(0.5)
 
     def rx_tilt_command(self, args):
         angle = args.get("angle")
-        self.tilt_servo.angle = angle
+        self.tilt_servo.angle = int(angle)
         self.timer.wait(0.5)
 
     def register_remote_handlers(self):
