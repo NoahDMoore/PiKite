@@ -14,8 +14,14 @@ if TYPE_CHECKING:
 logger = logger_module.get_logger(__name__)
 
 class CaptureSession:
-    """Class to manage state and parameters for a media capture session."""
+    """Class to store parameters for a PiKiteApp capture session."""
     def __init__(self, app: PiKiteApp):
+        """
+        Initialization for a PiKiteApp CaptureSession
+
+        Args:
+            app (PiKiteApp): The main application instance.
+        """
         self.app = app
 
         # Mark the start of the capture session for runtime tracking
