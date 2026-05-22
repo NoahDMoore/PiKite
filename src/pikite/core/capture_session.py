@@ -15,7 +15,7 @@ logger = logger_module.get_logger(__name__)
 
 class CaptureSession:
     """Class to store parameters for a PiKiteApp capture session."""
-    def __init__(self, app: PiKiteApp):
+    def __init__(self, app: "PiKiteApp"):
         """
         Initialization for a PiKiteApp CaptureSession
 
