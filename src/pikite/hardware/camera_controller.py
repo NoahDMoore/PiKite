@@ -411,7 +411,7 @@ class PreviewStream:
     async def stream(self):
         while True:
             if not self.streaming:
-                await asyncio.sleep(0)
+                await asyncio.sleep(1)
                 continue
             
             if self.latest_frame is not None:
