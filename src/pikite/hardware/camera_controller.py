@@ -393,7 +393,7 @@ class PreviewStream:
 
         try:
             while self.streaming:
-                if not self.timer.interval_elapsed(FRAME_RATE):
+                if not self.timer.interval_elapsed(1):
                     await asyncio.sleep(0.05)
                     continue
 
