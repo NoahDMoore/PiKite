@@ -412,7 +412,7 @@ class PreviewStream:
     async def stream(self):
         while True:
             if not self.streaming:
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.05)
                 continue
             
             if self.latest_frame is not None:
@@ -423,7 +423,3 @@ class PreviewStream:
                 })
 
                 self.latest_frame = None
-
-                await asyncio.sleep(0.05)
-
-            logger.debug("End of stream loop. Continuing loop.")
