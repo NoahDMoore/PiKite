@@ -414,6 +414,7 @@ class PreviewStream:
             return
     
         if self.latest_frame is not None:
+            logger.debug("New preview frame received. Transmitting to server.")
             self.server.send({
                 "type": "preview_frame",
                 "data": self.latest_frame.hex()
