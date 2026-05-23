@@ -425,3 +425,5 @@ class PreviewStream:
                 self.latest_frame = None
 
                 await asyncio.sleep(0.05)
+
+            logger.debug("End of stream loop. Continuing loop.")
