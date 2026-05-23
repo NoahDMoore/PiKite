@@ -493,8 +493,9 @@ class PiKiteApp:
 
         while application_running:
             if self.input_handler.active_scope == InputScope.MENU:
-                self.preview.stream()
-                await asyncio.sleep(0.1)
+                pass
+                #self.preview.stream()
+                #await asyncio.sleep(0.1)
 
             elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
                 self.preview.stop()
