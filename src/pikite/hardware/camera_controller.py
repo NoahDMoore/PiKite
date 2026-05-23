@@ -1,8 +1,13 @@
+import asyncio
+import io
 from pathlib import Path
+from PIL import Image
 
 from ..core.logger import get_logger
 from ..core.settings import Settings
 from ..core.constants import CAMERA_MODELS, CAPTURE_MODES, MAX_RESOLUTIONS
+from ..core.timer import Timer
+from ..remote.microdot_server import ControllerServer
 from ..system.storage import StorageManager
 
 from picamera2 import Picamera2 # type: ignore
@@ -320,9 +325,97 @@ class CameraController:
         """
         camera_list = Picamera2.global_camera_info()
         detected_model = camera_list[0].get("model", None) if camera_list else None
+        logger.debug(f"The system reports camera model ... {detected_model}")
 
         if detected_model in CAMERA_MODELS.__members__ and detected_model is not None:
             return CAMERA_MODELS[detected_model]
         else:
-            logger.warning("Unable to detect camera model.")
+            logger.warning("Unable to match detected camera model with compatable models.")
             return None
+        
+
+class PreviewStream:
+    def __init__(self, camera: CameraController, server: ControllerServer):
+        self.camera = camera
+        self.server = server
+
+        self.timer = Timer()
+        self.timer.start()
+
+        self.preview_task = None
+        self.streaming = False
+        self.latest_frame = None
+
+    def start(self):
+        """
+        Start preview frame generator for streaming preview of camera output.
+        """
+        if self.streaming:
+            logger.warning("Cannot start preview stream because it is already streaming.")
+            return
+        
+        self.streaming = True
+        self.timer.start()
+
+        self.preview_task = asyncio.create_task(self._preview_stream())
+
+    def stop(self):
+        """
+        Stop preview frame generator to end streaming preview of camera output.
+        """
+        if not self.streaming:
+            logger.warning("Cannot stop preview stream because it is not currently streaming.")
+            return
+        
+        self.streaming = False
+
+        if self.preview_task is not None:
+            self.preview_task.cancel()
+            self.preview_task = None
+
+        self.timer.stop()
+        self.latest_frame = None            
+
+    async def _preview_stream(self):
+        """
+        Stores the latest frame from the preview stream.
+
+        Raises:
+            ValueError: If the preview is not currently streaming.
+        """
+        if not self.streaming:
+            try:
+                raise(ValueError(f"The preview stream is not running. Call start_preview() to initiate preview stream."))
+            except ValueError as e:
+                logger.warning(e)
+                return
+
+        FRAME_RATE = 1 / 30  # 30 FPS
+
+        try:
+            while self.streaming:
+                if not self.timer.interval_elapsed(FRAME_RATE):
+                    await asyncio.sleep(0.01)
+                    continue
+
+                frame = self.camera.picam2.capture_array("lores")
+
+                image = Image.fromarray(frame)
+                buffer = io.BytesIO()
+                image.save(buffer, format="JPEG", quality=70)
+
+                self.latest_frame = buffer.getvalue()
+        except asyncio.CancelledError:
+            logger.debug("Preview stream cancelled")
+
+    async def stream(self):
+        while self.streaming:
+            if self.latest_frame is not None:
+                self.server.send({
+                    "type": "preview_frame",
+                    "data": self.latest_frame.hex()
+                })
+
+                self.latest_frame = None
+
+            await asyncio.sleep(0.01)

@@ -7,7 +7,7 @@ from pikite.core.lcd_menu import Menu
 import pikite.core.logger as logger_module
 from pikite.core.settings import Settings
 from pikite.core.timer import Timer
-from pikite.hardware.camera_controller import CameraController
+from pikite.hardware.camera_controller import CameraController, PreviewStream
 from pikite.hardware.button_controller import ButtonController
 from pikite.hardware.display_controller import DisplayController, LoadingBar, PreLoader
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
@@ -70,6 +70,9 @@ class PiKiteApp:
         # Initialize Remote Input Handler
         self.remote_input = RemoteInput(self.remote_server, self.input_handler)
         self.register_remote_handlers()
+
+        # Initialize Camera Preview Stream
+        self.preview = PreviewStream(self.camera_controller, self.remote_server)
         initialization_progress_bar.advance(10)
 
         # Initialize Buttons
@@ -486,12 +489,16 @@ class PiKiteApp:
 
     async def main_loop(self):
         application_running = True
+        self.preview.start()
+
         while application_running:
             if self.input_handler.active_scope == InputScope.MENU:
                 pass
 
             elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
+                self.preview.stop()
                 await self.capture_loop()
+                self.preview.start()
 
             elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
                 display_system_info(self.display_controller) # type: ignore
@@ -503,6 +510,7 @@ class PiKiteApp:
             
         # Cleanup at End of Runtime
         self.button_controller.cleanup()
+        self.preview.stop()
 
     async def run(self):
         logger.info("Starting PiKite Application")
@@ -510,5 +518,6 @@ class PiKiteApp:
         await asyncio.gather(
             self.remote_server.start(),
             self.remote_input.start_listening(),
+            self.preview.stream(),
             self.main_loop()
         )

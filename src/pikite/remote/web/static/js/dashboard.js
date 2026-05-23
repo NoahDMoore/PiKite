@@ -152,9 +152,12 @@ function endCaptureSession(info) {
 
 function updateCapturePreview(obj) {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
-        document.getElementById("capture-preview-enable-btn");
-        file_path = obj.file_path;
-        capturePreview.src = file_path + "?" + new Date().getTime();
+        if (obj.type == "preview_frame") {
+            capturePreview.src = "data:image/jpeg;base64," + obj.data;
+        } else if (obj.type == "last_captured_photo") {
+            file_path = obj.file_path;
+            capturePreview.src = file_path + "?" + new Date().getTime();
+        }
     }
 }
 
