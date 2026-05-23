@@ -403,8 +403,7 @@ class PreviewStream:
                 buffer = io.BytesIO()
                 image.save(buffer, format="JPEG", quality=70)
                 self.latest_frame = buffer.getvalue()
-                
-                await asyncio.sleep(0)
+
         except asyncio.CancelledError:
             logger.debug("Preview stream cancelled")
 
