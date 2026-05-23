@@ -136,18 +136,30 @@ class CameraController:
 
         #Configure camera settings based on the provided settings
         self.capture_mode = CAPTURE_MODES(self.settings.get("cam_capture_mode", CAPTURE_MODES.STILL))  # Default to STILL if not specified or invalid
+        self.resolution = self.get_resolution()
+        self.transformation = Transform(hflip=True, vflip=True) if self.settings.get("cam_rotation") == 180 else Transform(hflip=False, vflip=False)
 
-        resolution = self.get_resolution()
-        transformation = Transform(hflip=True, vflip=True) if self.settings.get("cam_rotation") == 180 else Transform(hflip=False, vflip=False)
+        self.preview_config = self.picam2.create_preview_configuration(
+            main={"size": (1280, 720)},
+            lores={"size": (640, 480)},
+            transform=self.transformation
+        )
 
         if self.capture_mode == CAPTURE_MODES.STILL:
-            config = self.picam2.create_still_configuration(main={"size": resolution}, transform=transformation)
+            self.capture_config = self.picam2.create_still_configuration(
+                main={"size": self.resolution},
+                transform=self.transformation
+            )
         elif self.capture_mode == CAPTURE_MODES.VIDEO:
-            config = self.picam2.create_video_configuration(main={"size": resolution}, encode="main", transform=transformation)
+            self.capture_config = self.picam2.create_video_configuration(
+                main={"size": self.resolution},
+                encode="main",
+                transform=self.transformation
+            )
         else:
-            config = self.picam2.create_preview_configuration(main={"size": resolution}, transform=transformation)
+            self.capture_config = self.preview_config
 
-        self.picam2.configure(config)
+        self.picam2.configure(self.preview_config)
 
         self.picam2.set_controls({
             "AeEnable": self.settings.get("cam_ae_enable", True),                                   # Enable auto exposure
@@ -226,15 +238,23 @@ class CameraController:
             output_filepath (Path): File to save the captured image.
         
         Raises:
+            ValueError: If self.capture_mode is not CAPTURE_MODES.STILL
             ValueError: If output_filepath is not provided.
         """
+        if self.capture_mode != CAPTURE_MODES.STILL:
+            try:
+                raise(ValueError(f"The camera is not currently configured for still photos. Current mode: {self.capture_mode}"))
+            except ValueError as e:
+                logger.error(e)
+                return
+
         if output_filepath is None:
             try:
                 raise(ValueError("Output filepath must be provided to save the captured image."))
             except ValueError as e:
                 logger.error(e)
                 return
-        self.picam2.capture_file(str(output_filepath))
+        self.picam2.switch_mode_and_capture_file(self.capture_config, str(output_filepath))
 
     def start_video(self, output_filepath: Path | None=None):
         """
@@ -244,14 +264,25 @@ class CameraController:
             output_filepath (Path): File to save the recorded video.
 
         Raises:
+            ValueError: If self.capture_mode is not CAPTURE_MODES.VIDEO
             ValueError: If output_filepath is not provided.
         """
+        if self.capture_mode != CAPTURE_MODES.VIDEO:
+            try:
+                raise(ValueError(f"The camera is not currently configured for video. Current mode: {self.capture_mode}"))
+            except ValueError as e:
+                logger.error(e)
+                return
+
         if output_filepath is None:
             try:
                 raise(ValueError("Output filepath must be provided to save the recorded video."))
             except ValueError as e:
                 logger.error(e)
                 return
+
+        self.picam2.switch_mode(self.capture_config)
+        
         encoder = H264Encoder(bitrate=10000000)
         output = FfmpegOutput(str(output_filepath))
         self.is_recording = True
@@ -264,9 +295,21 @@ class CameraController:
     def stop_video(self):
         """
         Stops the ongoing video recording.
+        
+        Raises:
+            ValueError: If the camera is not currently recording.
         """
+        if not self.is_recording:
+            try:
+                raise(ValueError(f"The camera is not currently recording. No recording to stop."))
+            except ValueError as e:
+                logger.warning(e)
+            return
+
         self.picam2.stop_recording()
         self.is_recording = False
+
+        self.picam2.switch_mode(self.preview_config)
 
     def detect_camera_model(self) -> CAMERA_MODELS | None:
         """
