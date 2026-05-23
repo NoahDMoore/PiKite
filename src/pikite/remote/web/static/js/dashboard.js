@@ -152,7 +152,9 @@ function endCaptureSession(info) {
 
 function updateCapturePreview(obj) {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
+        console.log(obj.type)
         if (obj.type == "preview_frame") {
+            console.log("In preview frame handler.")
             capturePreview.src = "data:image/jpeg;base64," + obj.data;
         } else if (obj.type == "last_captured_photo") {
             file_path = obj.file_path;
