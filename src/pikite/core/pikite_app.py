@@ -191,6 +191,15 @@ class PiKiteApp:
 
         self.input_handler.register(
             scope=InputScope.MENU,
+            command=InputCommand.SET_BASELINE_PRESSURE,
+            callback=lambda: self.pressure_sensor.get_baseline_pressure(
+                num_samples=80,
+                display_controller=self.display_controller
+            )
+        )
+
+        self.input_handler.register(
+            scope=InputScope.MENU,
             command=InputCommand.DISPLAY_SYSTEM_INFO,
             callback=lambda: self.input_handler.set_scope(InputScope.SYSTEM_INFO)
         )
@@ -419,8 +428,6 @@ class PiKiteApp:
             self.capturing = True   # Set capturing flag to True at the start of the loop
 
             with CaptureSession(self) as session:
-                self.pressure_sensor.get_baseline_pressure(num_samples=80, display_controller=self.display_controller)
-
                 while self.capturing or self.is_recording:
                     if self.input_handler.active_scope != InputScope.CAPTURE_LOOP:
                         self.capturing = False
