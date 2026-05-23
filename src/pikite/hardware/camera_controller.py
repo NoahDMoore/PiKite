@@ -410,16 +410,18 @@ class PreviewStream:
             logger.debug("Preview stream cancelled")
 
     async def stream(self):
-        if not self.streaming:
-            return
-    
-        if self.latest_frame is not None:
-            logger.debug("New preview frame received. Transmitting to server.")
-            self.server.send({
-                "type": "preview_frame",
-                "data": self.latest_frame.hex()
-            })
+        while True:
+            if not self.streaming:
+                await asyncio.sleep(0.01)
+                return
+            
+            if self.latest_frame is not None:
+                logger.debug("New preview frame received. Transmitting to server.")
+                self.server.send({
+                    "type": "preview_frame",
+                    "data": self.latest_frame.hex()
+                })
 
-            self.latest_frame = None
+                self.latest_frame = None
 
-            await asyncio.sleep(0.05)
+                await asyncio.sleep(0.05)
