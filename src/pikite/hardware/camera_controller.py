@@ -418,4 +418,4 @@ class PreviewStream:
 
                 self.latest_frame = None
 
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.05)
