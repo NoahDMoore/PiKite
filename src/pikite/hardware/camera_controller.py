@@ -355,7 +355,6 @@ class PreviewStream:
             return
         
         self.streaming = True
-        self.timer.start()
 
         self.preview_task = asyncio.create_task(self._preview_stream())
 
