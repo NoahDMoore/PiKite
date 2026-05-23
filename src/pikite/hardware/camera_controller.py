@@ -413,7 +413,7 @@ class PreviewStream:
         while True:
             if not self.streaming:
                 await asyncio.sleep(0.01)
-                return
+                continue
             
             if self.latest_frame is not None:
                 logger.debug("New preview frame received. Transmitting to server.")
