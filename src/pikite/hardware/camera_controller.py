@@ -394,7 +394,7 @@ class PreviewStream:
         try:
             while self.streaming:
                 if not self.timer.interval_elapsed(FRAME_RATE):
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(1)
                     continue
 
                 frame = self.camera.picam2.capture_array("lores")
