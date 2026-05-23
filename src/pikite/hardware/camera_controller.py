@@ -388,23 +388,22 @@ class PreviewStream:
             except ValueError as e:
                 logger.warning(e)
                 return
-
+        logger.debug("In _preview_stream")
         FRAME_RATE = 1 / 30  # 30 FPS
 
         try:
             while self.streaming:
+                logger.debug("In streaming loop")
                 if not self.timer.interval_elapsed(1):
                     await asyncio.sleep(0.05)
                     continue
 
                 frame = self.camera.picam2.capture_array("lores")
-                await asyncio.sleep(0)
                 image = Image.fromarray(frame)
-                await asyncio.sleep(0)
                 buffer = io.BytesIO()
                 image.save(buffer, format="JPEG", quality=70)
-                await asyncio.sleep(0)
                 self.latest_frame = buffer.getvalue()
+                
                 await asyncio.sleep(0)
         except asyncio.CancelledError:
             logger.debug("Preview stream cancelled")
