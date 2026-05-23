@@ -408,7 +408,7 @@ class PreviewStream:
         except asyncio.CancelledError:
             logger.debug("Preview stream cancelled")
 
-    def stream(self):
+    async def stream(self):
         if not self.streaming:
             return
     
@@ -419,3 +419,5 @@ class PreviewStream:
             })
 
             self.latest_frame = None
+
+            await asyncio.sleep(0.05)

@@ -489,13 +489,11 @@ class PiKiteApp:
 
     async def main_loop(self):
         application_running = True
-        self.preview.start()
+        #self.preview.start()
 
         while application_running:
             if self.input_handler.active_scope == InputScope.MENU:
                 pass
-                #self.preview.stream()
-                #await asyncio.sleep(0.1)
 
             elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
                 self.preview.stop()
@@ -520,5 +518,6 @@ class PiKiteApp:
         await asyncio.gather(
             self.remote_server.start(),
             self.remote_input.start_listening(),
+            self.preview.stream(),
             self.main_loop()
         )
