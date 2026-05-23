@@ -408,14 +408,14 @@ class PreviewStream:
         except asyncio.CancelledError:
             logger.debug("Preview stream cancelled")
 
-    async def stream(self):
-        while self.streaming:
-            if self.latest_frame is not None:
-                self.server.send({
-                    "type": "preview_frame",
-                    "data": self.latest_frame.hex()
-                })
+    def stream(self):
+        if not self.streaming:
+            return
+    
+        if self.latest_frame is not None:
+            self.server.send({
+                "type": "preview_frame",
+                "data": self.latest_frame.hex()
+            })
 
-                self.latest_frame = None
-
-            await asyncio.sleep(0.05)
+            self.latest_frame = None
