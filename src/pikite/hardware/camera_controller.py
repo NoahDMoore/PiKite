@@ -406,7 +406,7 @@ class PreviewStream:
                     continue
 
                 frame = self.camera.picam2.capture_array("lores")
-                frame = cv2.cvtColor(frame, cv2.COLOR_YUV2RGB_I420)
+                frame = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
                 
                 success, encoded = cv2.imencode(
                     ".jpg",
