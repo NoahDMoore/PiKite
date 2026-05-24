@@ -1,6 +1,5 @@
 import asyncio
 import cv2
-import io
 from pathlib import Path
 from PIL import Image
 
