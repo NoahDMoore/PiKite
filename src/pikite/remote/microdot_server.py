@@ -343,6 +343,8 @@ class ControllerServer:
                     payload = json.dumps({"state": "Message: " + message})
                 elif isinstance(message, dict):
                     payload = json.dumps(message)
+                elif isinstance(message, bytes):
+                    payload = message
                 else:
                     raise TypeError
 

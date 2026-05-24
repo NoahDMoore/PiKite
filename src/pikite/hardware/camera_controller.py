@@ -422,7 +422,4 @@ class PreviewStream:
             except asyncio.CancelledError:
                 continue
 
-            self.server.send({
-                "type": "preview_frame",
-                "data": frame.hex()
-            })
+            self.server.send(frame)

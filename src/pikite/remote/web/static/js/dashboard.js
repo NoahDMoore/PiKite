@@ -152,10 +152,20 @@ function endCaptureSession(info) {
 
 function updateCapturePreview(obj) {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
-        console.log(obj.type)
-        if (obj.type == "preview_frame") {
-            console.log("In preview frame handler.")
-            capturePreview.src = "data:image/jpeg;base64," + obj.data;
+        if (obj instanceof Blob) {
+            const blob = obj
+            const newUrl = URL.createObjectURL(blob);
+            const preview = document.getElementById("capture-preview");
+
+            capturePreview.onload = function () {
+                if (currentPreviewUrl !== null) {
+                    URL.revokeObjectURL(currentPreviewUrl);
+                }
+
+                currentPreviewUrl = newUrl;
+            };
+
+            capturePreview.src = newUrl;
         } else if (obj.type == "last_captured_photo") {
             file_path = obj.file_path;
             capturePreview.src = file_path + "?" + new Date().getTime();

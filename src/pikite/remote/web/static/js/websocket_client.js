@@ -15,6 +15,7 @@ function startWebsocket() {
 	var websocket_url = "ws://" + location.host + "/ws?token=" + encodeURIComponent(localStorage.getItem("session_token"));
 	console.log("Connecting to WebSocket at: " + websocket_url);
 	ws = new WebSocket(websocket_url);
+	ws.binaryType = "arraybuffer";
 
 	ws.onopen = function () {
 		console.log("WebSocket connection established.");
@@ -36,6 +37,17 @@ function startWebsocket() {
 	};
 
 	ws.onmessage = function (event) {
+		if (event.data instanceof ArrayBuffer) {
+			const blob = new Blob(
+				[event.data],
+				{ type: "image/jpeg" }
+			);
+
+			updateCapturePreview(blob)
+			
+			return
+		}
+
 		var obj = JSON.parse(event.data);
         if (obj.hasOwnProperty("force_logout") && obj["force_logout"] === true) {
             handleLogout("Server error received: " + obj["error"]);
