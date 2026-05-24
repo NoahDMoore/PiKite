@@ -348,7 +348,7 @@ class ControllerServer:
                 else:
                     raise TypeError
 
-                logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
+                #logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
                 await ws.send(payload)  # Send message to websocket client
             except TypeError:
                 logger.error("Invalid Message Type: Messages must be a string or dict")
