@@ -408,11 +408,14 @@ class PreviewStream:
 
                 frame = self.camera.picam2.capture_array("lores")
                 frame = cv2.cvtColor(frame, cv2.COLOR_YUV2RGB_I420)
-                image = Image.fromarray(frame)
-                buffer = io.BytesIO()
-                image.save(buffer, format="JPEG", quality=70)
+                
+                success, encoded = cv2.imencode(
+                    ".jpg",
+                    frame,
+                    [int(cv2.IMWRITE_JPEG_QUALITY), 70]
+                )
 
-                image = buffer.getvalue()
+                image = encoded.tobytes()
                 
                 await self.latest_frame.put(image)
 
