@@ -398,7 +398,7 @@ class PreviewStream:
                 logger.warning(e)
                 return
 
-        FRAME_RATE = 1 / 30  # 30 FPS
+        FRAME_RATE = 1 / 10  # 10 FPS
 
         try:
             while self.streaming:
