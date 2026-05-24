@@ -497,7 +497,13 @@ class PiKiteApp:
 
             elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
                 self.preview.stop()
-                await self.capture_loop()
+
+                self.capture_task = asyncio.create_task(self.capture_loop())
+
+                await self.capture_task
+
+                self.capture_task = None
+
                 self.preview.start()
 
             elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
