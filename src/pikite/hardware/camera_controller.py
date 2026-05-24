@@ -368,6 +368,7 @@ class PreviewStream:
         self.streaming = False
 
         if self.preview_task is not None:
+            logger.debug("Canceling preview task.")
             self.preview_task.cancel()
             self.preview_task = None
 
