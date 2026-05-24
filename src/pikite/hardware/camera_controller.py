@@ -413,6 +413,7 @@ class PreviewStream:
     async def stream(self):
         while True:
             if not self.streaming:
+                logger.debug("NOT STREAMING")
                 await asyncio.sleep(0.05)
                 continue
 
