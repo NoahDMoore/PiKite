@@ -1,4 +1,5 @@
 import asyncio
+import cv2
 import io
 from pathlib import Path
 from PIL import Image
@@ -408,6 +409,7 @@ class PreviewStream:
                 logger.debug("Preview interval elapsed.")
 
                 frame = self.camera.picam2.capture_array("lores")
+                cv2.cvtColor(frame, cv2.COLOR_YUV2RGB_I420)
                 image = Image.fromarray(frame)
                 buffer = io.BytesIO()
                 image.save(buffer, format="JPEG", quality=70)
