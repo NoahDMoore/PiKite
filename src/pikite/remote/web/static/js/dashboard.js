@@ -150,6 +150,8 @@ function endCaptureSession(info) {
     sendCommand('FETCH_MEDIA_DIRS')
 }
 
+let currentPreviewUrl = null;
+
 function updateCapturePreview(obj) {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
         if (obj instanceof Blob) {
