@@ -398,6 +398,8 @@ class PreviewStream:
                     await asyncio.sleep(0.05)
                     continue
 
+                logger.debug("Preview interval elapsed.")
+
                 frame = self.camera.picam2.capture_array("lores")
                 image = Image.fromarray(frame)
                 buffer = io.BytesIO()
