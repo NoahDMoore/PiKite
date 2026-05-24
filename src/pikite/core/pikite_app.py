@@ -498,7 +498,6 @@ class PiKiteApp:
             elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
                 self.preview.stop()
                 await self.capture_loop()
-                logger.debug("CAPTURE LOOP ENDED")
                 self.preview.start()
 
             elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
