@@ -344,7 +344,7 @@ class PreviewStream:
 
         self.preview_task = None
         self.streaming = False
-        self.latest_frame = None
+        self.latest_frame = asyncio.Queue(maxsize=1)
 
     def start(self):
         """
@@ -373,7 +373,7 @@ class PreviewStream:
             self.preview_task = None
 
         self.timer.stop()
-        self.latest_frame = None            
+        self.latest_frame = asyncio.Queue(maxsize=1)            
 
     async def _preview_stream(self):
         """
@@ -402,7 +402,12 @@ class PreviewStream:
                 image = Image.fromarray(frame)
                 buffer = io.BytesIO()
                 image.save(buffer, format="JPEG", quality=70)
-                self.latest_frame = buffer.getvalue()
+
+                image = buffer.getvalue()
+                
+                await self.latest_frame.put(image)
+
+                await asyncio.sleep(FRAME_RATE)
 
         except asyncio.CancelledError:
             logger.debug("Preview stream cancelled")
@@ -413,17 +418,14 @@ class PreviewStream:
                 await asyncio.sleep(0.05)
                 continue
 
-            if self.latest_frame is None:
-                await asyncio.sleep(0.01)
+            try:
+                frame = await self.latest_frame.get()
+            except asyncio.CancelledError:
                 continue
 
-            logger.debug("New preview frame received. Transmitting to server.")
+            logger.debug("Transmitting preview frame")
 
             self.server.send({
                 "type": "preview_frame",
-                "data": self.latest_frame.hex()
+                "data": frame.hex()
             })
-
-            self.latest_frame = None
-            
-            await asyncio.sleep(0.05)
