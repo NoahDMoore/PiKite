@@ -402,7 +402,7 @@ class PreviewStream:
 
         try:
             while self.streaming:
-                if not self.timer.interval_elapsed(1):
+                if not self.timer.interval_elapsed(FRAME_RATE):
                     await asyncio.sleep(0.05)
                     continue
 
@@ -417,8 +417,6 @@ class PreviewStream:
                 image = buffer.getvalue()
                 
                 await self.latest_frame.put(image)
-
-                await asyncio.sleep(FRAME_RATE)
 
         except asyncio.CancelledError:
             logger.info("Preview stream cancelled")
