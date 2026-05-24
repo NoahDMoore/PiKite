@@ -79,7 +79,7 @@ class Timer:
             self.marks.clear()
             self.named_intervals.clear()
             self.state = TimerState.RUNNING
-            logger.debug("Timer started")
+            logger.info("Timer started")
 
     def reset(self, clear_intervals: bool = True):
         """Resets the current timer state."""
@@ -112,7 +112,7 @@ class Timer:
             self.marks.clear()
             self.named_intervals.clear()
             self.state = TimerState.STOPPED
-            logger.debug(f"Timer stopped. Elapsed time: {elapsed:.3f}s")
+            logger.info(f"Timer stopped. Elapsed time: {elapsed:.3f}s")
             return elapsed
     
     def pause(self):
@@ -122,7 +122,7 @@ class Timer:
             self.accumulated += (self.paused_time - self.start_time)  # type: ignore (to suppress mypy warning; start_time and paused_time cannot be None if running is True)
             self.start_time = None
             self.state = TimerState.PAUSED
-            logger.debug(f"Timer paused. Accumulated time: {self.accumulated:.3f}s")
+            logger.info(f"Timer paused. Accumulated time: {self.accumulated:.3f}s")
         elif self.stopped:
             logger.warning("Timer is not running. Cannot pause.")
             return
@@ -136,7 +136,7 @@ class Timer:
             self.start_time = self.time
             self.paused_time = None
             self.state = TimerState.RUNNING
-            logger.debug("Timer resumed")
+            logger.info("Timer resumed")
         elif self.running:
             logger.warning("Timer is already running.")
             return
@@ -236,7 +236,7 @@ class Timer:
         # Check if the specified interval has passed
         if elapsed_time - last_interval_time >= interval:
             self.named_intervals[name] = last_interval_time + interval if catch_up else elapsed_time # Reset last_interval_time
-            logger.debug(f"Interval '{name}' elapsed. Next check in {interval:.3f}s")
+            #logger.debug(f"Interval '{name}' elapsed. Next check in {interval:.3f}s")
             return True
         else:
             return False

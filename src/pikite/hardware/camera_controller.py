@@ -409,7 +409,7 @@ class PreviewStream:
                 await asyncio.sleep(FRAME_RATE)
 
         except asyncio.CancelledError:
-            logger.debug("Preview stream cancelled")
+            logger.info("Preview stream cancelled")
 
     async def stream(self):
         while True:
@@ -421,8 +421,6 @@ class PreviewStream:
                 frame = await self.latest_frame.get()
             except asyncio.CancelledError:
                 continue
-
-            logger.debug("Transmitting preview frame")
 
             self.server.send({
                 "type": "preview_frame",
