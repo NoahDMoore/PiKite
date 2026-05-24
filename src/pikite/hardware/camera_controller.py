@@ -409,7 +409,7 @@ class PreviewStream:
                 logger.debug("Preview interval elapsed.")
 
                 frame = self.camera.picam2.capture_array("lores")
-                cv2.cvtColor(frame, cv2.COLOR_YUV2RGB_I420)
+                frame = cv2.cvtColor(frame, cv2.COLOR_YUV2RGB_I420)
                 image = Image.fromarray(frame)
                 buffer = io.BytesIO()
                 image.save(buffer, format="JPEG", quality=70)
