@@ -374,7 +374,14 @@ class PreviewStream:
             self.preview_task = None
 
         self.timer.stop()
-        self.latest_frame = asyncio.Queue(maxsize=1)            
+        self._clear_frame_queue()
+
+    def _clear_frame_queue(self):
+        while not self.latest_frame.empty():
+            try:
+                self.latest_frame.get_nowait()
+            except asyncio.QueueEmpty:
+                break
 
     async def _preview_stream(self):
         """
