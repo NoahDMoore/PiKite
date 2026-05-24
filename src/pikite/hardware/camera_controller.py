@@ -393,7 +393,6 @@ class PreviewStream:
 
         try:
             while self.streaming:
-                logger.debug("In streaming loop")
                 if not self.timer.interval_elapsed(1):
                     await asyncio.sleep(0.05)
                     continue
