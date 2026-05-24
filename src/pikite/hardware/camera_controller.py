@@ -387,7 +387,7 @@ class PreviewStream:
             except ValueError as e:
                 logger.warning(e)
                 return
-        logger.debug("In _preview_stream")
+
         FRAME_RATE = 1 / 30  # 30 FPS
 
         try:
@@ -413,7 +413,6 @@ class PreviewStream:
     async def stream(self):
         while True:
             if not self.streaming:
-                logger.debug("NOT STREAMING")
                 await asyncio.sleep(0.05)
                 continue
 
