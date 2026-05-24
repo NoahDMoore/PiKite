@@ -420,9 +420,6 @@ class PreviewStream:
                 await asyncio.sleep(0.05)
                 continue
 
-            try:
-                frame = await self.latest_frame.get()
-            except asyncio.CancelledError:
-                continue
+            frame = await self.latest_frame.get()
 
             self.server.send(frame)
