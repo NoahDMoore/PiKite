@@ -406,8 +406,6 @@ class PreviewStream:
                     await asyncio.sleep(0.01)
                     continue
 
-                logger.debug("Preview interval elapsed.")
-
                 frame = self.camera.picam2.capture_array("lores")
                 frame = cv2.cvtColor(frame, cv2.COLOR_YUV2RGB_I420)
                 image = Image.fromarray(frame)
