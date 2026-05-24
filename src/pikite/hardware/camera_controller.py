@@ -416,15 +416,10 @@ class PreviewStream:
 
                 image = buffer.getvalue()
                 
-                if self.latest_frame.full():
-                    try:
-                        self.latest_frame.get_nowait()
-                    except asyncio.QueueEmpty:
-                        pass
-
-                self.latest_frame.put_nowait(image)
+                await self.latest_frame.put(image)
 
                 await asyncio.sleep(0)
+
         except asyncio.CancelledError:
             logger.info("Preview stream cancelled")
 
