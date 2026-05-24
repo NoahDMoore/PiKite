@@ -100,7 +100,7 @@ class ControllerServer:
                     await self.register_websocket_client(ws) # Register the WebSocket connection
                 finally:
                     self.websocket_connected = False
-                    self.outgoing_messages = asyncio.Queue() # Clear outgoing messages buffer when client disconnects
+                    self._clear_outgoing_messages # Clear outgoing messages buffer when client disconnects
                     logger.info(f"WebSocket connection closed for client: {request.client_addr}")
             except Exception as e:
                 logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
@@ -354,6 +354,13 @@ class ControllerServer:
                 logger.error("Invalid Message Type: Messages must be a string or dict")
                 
             await asyncio.sleep(0)      # yield back to scheduler
+
+    def _clear_outgoing_messages(self):
+        while not self.outgoing_messages.empty():
+            try:
+                self.outgoing_messages.get_nowait()
+            except asyncio.QueueEmpty:
+                break
 
     async def get(self):
         """
