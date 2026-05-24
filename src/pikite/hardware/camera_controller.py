@@ -340,7 +340,6 @@ class PreviewStream:
         self.server = server
 
         self.timer = Timer()
-        self.timer.start()
 
         self.preview_task = None
         self.streaming = False
@@ -355,7 +354,7 @@ class PreviewStream:
             return
         
         self.streaming = True
-
+        self.timer.start()
         self.preview_task = asyncio.create_task(self._preview_stream())
 
     def stop(self):
