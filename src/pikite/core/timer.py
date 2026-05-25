@@ -19,12 +19,12 @@ class TimerState(Enum):
     PAUSED = auto()
 
 class Timer:
-    def __init__(self, name: str = str(sys._getframe(1).f_globals.get('__name__'))):
+    def __init__(self, name: str | None = None):
         """
         Initializes the Timer.
         
         Args:
-            name (str): A name for the Timer instance. Defaults to the Timer __name__.
+            name (str | None): A name for the Timer instance. If None, defaults to name of calling script.
         """
         print()
         self.start_time: float | None = None            # Used to store the time when the timer was started, reset, or resumed
@@ -34,7 +34,12 @@ class Timer:
         self.marks: dict[str, float | None] = {}
         self.named_intervals: dict[str, float] = {}
         self.state: TimerState = TimerState.STOPPED
-        self.name = name
+
+        if name is not None:
+            self.name = sys._getframe(1).f_globals.get('__name__')
+        else:
+            self.name = __name__
+        
         logger.info(f"Timer instance for {self.name} created")
 
     @property
