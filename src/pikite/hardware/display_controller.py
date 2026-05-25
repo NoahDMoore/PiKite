@@ -3,11 +3,15 @@ import time
 import board        # type: ignore
 import digitalio    # type: ignore
 
+import pikite.core.logger as logger_module
 from ..system.storage import StorageManager
 
 #Mini PiTFT
 from adafruit_rgb_display import st7789             # type: ignore
 from PIL import Image, ImageDraw, ImageFont
+
+# Setup Logger
+logger = logger_module.get_logger(__name__)
 
 # File Paths
 storage_manager = StorageManager()
@@ -27,10 +31,17 @@ class DisplayController:
     def __init__(self):
         """Initializes the DisplayController with the Mini PiTFT display."""
         # Setup the display
+        self.cs = digitalio.DigitalInOut(board.CE0)
+        self.dc = digitalio.DigitalInOut(board.D25)
+
+        self.backlight = digitalio.DigitalInOut(board.D22)
+        self.backlight.switch_to_output()
+        self.backlight.value = True
+
         self.display = st7789.ST7789(
             spi=board.SPI(),
-            cs=digitalio.DigitalInOut(board.CE0),
-            dc=digitalio.DigitalInOut(board.D25),
+            cs= self.cs,
+            dc=self.dc,
             rst=None,
             baudrate=64000000,
             width=135,
@@ -40,15 +51,19 @@ class DisplayController:
             rotation=90,
         )
 
-        self.backlight = digitalio.DigitalInOut(board.D22)
-        self.backlight.switch_to_output()
-        self.backlight.value = True
-
         self.IMAGE_WIDTH = self.display.height
         self.IMAGE_HEIGHT = self.display.width
 
         self.FONT30 = ImageFont.truetype(FONTS_DIR / "robotobold.ttf", 30)
         self.FONT25 = ImageFont.truetype(FONTS_DIR / "robotobold.ttf", 25)
+
+    def __enter__(self):
+        logger.debug("Entering DisplayController context manager")
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        logger.debug("Exiting DisplayController context manager")
+        self.close()
 
     def __repr__(self):
         """Return a string representation of the DisplayController."""
@@ -133,7 +148,7 @@ class DisplayController:
                 lcd_image = Image.open(message)
                 lcd_image = lcd_image.convert('RGBA')
             except Exception as e:
-                print(f"Error loading image: {e}")
+                logger.error(f"Error loading image: {e}")
                 return
         elif ":" in message:
             # Print a two-line message centered on the display
@@ -161,6 +176,11 @@ class DisplayController:
             canvas.text(((self.IMAGE_WIDTH - width) / 2, (self.IMAGE_HEIGHT - height) / 2), message, font=self.FONT30, fill=fg_color)
         
         self.display.image(lcd_image)
+
+    def close(self):
+        self.cs.deinit()
+        self.dc.deinit()
+        self.backlight.deinit()
 
 class GIF:
     """
