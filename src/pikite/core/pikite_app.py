@@ -582,9 +582,12 @@ class PiKiteApp:
         await self.remote_server.close()
         _advance_progress()
         
+        # Home Servos
+        self.home_pan_tilt()
+        _advance_progress()
+
         # Stop the Pan Servo
         self.pan_servo.stop()
-        _advance_progress()
         
         # Stop the Tilt Servo
         self.tilt_servo.stop()
