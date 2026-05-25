@@ -503,13 +503,23 @@
 	</menu_item>
 	
 	<menu_item name="system" message="System Info" action="display_system_info" parent="root" />
-	<menu_item name="poweroff" message="Shut Down?" action="submenu" parent="root" >
-		<menu_item name="cancelPoweroff" message="Really? [No]" action="return" parent="poweroff" />
-		<menu_item name="confirmPoweroff" message="Really? [Yes]" action="input_command" command="SHUTDOWN" parent="poweroff" />
-	</menu_item>
 
-	<menu_item name="reboot" message="Reboot?" action="submenu" parent="root">
-		<menu_item name="cancelReboot" message="Really? [No]" action="return" parent="reboot" />
-		<menu_item name="confirmReboot" message="Really? [Yes]" action="input_command" command="REBOOT" parent="reboot" />
+	<menu_item name="exitPiKite" message="Exit PiKite" action="submenu" parent="root">
+		<menu_item name="poweroff" message="Shut Down?" action="submenu" parent="root">
+			<menu_item name="cancelPoweroff" message="Really? [No]" action="return" parent="poweroff" />
+			<menu_item name="confirmPoweroff" message="Really? [Yes]" action="input_command" command="SHUTDOWN" parent="poweroff" />
+		</menu_item>
+
+		<menu_item name="reboot" message="Reboot?" action="submenu" parent="root">
+			<menu_item name="cancelReboot" message="Really? [No]" action="return" parent="reboot" />
+			<menu_item name="confirmReboot" message="Really? [Yes]" action="input_command" command="REBOOT" parent="reboot" />
+		</menu_item>
+
+		<menu_item name="exit" message="Close Application" action="submenu" parent="root">
+			<menu_item name="cancelCloseApp" message="Really? [No]" action="return" parent="exit" />
+			<menu_item name="confirmCloseApp" message="Really? [Yes]" action="input_command" command="EXIT" parent="exit" />
+		</menu_item>
+
+		<menu_item name="exitPiKiteReturn" message="Cancel Exit" action="return" parent="exitPiKite" />
 	</menu_item>
 </menu>

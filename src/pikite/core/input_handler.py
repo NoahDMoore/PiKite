@@ -32,6 +32,7 @@ class InputCommand(Enum):
     DISPLAY_SYSTEM_INFO = auto()
     SHUTDOWN = auto()
     REBOOT = auto()
+    EXIT = auto()
 
     # Remote Commands
     FETCH_SETTINGS = auto()

@@ -220,6 +220,12 @@ class PiKiteApp:
         )
 
         self.input_handler.register(
+            scope=InputScope.MENU,
+            command=InputCommand.EXIT,
+            callback=self.exit
+        )
+
+        self.input_handler.register(
             scope=InputScope.SYSTEM_INFO,
             command=InputCommand.NEXT,
             callback=lambda: self.input_handler.set_scope(InputScope.MENU)
