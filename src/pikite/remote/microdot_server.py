@@ -111,7 +111,7 @@ class ControllerServer:
                     if not self.active_websockets:
                         self.websocket_connected = False
 
-                    self._clear_outgoing_messages() # Clear outgoing messages buffer when client disconnects
+                    self._clear_outgoing_messages # Clear outgoing messages buffer when client disconnects
                     
                     logger.info(f"WebSocket connection closed for client: {request.client_addr}")
             except Exception as e:
@@ -330,18 +330,12 @@ class ControllerServer:
         Args:
             ws: The WebSocket connection object.
         """
-        try:
-            while True:
-                message = await ws.receive() # Receive message from websocket client
-                await self.incoming_messages.put(message) # Store message for retrieval in the incoming_messages buffer
-                logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
+        while True:
+            message = await ws.receive() # Receive message from websocket client
+            await self.incoming_messages.put(message) # Store message for retrieval in the incoming_messages buffer
+            logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
 
-                await asyncio.sleep(0)      # yield back to scheduler
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:
-            logger.info(f"Controller Server RX loop ended: {e}")
-            return
+            await asyncio.sleep(0)      # yield back to scheduler
 
     async def _tx_loop(self, ws: WebSocket):
         """
@@ -353,31 +347,25 @@ class ControllerServer:
         Raises:
             TypeError: If the message type is not string or dict.
         """
-        try:
-            while True:
-                message = await self.outgoing_messages.get() # Wait for a message to be available in the outgoing_messages queue
-                try:
-                    # If the raw message is a string, wrap it in JSON object
-                    if isinstance(message, str):
-                        payload = json.dumps({"state": "Message: " + message})
-                    elif isinstance(message, dict):
-                        payload = json.dumps(message)
-                    elif isinstance(message, bytes):
-                        payload = message
-                    else:
-                        raise TypeError
+        while True:
+            message = await self.outgoing_messages.get() # Wait for a message to be available in the outgoing_messages queue
+            try:
+                # If the raw message is a string, wrap it in JSON object
+                if isinstance(message, str):
+                    payload = json.dumps({"state": "Message: " + message})
+                elif isinstance(message, dict):
+                    payload = json.dumps(message)
+                elif isinstance(message, bytes):
+                    payload = message
+                else:
+                    raise TypeError
 
-                    #logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
-                    await ws.send(payload)  # Send message to websocket client
-                except TypeError:
-                    logger.error("Invalid Message Type: Messages must be a string or dict")
-                    
-                await asyncio.sleep(0)      # yield back to scheduler
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:
-            logger.info(f"ControllerServer TX loop ended: {e}")
-            return
+                #logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
+                await ws.send(payload)  # Send message to websocket client
+            except TypeError:
+                logger.error("Invalid Message Type: Messages must be a string or dict")
+                
+            await asyncio.sleep(0)      # yield back to scheduler
 
     def _clear_outgoing_messages(self):
         while not self.outgoing_messages.empty():
