@@ -595,10 +595,11 @@ class PiKiteApp:
         _advance_progress()
 
         # Log and display message indicating the app has closed
-        logger.info("PiKite clean-up complete. Closing application.")
         
         self.display_controller.print_message(
             message="PiKite Closed",
             bg_color=(0,0,0),
             fg_color=(255,255,255)
         )
+        
+        logger.info("PiKite clean-up complete. Closing application.")
