@@ -601,5 +601,8 @@ class PiKiteApp:
             bg_color=(0,0,0),
             fg_color=(255,255,255)
         )
-        
+
+        # Cleanup Display Controller
+        self.display_controller.close()
+
         logger.info("PiKite clean-up complete. Closing application.")
