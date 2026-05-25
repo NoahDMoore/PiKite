@@ -522,7 +522,7 @@ class PiKiteApp:
             self.main_loop()
         )
 
-        self.on_close
+        self.on_close()
 
     def register_on_close_callback(self, callback: Callable):
         self.on_close_callback = callback
