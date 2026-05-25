@@ -30,7 +30,7 @@ class CaptureSession:
         self.preparing_to_stop = False
 
         # Mark the start of the capture session for runtime tracking
-        self.app.timer.mark("capture_loop_start")
+        self.app.timer.mark("capture_session_start")
         self.session_start_time = datetime.now()
         
         # Determine capture mode based on application settings
@@ -149,7 +149,7 @@ class CaptureSession:
     @property
     def runtime(self):
         """Calculate the runtime of the capture session."""
-        return self.app.timer.since_mark("capture_loop_start")
+        return self.app.timer.since_mark("capture_session_start")
 
     @property
     def runtime_string(self):
