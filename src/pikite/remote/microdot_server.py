@@ -307,10 +307,36 @@ class ControllerServer:
         Args:
             ws: The WebSocket connection object.
         """
+        rx_task = asyncio.create_task(self._rx_loop(ws))
+        tx_task = asyncio.create_task(self._tx_loop(ws))
+
         try:
-            await asyncio.gather(self._rx_loop(ws), self._tx_loop(ws))
+            # Wait until one task exits/fails
+            done, pending = await asyncio.wait(
+                [rx_task, tx_task],
+                return_when=asyncio.FIRST_COMPLETED
+            )
+
+            # Raise exceptions from completed tasks
+            for task in done:
+                e = task.exception()
+                if e:
+                    raise e
         except Exception as e:
             logger.info(f"WebSocket Error: {e}")
+
+        finally:
+            # Cancel anything still running
+            for task in (rx_task, tx_task):
+                if not task.done():
+                    task.cancel()
+
+            # Wait for cancellation to complete
+            await asyncio.gather(
+                rx_task,
+                tx_task,
+                return_exceptions=True
+            )
 
     def register_auth_token(self) -> str:
         """
@@ -338,9 +364,10 @@ class ControllerServer:
 
                 await asyncio.sleep(0)      # yield back to scheduler
         except asyncio.CancelledError:
+            logger.debug("ControllerServer RX loop task cancelled.")
             raise
         except Exception as e:
-            logger.info(f"Controller Server RX loop ended: {e}")
+            logger.info(f"ControllerServer RX loop ended: {e}")
             return
 
     async def _tx_loop(self, ws: WebSocket):
@@ -374,6 +401,7 @@ class ControllerServer:
                     
                 await asyncio.sleep(0)      # yield back to scheduler
         except asyncio.CancelledError:
+            logger.debug("ControllerServer TX loop task cancelled.")
             raise
         except Exception as e:
             logger.info(f"ControllerServer TX loop ended: {e}")
