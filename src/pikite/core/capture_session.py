@@ -55,14 +55,20 @@ class CaptureSession:
         self.pan_tilt_pattern = self._create_pan_tilt_pattern()
         self.pan_tilt_interval = self.app.settings.get("pan_tilt_interval", 30)
 
-        # Initialize handlers for remote session info requests
+        # Initialize handlers for capture session
         self.info_handler = {
             "scope":InputScope.CAPTURE_LOOP,
             "command":InputCommand.REQUEST_SESSION_INFO,
             "callback":self.tx_session_info
         }
-
         self.app.input_handler.register(**self.info_handler)
+
+        self.stop_capture_handler = {
+            "scope":InputScope.CAPTURE_LOOP,
+            "command":InputCommand.STOP_CAPTURE,
+            "callback":self._prepare_to_stop
+        }
+        self.app.input_handler.register(**self.stop_capture_handler)
 
         # Initialize media path arguments
         self.media_path_args = {
@@ -191,6 +197,9 @@ class CaptureSession:
         }
         self.app.remote_server.send(session_end_payload)
 
+    def _prepare_to_stop(self):
+        self.preparing_to_stop = True
+
     def close(self):
         """Perform cleanup for the capture session."""
         # Close altitude CSV file
@@ -201,5 +210,6 @@ class CaptureSession:
 
         # Unregister capture loop specific input handlers
         self.app.input_handler.unregister(**self.info_handler)
+        self.app.input_handler.unregister(**self.stop_capture_handler)
 
         logger.info("Capture session closed. Cleanup complete.")

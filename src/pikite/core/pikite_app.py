@@ -339,12 +339,6 @@ class PiKiteApp:
             callback=self.rx_tilt_command
         )
 
-        self.input_handler.register(
-            scope=InputScope.CAPTURE_LOOP,
-            command=InputCommand.STOP_CAPTURE,
-            callback=lambda: self.input_handler.set_scope(InputScope.MENU)
-        )
-
     """Capture Loop Helper Methods"""
 
     def get_media_path(self, capture_mode, media_extension, session_dir):
@@ -466,12 +460,8 @@ class PiKiteApp:
                     if self.timer.interval_elapsed(session.pan_tilt_interval, "pan_tilt_interval") and not self.is_recording:
                         await self.step_pan_tilt(session.pan_tilt_pattern)
 
-                    if self.input_handler.active_scope != InputScope.CAPTURE_LOOP:
-                        # Signal that the capture_loop will end after the current loop or, if recording, once the recording has finished.
-                        if self.is_recording:
-                            session.preparing_to_stop = True
-                        else:
-                            session.loop = False
+                    if session.preparing_to_stop and not self.is_recording:
+                        session.loop = False
 
                     await asyncio.sleep(0.01)
         finally:
@@ -504,6 +494,7 @@ class PiKiteApp:
                 await self.capture_loop()
                 await asyncio.sleep(2)
                 self.preview.start()
+                self.input_handler.set_scope(InputScope.MENU)
 
             elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
                 display_system_info(self.display_controller) # type: ignore
