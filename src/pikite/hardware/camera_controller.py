@@ -340,7 +340,7 @@ class PreviewStream:
         self.camera = camera
         self.server = server
 
-        self.timer = Timer()
+        self.timer = Timer(name=f"{__name__}.{__class__.__name__}")
 
         self._active = True
 
