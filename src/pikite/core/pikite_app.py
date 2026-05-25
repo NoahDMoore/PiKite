@@ -490,11 +490,13 @@ class PiKiteApp:
                     pass
 
                 elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
-                    self.preview.stop()
+                    await self.preview.stop()
 
                     await self.capture_loop()
                     await asyncio.sleep(2)
+
                     self.preview.start()
+                    
                     self.input_handler.set_scope(InputScope.MENU)
 
                 elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
@@ -538,7 +540,7 @@ class PiKiteApp:
         _advance_progress()
 
         # Cleanup Camera Preview Stream
-        self.preview.close()
+        await self.preview.close()
         _advance_progress()
         
         # Cleanup RemoteInput

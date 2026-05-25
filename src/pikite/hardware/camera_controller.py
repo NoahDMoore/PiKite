@@ -360,7 +360,7 @@ class PreviewStream:
         logger.debug("Starting preview task.")
         self.preview_task = asyncio.create_task(self._preview_stream())
 
-    def stop(self):
+    async def stop(self):
         """
         Stop preview frame generator to end streaming preview of camera output.
         """
@@ -370,16 +370,19 @@ class PreviewStream:
         
         self.streaming = False
 
-        if self.preview_task is not None:
+        if self.preview_task is not None and not self.preview_task.done():
             logger.debug("Canceling preview task.")
             self.preview_task.cancel()
-            self.preview_task = None
+            try:
+                await self.preview_task
+            except asyncio.CancelledError:    
+                self.preview_task = None
 
         self.timer.stop()
         self._clear_frame_queue()
 
-    def close(self):
-        self.stop()
+    async def close(self):
+        await self.stop()
         self._active = False
 
     def _clear_frame_queue(self):
