@@ -218,6 +218,7 @@ class RemoteInput:
         while self._active:
             print("LISTENING")
             if self.server.incoming_messages.empty:
+                await asyncio.sleep(0.1)
                 continue
 
             message = await self.server.get()
