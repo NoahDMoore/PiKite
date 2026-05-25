@@ -80,8 +80,6 @@ updateButtonStates()
 var pikite_scope = null
 status_badge = document.getElementById("status-badge");
 
-capturePreview = document.getElementById("camera-feed");
-
 function loadSessionInfo(info) {
     document.getElementById("session-start").textContent = info.session_start || "N/A";
     document.getElementById("capture-mode").textContent = info.capture_mode || "N/A";
@@ -152,15 +150,15 @@ function endCaptureSession(info) {
 
 // Camera Feed
 
+capturePreview = document.getElementById("camera-feed");
 let currentPreviewUrl = null;
-camera_preview_badge = document.getElementById("camera-preview-badge");
+capture_preview_badge = document.getElementById("camera-preview-badge");
 
 function updateCapturePreview(obj) {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
         if (obj instanceof Blob) {
             const blob = obj
             const newUrl = URL.createObjectURL(blob);
-            const preview = document.getElementById("capture-preview");
 
             capturePreview.onload = function () {
                 if (currentPreviewUrl !== null) {
@@ -172,17 +170,21 @@ function updateCapturePreview(obj) {
 
             capturePreview.src = newUrl;
 
-            camera_preview_badge.classList.remove("last-capture");
-            camera_preview_badge.classList.add("preview");
-            camera_preview_badge.dataset.badgeCaption = "Live Preview";
+            if (capture_preview_badge.classList.contains("last-capture")) {
+                capture_preview_badge.classList.remove("last-capture");
+                capture_preview_badge.classList.add("preview");
+                capture_preview_badge.dataset.badgeCaption = "Live Preview";
+            }
 
         } else if (obj.type == "last_captured_photo") {
             file_path = obj.file_path;
             capturePreview.src = file_path + "?" + new Date().getTime();
 
-            camera_preview_badge.classList.remove("preview");
-            camera_preview_badge.classList.add("last-capture");
-            camera_preview_badge.dataset.badgeCaption = "Last Captured Image";
+            if (capture_preview_badge.classList.contains("preview")) {
+                capture_preview_badge.classList.remove("preview");
+                capture_preview_badge.classList.add("last-capture");
+                capture_preview_badge.dataset.badgeCaption = "Last Captured Image";
+            }
         }
     }
 }
