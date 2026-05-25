@@ -341,6 +341,8 @@ class PreviewStream:
 
         self.timer = Timer()
 
+        self._active = True
+
         self.preview_task = None
         self.streaming = False
         self.latest_frame = asyncio.Queue(maxsize=1)
@@ -375,6 +377,10 @@ class PreviewStream:
 
         self.timer.stop()
         self._clear_frame_queue()
+
+    def close(self):
+        self.stop()
+        self._active = False
 
     def _clear_frame_queue(self):
         while not self.latest_frame.empty():
@@ -424,7 +430,7 @@ class PreviewStream:
             logger.info("Preview stream cancelled")
 
     async def stream(self):
-        while True:
+        while self._active:
             if not self.streaming:
                 await asyncio.sleep(0.05)
                 continue
