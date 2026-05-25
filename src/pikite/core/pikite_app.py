@@ -90,6 +90,7 @@ class PiKiteApp:
         logger.info("PiKite Application Initialized")
 
         self.application_running = False
+        self.on_close_callback = None
 
     def _on_setting_change(self, setting_key, section, new_value):
         logger.info(f"Setting Change Detected: {setting_key} changed to {new_value} in section {section}")
