@@ -438,7 +438,7 @@ class PreviewStream:
         try:
             while self._active:
                 if not self.streaming:
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(0)
                     
                     if not self._active:
                         break
