@@ -7,7 +7,6 @@ function for high-resolution timing.
 
 from math import floor
 import time
-import datetime
 from enum import Enum, auto
 from .logger import get_logger
 
@@ -19,8 +18,13 @@ class TimerState(Enum):
     PAUSED = auto()
 
 class Timer:
-    def __init__(self):
-        """Initializes the Timer."""
+    def __init__(self, name: str = __name__):
+        """
+        Initializes the Timer.
+        
+        Args:
+            name (str): A name for the Timer instance. Defaults to the Timer __name__.
+        """
         self.start_time: float | None = None            # Used to store the time when the timer was started, reset, or resumed
         self.initial_start_time: float | None = None    # Used to store the time when the timer was started
         self.paused_time: float | None = None
@@ -28,7 +32,8 @@ class Timer:
         self.marks: dict[str, float | None] = {}
         self.named_intervals: dict[str, float] = {}
         self.state: TimerState = TimerState.STOPPED
-        logger.debug("Timer instance created")
+        self.name = name
+        logger.info(f"Timer instance for {self.name} created")
 
     @property
     def time(self) -> float:
@@ -69,7 +74,7 @@ class Timer:
     def start(self):
         """Starts the timer."""
         if self.running or self.paused:
-            logger.warning("Timer is already started. Cannot start again.")
+            logger.warning(f"Timer for {self.name} is already started. Cannot start again.")
             return
         else:
             self.start_time = self.time
@@ -79,7 +84,7 @@ class Timer:
             self.marks.clear()
             self.named_intervals.clear()
             self.state = TimerState.RUNNING
-            logger.info("Timer started")
+            logger.info(f"Timer for {self.name} started")
 
     def reset(self, clear_intervals: bool = True):
         """Resets the current timer state."""
@@ -101,7 +106,7 @@ class Timer:
     def stop(self) -> float | None:
         """Stops the timer and returns the total elapsed time."""
         if self.stopped:
-            logger.warning("Timer is not running. Cannot stop.")
+            logger.warning(f"Timer for {self.name} is not running. Cannot stop.")
             return None
         else:
             elapsed = self.elapsed()
@@ -112,7 +117,7 @@ class Timer:
             self.marks.clear()
             self.named_intervals.clear()
             self.state = TimerState.STOPPED
-            logger.info(f"Timer stopped. Elapsed time: {elapsed:.3f}s")
+            logger.info(f"Timer for {self.name} stopped. Elapsed time: {elapsed:.3f}s")
             return elapsed
     
     def pause(self):
@@ -122,12 +127,12 @@ class Timer:
             self.accumulated += (self.paused_time - self.start_time)  # type: ignore (to suppress mypy warning; start_time and paused_time cannot be None if running is True)
             self.start_time = None
             self.state = TimerState.PAUSED
-            logger.info(f"Timer paused. Accumulated time: {self.accumulated:.3f}s")
+            logger.info(f"Timer for {self.name} paused. Accumulated time: {self.accumulated:.3f}s")
         elif self.stopped:
-            logger.warning("Timer is not running. Cannot pause.")
+            logger.warning(f"Timer for {self.name} is not running. Cannot pause.")
             return
         else:
-            logger.warning("Timer is already paused.")
+            logger.warning(f"Timer for {self.name} is already paused.")
             return
     
     def resume(self):
@@ -136,12 +141,12 @@ class Timer:
             self.start_time = self.time
             self.paused_time = None
             self.state = TimerState.RUNNING
-            logger.info("Timer resumed")
+            logger.info(f"Timer for {self.name} resumed")
         elif self.running:
-            logger.warning("Timer is already running.")
+            logger.warning(f"Timer for {self.name} is already running.")
             return
         else:
-            logger.warning("Timer is not paused.")
+            logger.warning(f"Timer for {self.name} is not paused.")
             return
 
     def elapsed(self) -> float | None:
@@ -156,7 +161,7 @@ class Timer:
         elif self.paused:
             return self.accumulated
         else:
-            logger.warning("Timer is not running or paused. Cannot calculate elapsed time.")
+            logger.warning(f"Timer for {self.name} is not running or paused. Cannot calculate elapsed time.")
             return None
     
     def mark(self, name: str) -> None:
@@ -167,9 +172,9 @@ class Timer:
         """
         if self.running or self.paused:
             self.marks[name] = self.elapsed()
-            logger.debug(f"Mark '{name}' set at {self.marks[name]:.3f}s")
+            logger.debug(f"Mark '{name}' set at {self.marks[name]:.3f}s [Timer: {self.name}]")
         else:
-            logger.warning("Timer is not running or paused. Cannot set mark.")
+            logger.warning(f"Timer for {self.name} is not running or paused. Cannot set mark.")
 
     def since_mark(self, name: str) -> float | None:
         """Returns the time since a specific mark.
@@ -181,16 +186,16 @@ class Timer:
             float | None: Time in seconds since the mark was set, or None if the mark does not exist.
         """
         if self.stopped:
-            logger.warning("Timer is not running or paused. Cannot calculate time since mark.")
+            logger.warning(f"Timer for {self.name} is not running or paused. Cannot calculate time since mark.")
             return None
 
         mark = self.marks.get(name, None)
         if mark is not None:
             time_since = self.elapsed() - mark    # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
-            logger.debug(f"Time since mark '{name}': {time_since:.3f}s")
+            logger.debug(f"Time since mark '{name}': {time_since:.3f}s [Timer: {self.name}]")
             return time_since
         else:
-            logger.warning(f"Mark '{name}' does not exist.")
+            logger.warning(f"Mark '{name}' does not exist. [Timer: {self.name}]")
             return None
 
     def set_named_interval(self, name: str) -> None:
@@ -201,9 +206,9 @@ class Timer:
         """
         if self.running or self.paused:
             self.named_intervals[name] = self.elapsed()     # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
-            logger.debug(f"Named interval '{name}' set at {self.named_intervals[name]:.3f}s")
+            logger.debug(f"Named interval '{name}' set at {self.named_intervals[name]:.3f}s [Timer: {self.name}]")
         else:
-            logger.warning("Timer is not running or paused. Cannot create named interval.")
+            logger.warning(f"Timer for {self.name} is not running or paused. Cannot create named interval.")
 
     def interval_elapsed(self, interval: float, name: str = "_default", catch_up: bool = True) -> bool:
         """Checks if the specified interval has passed since the last check.
@@ -223,20 +228,20 @@ class Timer:
         last_interval_time = self.named_intervals.get(name, None)
 
         if last_interval_time is None:
-            logger.debug(f"Interval '{name}' does not exist. Creating a new one.")
+            logger.debug(f"Interval '{name}' does not exist. Creating a new one. [Timer: {self.name}]")
             self.set_named_interval(name)
             return False
         
         elapsed_time = self.elapsed()
 
         if elapsed_time is None:
-            logger.warning("Timer is not running or paused. Cannot check interval.")
+            logger.warning(f"Timer for {self.name} is not running or paused. Cannot check interval.")
             return False
         
         # Check if the specified interval has passed
         if elapsed_time - last_interval_time >= interval:
             self.named_intervals[name] = last_interval_time + interval if catch_up else elapsed_time # Reset last_interval_time
-            #logger.debug(f"Interval '{name}' elapsed. Next check in {interval:.3f}s")
+            #logger.debug(f"Interval '{name}' elapsed. Next check in {interval:.3f}s [Timer: {self.name}]")
             return True
         else:
             return False
@@ -252,24 +257,24 @@ class Timer:
             float | None: Remaining time in seconds until the interval elapses, or None if the timer is stopped or paused.
         """
         if self.stopped or self.paused:
-            logger.warning("Timer is not running or paused. Cannot check interval remaining time.")
+            logger.warning(f"Timer for {self.name} is not running or paused. Cannot check interval remaining time.")
             return None
 
         last_interval_time = self.named_intervals.get(name, None)
 
         if last_interval_time is None:
-            logger.debug(f"Interval '{name}' does not exist. Creating a new one.")
+            logger.debug(f"Interval '{name}' does not exist. Creating a new one. [Timer: {self.name}]")
             self.set_named_interval(name)
             return interval
         
         elapsed_time = self.elapsed()
 
         if elapsed_time is None:
-            logger.warning("Timer is not running or paused. Cannot check interval remaining time.")
+            logger.warning(f"Timer for {self.name} is not running or paused. Cannot check interval remaining time.")
             return None
         
         remaining_time = max(0.0, interval - (elapsed_time - last_interval_time))
-        logger.debug(f"Interval '{name}' remaining time: {remaining_time:.3f}s")
+        logger.debug(f"Interval '{name}' remaining time: {remaining_time:.3f}s [Timer: {self.name}]")
         return remaining_time
         
     def format_elapsed_time(self, time_in_seconds):
@@ -304,7 +309,7 @@ class Timer:
         Waits until a callable condition returns True or timeout expires.
 
         Args:
-            condition (Callable): Function returning bool.
+            condition (Callable): Function returning bool on which to wait.
             timeout (float): Max seconds to wait.
             poll_interval (float): Sleep interval between checks.
 
@@ -313,9 +318,9 @@ class Timer:
             TimeoutError: If timeout is exceeded.
         """
         if not self.running:
-            raise RuntimeError("Timer must be running to use wait_until")
+            raise RuntimeError("Timer for {self.name} must be running to use wait_until")
 
         while not condition():
             if self.elapsed() >= timeout: # type: ignore (to suppress mypy warning; elapsed() cannot return None if the timer is running or paused)
-                raise TimeoutError("Condition wait timed out")
+                raise TimeoutError(f"Condition wait timed out for wait_until [Timer: {self.name}]")
             self.wait(poll_interval)
