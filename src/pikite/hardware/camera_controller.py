@@ -386,6 +386,7 @@ class PreviewStream:
         await self.stop()
         self._active = False
         self.latest_frame.put_nowait("CLOSE") # Ensure stream loop breaks await by adding to latest_frame queue
+        await asyncio.sleep(0.5)
 
     def _clear_frame_queue(self):
         while not self.latest_frame.empty():
