@@ -26,7 +26,6 @@ class Timer:
         Args:
             name (str | None): A name for the Timer instance. If None, defaults to name of calling script.
         """
-        print(sys._getframe(1).f_globals.get('__name__'))
         self.start_time: float | None = None            # Used to store the time when the timer was started, reset, or resumed
         self.initial_start_time: float | None = None    # Used to store the time when the timer was started
         self.paused_time: float | None = None
@@ -35,10 +34,10 @@ class Timer:
         self.named_intervals: dict[str, float] = {}
         self.state: TimerState = TimerState.STOPPED
 
-        if name is not None:
+        if name is None:
             self.name = sys._getframe(1).f_globals.get('__name__')
         else:
-            self.name = __name__
+            self.name = name
         
         logger.info(f"Timer instance for {self.name} created")
 
