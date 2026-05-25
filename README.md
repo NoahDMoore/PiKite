@@ -126,6 +126,25 @@ sudo ~/.local/bin/poetry run python -m pikite
 
 This runs the entrypoint defined in `__main__.py`. and expects hardware as defined below.
 
+### Setting Up a System Service to Run on Startup
+```bash
+sudo cp ~/PiKite/pikite.service /etc/systemd/system/pikite.service
+sudo nano /etc/systemd/system/pikite.service
+# Then update the service file to your username. Save and exit the service file.
+
+sudo systemctl daemon-reload
+sudo systemctl enable pikite.service
+
+#To Start the service immediately:
+sudo systemctl start pikite.service
+
+# To Stop the service:
+sudo systemctl stop pikite.service
+
+# To Disable Autorun on boot
+sudo systemctl disable pikite.service
+```
+
 ---
 ## Recommended Hardware
 
