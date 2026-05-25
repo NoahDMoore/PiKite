@@ -358,7 +358,7 @@ class PreviewStream:
         
         self.streaming = True
         self.timer.start()
-        logger.info("Starting preview task.")
+        logger.debug("Starting preview task.")
         self.preview_task = asyncio.create_task(self._preview_stream())
 
     async def stop(self):
@@ -440,7 +440,7 @@ class PreviewStream:
         logger.info("Camera preview stream stopped")
 
     async def stream(self):
-        logger.info("Camera preview stream initialized.")
+        logger.info("Camera preview stream ready.")
         try:
             while self._active:
                 if not self.streaming:
