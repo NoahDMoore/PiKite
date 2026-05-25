@@ -386,6 +386,7 @@ class PreviewStream:
         await self.stop()
         logger.info("Camera preview stream stopped.")
         self._active = False
+        self.latest_frame.put_nowait("CLOSE")
 
     def _clear_frame_queue(self):
         while not self.latest_frame.empty():
@@ -443,6 +444,9 @@ class PreviewStream:
             print("STREAMING")
 
             frame = await self.latest_frame.get()
+
+            if frame == "CLOSE":
+                break
 
             self.server.send(frame)
 
