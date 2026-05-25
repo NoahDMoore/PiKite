@@ -22,7 +22,8 @@ from ..core.timer import Timer
 # Setup Logger
 logger = get_logger(__name__)
 
-timer = Timer(name=sys._getframe(1).f_locals['self'].__class__)
+# Initialize Timer
+timer = Timer()
 
 class TiltServo:
     """
