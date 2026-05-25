@@ -152,7 +152,7 @@ function endCaptureSession(info) {
 
 capturePreview = document.getElementById("camera-feed");
 let currentPreviewUrl = null;
-capture_preview_badge = document.getElementById("camera-preview-badge");
+capture_preview_badge = document.getElementById("capture-preview-badge");
 
 function updateCapturePreview(obj) {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
