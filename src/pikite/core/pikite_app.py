@@ -496,7 +496,7 @@ class PiKiteApp:
                     await asyncio.sleep(2)
 
                     self.preview.start()
-                    
+
                     self.input_handler.set_scope(InputScope.MENU)
 
                 elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
@@ -529,7 +529,7 @@ class PiKiteApp:
                 cleanup_progress_bar.advance(10)
 
         try:
-            cleanup_progress_bar = LoadingBar("Loading PiKite", self.display_controller)
+            cleanup_progress_bar = LoadingBar("Closing PiKite", self.display_controller)
         except:
             cleanup_progress_bar = None
         _advance_progress()
