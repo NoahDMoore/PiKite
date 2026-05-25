@@ -15,14 +15,19 @@ logger = logger_module.get_logger(__name__)
 
 class CaptureSession:
     """Class to store parameters for a PiKiteApp capture session."""
-    def __init__(self, app: "PiKiteApp"):
+    def __init__(self, app: "PiKiteApp", loop: bool = True):
         """
         Initialization for a PiKiteApp CaptureSession
 
         Args:
             app (PiKiteApp): The main PiKiteApp application instance.
+            loop (bool): Flag to signal a capture session loop. Default is True.
         """
         self.app = app
+
+        # Set flags for capture_loop logic
+        self.loop = loop
+        self.preparing_to_stop = False
 
         # Mark the start of the capture session for runtime tracking
         self.app.timer.mark("capture_loop_start")

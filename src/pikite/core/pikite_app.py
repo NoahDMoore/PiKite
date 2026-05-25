@@ -86,9 +86,6 @@ class PiKiteApp:
         # Initialize Menu System
         self.menu = self.initialize_menu()
 
-        # Session Variables
-        self.capturing = False
-
         logger.info("PiKite Application Initialized")
 
     def _on_setting_change(self, setting_key, section, new_value):
@@ -428,14 +425,9 @@ class PiKiteApp:
         """
         try:
             logger.info("Starting Capture Loop")
-            self.capturing = True   # Set capturing flag to True at the start of the loop
 
             with CaptureSession(self) as session:
-                while self.capturing or self.is_recording:
-                    if self.input_handler.active_scope != InputScope.CAPTURE_LOOP:
-                        # Signal that the capture_loop will end after the current loop or once the recording has finished.
-                        self.capturing = False
-
+                while session.loop:
                     if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
                         self.display_controller.print_message(f"PiKite Running: {session.runtime_string}")
                         session.tx_session_update() # Send session update to remote client
@@ -459,20 +451,27 @@ class PiKiteApp:
                                 self.timer.set_named_interval("video_length")
                                 
                     if self.is_recording:
+                        # If capture has been stopped but video is still recording, log time remaining until recording stops
+                        if session.preparing_to_stop:
+                            if self.timer.interval_elapsed(1.0, "time_remaining_check"):
+                                time_remaining = self.timer.interval_remaining(session.video_length, "video_length")
+                                logger.info(f"Capture loop ending, but video is still recording. Waiting for recording to finish... {time_remaining:.1f}s remaining.")
+                        
                         if self.timer.interval_elapsed(session.video_length, "video_length"):
                             self.stop_video()
                             session.capture_count += 1
                             self.timer.set_named_interval("capture_interval")
                             self.timer.named_intervals.pop("video_length", None)  # Clear video length interval
 
-                        # If capture has been stopped but video is still recording, log time remaining until recording stops
-                        if not self.capturing:
-                            if self.timer.interval_elapsed(1.0, "time_remaining_check"):
-                                time_remaining = self.timer.interval_remaining(session.video_length, "video_length")
-                                logger.info(f"Capture loop ending, but video is still recording. Waiting for recording to finish... {time_remaining:.1f}s remaining.")
-
                     if self.timer.interval_elapsed(session.pan_tilt_interval, "pan_tilt_interval") and not self.is_recording:
                         await self.step_pan_tilt(session.pan_tilt_pattern)
+
+                    if self.input_handler.active_scope != InputScope.CAPTURE_LOOP:
+                        # Signal that the capture_loop will end after the current loop or, if recording, once the recording has finished.
+                        if self.is_recording:
+                            session.preparing_to_stop = True
+                        else:
+                            session.loop = False
 
                     await asyncio.sleep(0.01)
         finally:
