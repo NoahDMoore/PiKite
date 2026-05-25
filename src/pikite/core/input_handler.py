@@ -225,6 +225,8 @@ class RemoteInput:
             await self.handle_message(message)
             
             await asyncio.sleep(0)      # yield back to scheduler
+
+        logger.info("RemoteInput listener stopped.")
     
     async def handle_message(self, message):
         try:
