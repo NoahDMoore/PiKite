@@ -19,14 +19,14 @@ class TimerState(Enum):
     PAUSED = auto()
 
 class Timer:
-    def __init__(self, name: str = __name__):
+    def __init__(self, name: str = str(sys._getframe(1).f_globals.get('__name__'))):
         """
         Initializes the Timer.
         
         Args:
             name (str): A name for the Timer instance. Defaults to the Timer __name__.
         """
-        print(sys._getframe(1).f_globals.get('__name__'))
+        print()
         self.start_time: float | None = None            # Used to store the time when the timer was started, reset, or resumed
         self.initial_start_time: float | None = None    # Used to store the time when the timer was started
         self.paused_time: float | None = None
