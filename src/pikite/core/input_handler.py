@@ -213,14 +213,11 @@ class RemoteInput:
         self.server = server
         self.input_handler = input_handler
         self._active = True
-        self._listening = False
 
     async def start_listening(self):
-        self._listening = True
-
         while self._active:
             print("LISTENING")
-            if self.server.incoming_messages.empty:
+            if self.server.incoming_messages.empty():
                 await asyncio.sleep(0.1)
                 continue
 
@@ -229,7 +226,7 @@ class RemoteInput:
             
             await asyncio.sleep(0)      # yield back to scheduler
 
-        self._listening = False
+        logger.info("RemoteInput listener closed.")
     
     async def handle_message(self, message):
         try:
@@ -258,8 +255,3 @@ class RemoteInput:
 
     def close(self):
         self._active = False
-
-        while self._listening:
-            pass
-
-        logger.info("RemoteInput listener closed.")
