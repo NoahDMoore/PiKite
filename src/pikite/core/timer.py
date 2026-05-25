@@ -26,7 +26,7 @@ class Timer:
         Args:
             name (str | None): A name for the Timer instance. If None, defaults to name of calling script.
         """
-        print()
+        print(sys._getframe(1).f_globals.get('__name__'))
         self.start_time: float | None = None            # Used to store the time when the timer was started, reset, or resumed
         self.initial_start_time: float | None = None    # Used to store the time when the timer was started
         self.paused_time: float | None = None
