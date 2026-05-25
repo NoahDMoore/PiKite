@@ -182,6 +182,8 @@ class DisplayController:
         self.dc.deinit()
         self.backlight.deinit()
 
+        logger.info("DisplayController cleanup complete.")
+
 class GIF:
     """
     Class to handle GIF images for display on the Mini PiTFT.
