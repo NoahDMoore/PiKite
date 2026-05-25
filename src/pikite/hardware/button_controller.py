@@ -87,7 +87,7 @@ class ButtonController:
 
     def __exit__(self, exc_type, exc, tb):
         logger.info("Exiting ButtonController context")
-        self.cleanup()
+        self.close()
 
         # Do not suppress exceptions
         return False
@@ -108,12 +108,13 @@ class ButtonController:
             source=InputSource.GPIO,
         )
 
-    def cleanup(self):
+    def close(self):
         """Remove GPIO event detection for managed pins."""
         logger.info("Cleaning up ButtonController GPIO resources")
 
         GPIO.remove_event_detect(self.pin_next)
         GPIO.remove_event_detect(self.pin_select)
+        GPIO.cleanup([self.pin_next, self.pin_select])
 
     def set_commands(self, *, next_command: Optional[InputCommand] = None, select_command: Optional[InputCommand] = None, scope: Optional[InputScope] = None):
         """
