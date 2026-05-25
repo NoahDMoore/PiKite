@@ -216,7 +216,6 @@ class RemoteInput:
 
     async def start_listening(self):
         while self._active:
-            print("LISTENING")
             message = await self.server.get()
 
             if message == "CLOSE":

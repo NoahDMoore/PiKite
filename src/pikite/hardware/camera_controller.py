@@ -384,9 +384,8 @@ class PreviewStream:
     async def close(self):
         logger.info("Closing camera preview stream.")
         await self.stop()
-        logger.info("Camera preview stream stopped.")
         self._active = False
-        self.latest_frame.put_nowait("CLOSE")
+        self.latest_frame.put_nowait("CLOSE") # Ensure stream loop breaks await by adding to latest_frame queue
 
     def _clear_frame_queue(self):
         while not self.latest_frame.empty():
@@ -433,15 +432,13 @@ class PreviewStream:
                 await asyncio.sleep(0)
 
         except asyncio.CancelledError:
-            logger.info("Preview stream cancelled")
+            logger.debug("Preview stream cancelled")
 
     async def stream(self):
         while self._active:
-            print("MAYBE STREAMING")
             if not self.streaming:
                 await asyncio.sleep(0.05)
                 continue
-            print("STREAMING")
 
             frame = await self.latest_frame.get()
 
