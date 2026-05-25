@@ -1,0 +1,15 @@
+[Unit]
+Description=PiKite - An integrated kite aerial photography system for Raspberry Pi
+After=network.target
+
+[Service]
+Type=idle
+# Replace 'YOUR_USERNAME' with your actual username
+# Verify poetry path by running 'which poetry' from the PiKite directory
+ExecStart=/home/YOUR_USERNAME/.local/bin/poetry run python -m pikite
+WorkingDirectory=/home/YOUR_USERNAME/PiKite/
+User=YOUR_USERNAME
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
