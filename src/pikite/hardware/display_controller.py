@@ -182,7 +182,7 @@ class DisplayController:
         self.dc.deinit()
         self.backlight.deinit()
 
-        logger.info("DisplayController cleanup complete.")
+        logger.info("DisplayController stopped.")
 
 class GIF:
     """
