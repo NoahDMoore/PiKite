@@ -217,22 +217,17 @@ class RemoteInput:
     async def start_listening(self):
         while self._active:
             print("LISTENING")
-            if self.server.incoming_messages.empty():
-                await asyncio.sleep(0.1)
-                continue
-
             message = await self.server.get()
+
+            if message == "CLOSE":
+                break
+
             await self.handle_message(message)
             
             await asyncio.sleep(0)      # yield back to scheduler
-
-        logger.info("RemoteInput listener closed.")
     
     async def handle_message(self, message):
         try:
-            if message == "CLOSE":
-                return
-
             if isinstance(message, str):
                 message = json.loads(message)  # Parse JSON string to dict
             
@@ -255,3 +250,6 @@ class RemoteInput:
 
     def close(self):
         self._active = False
+
+        # Prevent waiting on an empty message queue before stopping
+        self.server.incoming_messages.put_nowait("CLOSE")
