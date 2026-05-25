@@ -111,6 +111,7 @@ class CameraController:
         """
         self.picam2.stop()
         self.picam2.close()
+        logger.info("CameraController has been closed.")
 
     def initialize_camera(self):
         """
