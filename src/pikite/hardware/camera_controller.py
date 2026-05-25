@@ -358,7 +358,7 @@ class PreviewStream:
         
         self.streaming = True
         self.timer.start()
-        logger.debug("Starting preview task.")
+        logger.info("Starting preview task.")
         self.preview_task = asyncio.create_task(self._preview_stream())
 
     async def stop(self):
@@ -412,6 +412,8 @@ class PreviewStream:
         FRAME_RATE = 1 / 10  # 10 FPS
 
         try:
+            logger.info("Camera preview stream started.")
+
             while self.streaming:
                 if not self.timer.interval_elapsed(FRAME_RATE):
                     await asyncio.sleep(0.01)
@@ -435,7 +437,10 @@ class PreviewStream:
         except asyncio.CancelledError:
             logger.debug("Preview stream cancelled")
 
+        logger.info("Camera preview stream stopped")
+
     async def stream(self):
+        logger.info("Camera preview stream initialized.")
         try:
             while self._active:
                 if not self.streaming:
