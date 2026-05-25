@@ -36,7 +36,6 @@ class Timer:
 
         if name is None:
             self.name = sys._getframe(1).f_globals.get('__name__')
-            print(sys._getframe(1).f_locals)
         else:
             self.name = name
         
