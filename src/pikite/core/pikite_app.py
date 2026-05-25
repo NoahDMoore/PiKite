@@ -1,4 +1,5 @@
 import asyncio
+from typing import Callable
 
 from pikite.core.capture_session import CaptureSession
 import pikite.core.constants as CONSTANTS
@@ -87,6 +88,8 @@ class PiKiteApp:
         self.menu = self.initialize_menu()
 
         logger.info("PiKite Application Initialized")
+
+        self.application_running = False
 
     def _on_setting_change(self, setting_key, section, new_value):
         logger.info(f"Setting Change Detected: {setting_key} changed to {new_value} in section {section}")
@@ -207,13 +210,13 @@ class PiKiteApp:
         self.input_handler.register(
             scope=InputScope.MENU,
             command=InputCommand.SHUTDOWN,
-            callback=PowerManagement.shutdown
+            callback=self.shutdown
         )
 
         self.input_handler.register(
             scope=InputScope.MENU,
             command=InputCommand.REBOOT,
-            callback=PowerManagement.reboot
+            callback=self.reboot
         )
 
         self.input_handler.register(
@@ -481,11 +484,11 @@ class PiKiteApp:
             self.home_pan_tilt()
 
     async def main_loop(self):
+        self.application_running = True
         try:
-            application_running = True
             self.preview.start()
 
-            while application_running:
+            while self.application_running:
                 if self.input_handler.active_scope == InputScope.MENU:
                     pass
 
@@ -518,6 +521,23 @@ class PiKiteApp:
             self.preview.stream(),
             self.main_loop()
         )
+
+        self.on_close
+
+    def register_on_close_callback(self, callback: Callable):
+        self.on_close_callback = callback
+
+    def on_close(self):
+        if self.on_close_callback is not None and isinstance(self.on_close_callback, Callable):
+            self.on_close_callback()
+
+    def shutdown(self):
+        self.register_on_close_callback(PowerManagement.shutdown)
+        self.application_running = False
+
+    def reboot(self):
+        self.register_on_close_callback(PowerManagement.reboot)
+        self.application_running = False
 
     async def cleanup(self):
         # Cleanup at End of Runtime
