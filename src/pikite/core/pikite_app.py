@@ -481,32 +481,31 @@ class PiKiteApp:
             self.home_pan_tilt()
 
     async def main_loop(self):
-        application_running = True
-        self.preview.start()
+        try:
+            application_running = True
+            self.preview.start()
 
-        while application_running:
-            if self.input_handler.active_scope == InputScope.MENU:
-                pass
+            while application_running:
+                if self.input_handler.active_scope == InputScope.MENU:
+                    pass
 
-            elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
-                self.preview.stop()
+                elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
+                    self.preview.stop()
 
-                await self.capture_loop()
-                await asyncio.sleep(2)
-                self.preview.start()
-                self.input_handler.set_scope(InputScope.MENU)
+                    await self.capture_loop()
+                    await asyncio.sleep(2)
+                    self.preview.start()
+                    self.input_handler.set_scope(InputScope.MENU)
 
-            elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
-                display_system_info(self.display_controller) # type: ignore
+                elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
+                    display_system_info(self.display_controller) # type: ignore
 
-                while self.input_handler.active_scope == InputScope.SYSTEM_INFO:
-                    await asyncio.sleep(0.1)
+                    while self.input_handler.active_scope == InputScope.SYSTEM_INFO:
+                        await asyncio.sleep(0.1)
 
-            await asyncio.sleep(0.1)
-            
-        # Cleanup at End of Runtime
-        self.button_controller.cleanup()
-        self.preview.stop()
+                await asyncio.sleep(0.1)
+        finally:
+            await self.cleanup()
 
     async def run(self):
         logger.info("Starting PiKite Application")
@@ -516,4 +515,64 @@ class PiKiteApp:
             self.remote_input.start_listening(),
             self.preview.stream(),
             self.main_loop()
+        )
+
+    async def cleanup(self):
+        # Cleanup at End of Runtime
+        logger.info("Preparing to close PiKite. Cleaning up...")
+        
+        # Create Progress Bar
+        def _advance_progress():
+            if cleanup_progress_bar is not None:
+                cleanup_progress_bar.advance(10)
+
+        try:
+            cleanup_progress_bar = LoadingBar("Loading PiKite", self.display_controller)
+        except:
+            cleanup_progress_bar = None
+        _advance_progress()
+
+
+        # Cleanup Button Controller
+        self.button_controller.close()
+        _advance_progress()
+
+        # Cleanup Camera Preview Stream
+        self.preview.close()
+        _advance_progress()
+        
+        # Cleanup RemoteInput
+        self.remote_input.close()
+        _advance_progress()
+        
+        # Shutdown ControllerServer
+        await self.remote_server.close()
+        _advance_progress()
+        
+        # Stop the Pan Servo
+        self.pan_servo.stop()
+        _advance_progress()
+        
+        # Stop the Tilt Servo
+        self.tilt_servo.stop()
+        _advance_progress()
+        
+        # Cleanup Camera Controller
+        self.camera_controller.close()
+        _advance_progress()
+        
+        # Get Final Runtime
+        runtime = self.timer.stop()
+        _advance_progress()
+        
+        logger.info(f"PiKite has run for {self.timer.format_elapsed_time(runtime)}.")
+        _advance_progress()
+
+        # Log and display message indicating the app has closed
+        logger.info("PiKite clean-up complete. Closing application.")
+        
+        self.display_controller.print_message(
+            message="PiKite Closed",
+            bg_color=(0,0,0),
+            fg_color=(255,255,255)
         )
