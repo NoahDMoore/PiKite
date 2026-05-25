@@ -414,9 +414,11 @@ class PiKiteApp:
             "tilt_angle": self.tilt_servo.angle
         })
 
-    def home_pan_tilt(self):
+    async def home_pan_tilt(self):
         self.pan_servo.rotate_to(speed=0.5, target_angle=0)
+        await asyncio.sleep(0.5)
         self.tilt_servo.angle = 0
+        await asyncio.sleep(0.5)
         logger.info("Pan/Tilt homed to default position")
 
     @property
@@ -488,7 +490,7 @@ class PiKiteApp:
                 self.timer.named_intervals.pop(key, None)
 
             # Home the Pan/Tilt Servos
-            self.home_pan_tilt()
+            await self.home_pan_tilt()
 
     async def main_loop(self):
         self.application_running = True
@@ -583,12 +585,12 @@ class PiKiteApp:
         _advance_progress()
         
         # Home Servos
-        self.home_pan_tilt()
+        await self.home_pan_tilt()
         _advance_progress()
 
         # Stop the Pan Servo
         self.pan_servo.stop()
-        
+
         # Stop the Tilt Servo
         self.tilt_servo.stop()
         _advance_progress()
