@@ -212,9 +212,10 @@ class RemoteInput:
     def __init__(self, server: ControllerServer, input_handler: InputHandler):
         self.server = server
         self.input_handler = input_handler
+        self._active = True
 
     async def start_listening(self):
-        while True:
+        while self._active:
             message = await self.server.get()
             await self.handle_message(message)
             
@@ -222,6 +223,9 @@ class RemoteInput:
     
     async def handle_message(self, message):
         try:
+            if message == "CLOSE":
+                return
+
             if isinstance(message, str):
                 message = json.loads(message)  # Parse JSON string to dict
             
@@ -241,3 +245,10 @@ class RemoteInput:
                 logger.error(f"Unknown message type received: {message.get('type')}")
         except Exception as e:
             logger.error(f"Error handling remote message: {e}")
+
+    def close(self):
+        self._active = False
+
+        if self.server.incoming_messages.empty:
+            # Prevent waiting on an empty message queue before stopping
+            self.server.incoming_messages.put_nowait("CLOSE")
