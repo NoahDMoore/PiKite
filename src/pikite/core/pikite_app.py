@@ -467,7 +467,7 @@ class PiKiteApp:
                         if not self.capturing:
                             if self.timer.interval_elapsed(1.0, "time_remaining_check"):
                                 time_remaining = self.timer.interval_remaining(session.video_length, "video_length")
-                                logger.info("Capture loop ending, but video is still recording. Waiting for recording to finish... {time_remaining:.1f}s remaining.")
+                                logger.info(f"Capture loop ending, but video is still recording. Waiting for recording to finish... {time_remaining:.1f}s remaining.")
 
                     if self.timer.interval_elapsed(session.pan_tilt_interval, "pan_tilt_interval") and not self.is_recording:
                         await self.step_pan_tilt(session.pan_tilt_pattern)
