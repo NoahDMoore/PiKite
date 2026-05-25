@@ -225,6 +225,8 @@ class RemoteInput:
             await self.handle_message(message)
             
             await asyncio.sleep(0)      # yield back to scheduler
+
+        logger.info("RemoteInput listener closed.")
     
     async def handle_message(self, message):
         try:
@@ -253,6 +255,3 @@ class RemoteInput:
 
     def close(self):
         self._active = False
-
-        # Prevent waiting on an empty message queue before stopping
-        self.server.incoming_messages.put_nowait("CLOSE")
