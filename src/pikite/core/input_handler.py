@@ -217,6 +217,9 @@ class RemoteInput:
     async def start_listening(self):
         while self._active:
             print("LISTENING")
+            if self.server.incoming_messages.empty:
+                continue
+
             message = await self.server.get()
             await self.handle_message(message)
             
