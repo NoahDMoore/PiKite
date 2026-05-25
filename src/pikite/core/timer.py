@@ -6,6 +6,7 @@ function for high-resolution timing.
 """
 
 from math import floor
+import sys
 import time
 from enum import Enum, auto
 from .logger import get_logger
@@ -25,6 +26,7 @@ class Timer:
         Args:
             name (str): A name for the Timer instance. Defaults to the Timer __name__.
         """
+        print(sys._getframe(1).f_globals.get('__name__'))
         self.start_time: float | None = None            # Used to store the time when the timer was started, reset, or resumed
         self.initial_start_time: float | None = None    # Used to store the time when the timer was started
         self.paused_time: float | None = None
