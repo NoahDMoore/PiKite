@@ -433,6 +433,7 @@ class PiKiteApp:
             with CaptureSession(self) as session:
                 while self.capturing or self.is_recording:
                     if self.input_handler.active_scope != InputScope.CAPTURE_LOOP:
+                        # Signal that the capture_loop will end after the current loop or once the recording has finished.
                         self.capturing = False
 
                     if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
