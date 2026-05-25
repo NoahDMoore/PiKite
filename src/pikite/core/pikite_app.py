@@ -435,8 +435,9 @@ class PiKiteApp:
                     if self.input_handler.active_scope != InputScope.CAPTURE_LOOP:
                         self.capturing = False
 
-                    if self.timer.interval_elapsed(1.0, "runtime"):
+                    if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
                         self.display_controller.print_message(f"PiKite Running: {session.runtime_string}")
+                        session.tx_session_update() # Send session update to remote client
 
                     if self.timer.interval_elapsed(session.altitude_interval, "altitude_interval"):
                         self.log_altitude(session.csv_writer)
@@ -472,16 +473,18 @@ class PiKiteApp:
                     if self.timer.interval_elapsed(session.pan_tilt_interval, "pan_tilt_interval") and not self.is_recording:
                         await self.step_pan_tilt(session.pan_tilt_pattern)
 
-                    # Update session info on remote clients at regular intervals
-                    if self.timer.interval_elapsed(1.0, "session_info_update"):
-                        session.tx_session_update()
-
                     await asyncio.sleep(0.01)
         finally:
             logger.info("Exiting Capture Loop, performing cleanup")
 
             # Clear Capture Intervals
-            for key in ["runtime", "capture_interval", "altitude_interval", "pan_tilt_interval", "time_remaining_check", "session_info_update"]:
+            for key in [
+                            "runtime_and_session_info",
+                            "capture_interval",
+                            "altitude_interval",
+                            "pan_tilt_interval",
+                            "time_remaining_check"
+                        ]:
                 self.timer.named_intervals.pop(key, None)
 
             # Home the Pan/Tilt Servos
