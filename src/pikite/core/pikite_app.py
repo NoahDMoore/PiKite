@@ -208,23 +208,24 @@ class PiKiteApp:
             callback=lambda: self.input_handler.set_scope(InputScope.SYSTEM_INFO)
         )
 
-        self.input_handler.register(
-            scope=InputScope.MENU,
-            command=InputCommand.SHUTDOWN,
-            callback=self.shutdown
-        )
+        for scope in [InputScope.MENU, InputScope.SYSTEM_INFO]:
+            self.input_handler.register(
+                scope=scope,
+                command=InputCommand.SHUTDOWN,
+                callback=self.shutdown
+            )
 
-        self.input_handler.register(
-            scope=InputScope.MENU,
-            command=InputCommand.REBOOT,
-            callback=self.reboot
-        )
+            self.input_handler.register(
+                scope=scope,
+                command=InputCommand.REBOOT,
+                callback=self.reboot
+            )
 
-        self.input_handler.register(
-            scope=InputScope.MENU,
-            command=InputCommand.EXIT,
-            callback=self.exit
-        )
+            self.input_handler.register(
+                scope=scope,
+                command=InputCommand.EXIT,
+                callback=self.exit
+            )
 
         self.input_handler.register(
             scope=InputScope.SYSTEM_INFO,
