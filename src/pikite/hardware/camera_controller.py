@@ -434,9 +434,11 @@ class PreviewStream:
 
     async def stream(self):
         while self._active:
+            print("MAYBE STREAMING")
             if not self.streaming:
                 await asyncio.sleep(0.05)
                 continue
+            print("STREAMING")
 
             frame = await self.latest_frame.get()
 
