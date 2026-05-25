@@ -182,6 +182,29 @@
                     </div>
                 </div>
             </div>
+
+            <div class="fixed-action-btn">
+                <a class="btn-floating btn-large red waves-effect waves-light">
+                    <i class="large material-icons">settings_power</i>
+                </a>
+                <ul>
+                    <li>
+                        <a class="btn-floating green tooltipped" data-position="left" data-tooltip="Shutdown" id="shutdown-btn">
+                            <i class="material-icons">power_settings</i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="btn-floating yellow darken-1 tooltipped" data-position="left" data-tooltip="Reboot" id="reboot-btn">
+                            <i class="material-icons">refresh</i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="btn-floating blue tooltipped" data-position="left" data-tooltip="Stop PiKite Application" id="exit-btn">
+                            <i class="material-icons">exit_to_app</i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
     <!-- MEDIA -->
@@ -353,6 +376,48 @@
 
             document.getElementById('stop-capture-btn').addEventListener('click', function() {
                 sendCommand('STOP_CAPTURE');
+            });
+
+            document.getElementById('shutdown-btn').addEventListener('click', function() {
+                if (pikite_scope == "CAPTURE_LOOP") {
+                    M.toast({html: `WARNING: Must stop capture session before shutdown.`, classes: 'orange darken-4'})
+                    return;
+                } else {
+                    confirmation = confirm("Are you sure you want shutdown?");
+                    if (confirmation) {
+                        sendCommand('SHUTDOWN');
+                    } else {
+                        M.toast({html: 'Shutdown Aborted.'});
+                    }
+                }
+            });
+
+            document.getElementById('reboot-btn').addEventListener('click', function() {
+                if (pikite_scope == "CAPTURE_LOOP") {
+                    M.toast({html: `WARNING: Must stop capture session before reboot.`, classes: 'orange darken-4'})
+                    return;
+                } else {
+                    confirmation = confirm("Are you sure you want reboot?");
+                    if (confirmation) {
+                        sendCommand('REBOOT');
+                    } else {
+                        M.toast({html: 'Reboot Aborted.'});
+                    }
+                }
+            });
+
+            document.getElementById('exit-btn').addEventListener('click', function() {
+                if (pikite_scope == "CAPTURE_LOOP") {
+                    M.toast({html: `WARNING: Must stop capture session before stopping app.`, classes: 'orange darken-4'})
+                    return;
+                } else {
+                    confirmation = confirm("Are you sure you want stop the PiKite application?");
+                    if (confirmation) {
+                        sendCommand('EXIT');
+                    } else {
+                        M.toast({html: 'Exit Aborted.'});
+                    }
+                }
             });
 
             // Settings
