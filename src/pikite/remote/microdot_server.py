@@ -39,10 +39,14 @@ class ControllerServer:
         self.app = Microdot()
         self.port = port
 
+        # Connections
+        self.server_task: asyncio.Task | None = None
+        self.active_websockets: set[WebSocket] = set()
+        self.websocket_connected = False
+
         # Message Buffers
         self.incoming_messages = asyncio.Queue()
         self.outgoing_messages = asyncio.Queue()
-        self.websocket_connected = False
 
         # Initialize Storage Manager
         self.storage = StorageManager()
@@ -95,12 +99,20 @@ class ControllerServer:
                 time_left = int(self.active_tokens[token] - time.time())
                 expiration_str = f"{time_left // 60}m {time_left % 60}s" if time_left >= 60 else f"{time_left}s"
                 logger.info(f"WebSocket connection established with client: {request.client_addr}. Session token expires in {expiration_str}.")
+                
+                self.active_websockets.add(ws)
                 self.websocket_connected = True
+                
                 try:
                     await self.register_websocket_client(ws) # Register the WebSocket connection
                 finally:
-                    self.websocket_connected = False
-                    self._clear_outgoing_messages # Clear outgoing messages buffer when client disconnects
+                    self.active_websockets.discard(ws)
+
+                    if not self.active_websockets:
+                        self.websocket_connected = False
+
+                    self._clear_outgoing_messages() # Clear outgoing messages buffer when client disconnects
+                    
                     logger.info(f"WebSocket connection closed for client: {request.client_addr}")
             except Exception as e:
                 logger.warning(f"WebSocket connection error for client {request.client_addr}: {e}")
@@ -318,12 +330,17 @@ class ControllerServer:
         Args:
             ws: The WebSocket connection object.
         """
-        while True:
-            message = await ws.receive() # Receive message from websocket client
-            await self.incoming_messages.put(message) # Store message for retrieval in the incoming_messages buffer
-            logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
+        try:
+            while True:
+                message = await ws.receive() # Receive message from websocket client
+                await self.incoming_messages.put(message) # Store message for retrieval in the incoming_messages buffer
+                logger.debug(f"RX: {message}", extra={"skip_remote": True}) # Log the message received, but don't send via the remote logging handler to avoid infinite loops.
 
-            await asyncio.sleep(0)      # yield back to scheduler
+                await asyncio.sleep(0)      # yield back to scheduler
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logger.info(f"Controller Server RX loop ended: {e}")
 
     async def _tx_loop(self, ws: WebSocket):
         """
@@ -335,25 +352,30 @@ class ControllerServer:
         Raises:
             TypeError: If the message type is not string or dict.
         """
-        while True:
-            message = await self.outgoing_messages.get() # Wait for a message to be available in the outgoing_messages queue
-            try:
-                # If the raw message is a string, wrap it in JSON object
-                if isinstance(message, str):
-                    payload = json.dumps({"state": "Message: " + message})
-                elif isinstance(message, dict):
-                    payload = json.dumps(message)
-                elif isinstance(message, bytes):
-                    payload = message
-                else:
-                    raise TypeError
+        try:
+            while True:
+                message = await self.outgoing_messages.get() # Wait for a message to be available in the outgoing_messages queue
+                try:
+                    # If the raw message is a string, wrap it in JSON object
+                    if isinstance(message, str):
+                        payload = json.dumps({"state": "Message: " + message})
+                    elif isinstance(message, dict):
+                        payload = json.dumps(message)
+                    elif isinstance(message, bytes):
+                        payload = message
+                    else:
+                        raise TypeError
 
-                #logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
-                await ws.send(payload)  # Send message to websocket client
-            except TypeError:
-                logger.error("Invalid Message Type: Messages must be a string or dict")
-                
-            await asyncio.sleep(0)      # yield back to scheduler
+                    #logger.debug(f"TX: {payload}", extra={"skip_remote": True}) # Log the message being sent, but don't send via the remote logging handler to avoid infinite loops.
+                    await ws.send(payload)  # Send message to websocket client
+                except TypeError:
+                    logger.error("Invalid Message Type: Messages must be a string or dict")
+                    
+                await asyncio.sleep(0)      # yield back to scheduler
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logger.info(f"ControllerServer TX loop ended: {e}")
 
     def _clear_outgoing_messages(self):
         while not self.outgoing_messages.empty():
@@ -394,4 +416,38 @@ class ControllerServer:
         Returns:
             An asyncio Task that runs the web server.
         """
-        return asyncio.create_task(self.app.start_server(port=self.port))
+        if self.server_task and not self.server_task.done():
+            logger.warning("Cannot start server. Server is already running!")
+
+        self.server_task = asyncio.create_task(self.app.start_server(port=self.port))
+
+        logger.info("ControllerServer started.")
+
+        return self.server_task
+    
+    async def close(self):
+        """
+        Shut down the web server and disconnect clients.
+        """
+        logger.info("Shutting down controller server...")
+
+        # Close all websocket clients
+        for ws in list(self.active_websockets):
+            try:
+                await ws.close()
+            except Exception as e:
+                logger.warning(f"Error closing websocket: {e}")
+
+        self.active_websockets.clear()
+        self.websocket_connected = False
+
+        # Stop Microdot server
+        if self.server_task and not self.server_task.done():
+            self.server_task.cancel()
+
+            try:
+                await self.server_task
+            except asyncio.CancelledError:
+                pass
+
+        logger.info("ControllerServer stopped.")
