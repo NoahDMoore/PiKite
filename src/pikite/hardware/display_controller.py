@@ -113,12 +113,14 @@ class DisplayController:
         """Turn off the display backlight."""
         self.backlight.value = False
 
-    def print_message(self, message: str | Image.Image):
+    def print_message(self, message: str | Image.Image, bg_color: tuple[int, int, int] = (255, 255, 255), fg_color: tuple[int, int, int] = (0, 0, 0)):
         """
         Print a message or image on the display. The message can be a string, an image file path, or a PIL Image object.
         
         Args:
             message (str or Image.Image): The message to print on the display.
+            bg_color (tuple): RGB color tuple for the background color. Default is white.
+            fg_color (tuple): RGB color tuple for the text color. Default is black.
         """
         lcd_image, canvas = None, None
 
@@ -136,7 +138,7 @@ class DisplayController:
         elif ":" in message:
             # Print a two-line message centered on the display
 
-            lcd_image, canvas = self.new_image()
+            lcd_image, canvas = self.new_image(color=bg_color)
 
             header = message.split(": ")[0] + ":"
             message = message.split(": ")[1]
@@ -146,17 +148,17 @@ class DisplayController:
             header_width = get_image_width(self.FONT30.getbbox(header))
             message_width = get_image_width(self.FONT30.getbbox(message))
 
-            canvas.text(((self.IMAGE_WIDTH - header_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) - (height / 2)), header, font=self.FONT30, fill="black")
-            canvas.text(((self.IMAGE_WIDTH - message_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) + (height / 2)), message, font=self.FONT30, fill="black")
+            canvas.text(((self.IMAGE_WIDTH - header_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) - (height / 2)), header, font=self.FONT30, fill=fg_color)
+            canvas.text(((self.IMAGE_WIDTH - message_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) + (height / 2)), message, font=self.FONT30, fill=fg_color)
         else:
             # Print a single line message centered on the display
 
-            lcd_image, canvas = self.new_image()
+            lcd_image, canvas = self.new_image(color=bg_color)
 
             width = get_image_width(self.FONT30.getbbox(message))
             height = get_image_height(self.FONT30.getbbox(message))
 
-            canvas.text(((self.IMAGE_WIDTH - width) / 2, (self.IMAGE_HEIGHT - height) / 2), message, font=self.FONT30, fill="black")
+            canvas.text(((self.IMAGE_WIDTH - width) / 2, (self.IMAGE_HEIGHT - height) / 2), message, font=self.FONT30, fill=fg_color)
         
         self.display.image(lcd_image)
 
