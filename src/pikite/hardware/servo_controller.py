@@ -11,6 +11,7 @@ Typical usage example:
 """
 
 from enum import Enum
+import sys
 
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
 
@@ -20,6 +21,8 @@ from ..core.timer import Timer
 
 # Setup Logger
 logger = get_logger(__name__)
+
+timer = Timer()
 
 class TiltServo:
     """
@@ -356,8 +359,6 @@ class PanServo:
         max_speed = speed # Use the user-supplied max speed
         k = 0.02          # Proportional constant (tune as needed)
 
-        timer = Timer()
-
         self.start()
 
         while True:
@@ -443,8 +444,6 @@ def initialize_pwm(pwm_channel: int, frequency: int, chip: int, retries: int = 2
     Raises:
         ValueError: If pwm_channel is not 0 or 1.
     """
-    timer = Timer()
-
     if pwm_channel in [0, 1]:
         for attempt in range(retries):
             try:
@@ -522,7 +521,7 @@ class PanTiltPattern:
         self.pan_reverse = False
         self.tilt_reverse = False
 
-        self.timer = Timer()
+        self.timer = Timer(name=f"{__name__}.{__class__.__name__}")
 
         self.reset()
 
