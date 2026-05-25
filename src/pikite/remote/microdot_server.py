@@ -341,6 +341,7 @@ class ControllerServer:
             raise
         except Exception as e:
             logger.info(f"Controller Server RX loop ended: {e}")
+            return
 
     async def _tx_loop(self, ws: WebSocket):
         """
@@ -376,6 +377,7 @@ class ControllerServer:
             raise
         except Exception as e:
             logger.info(f"ControllerServer TX loop ended: {e}")
+            return
 
     def _clear_outgoing_messages(self):
         while not self.outgoing_messages.empty():
