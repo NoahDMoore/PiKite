@@ -250,6 +250,5 @@ class RemoteInput:
     def close(self):
         self._active = False
 
-        if self.server.incoming_messages.empty:
-            # Prevent waiting on an empty message queue before stopping
-            self.server.incoming_messages.put_nowait("CLOSE")
+        # Prevent waiting on an empty message queue before stopping
+        self.server.incoming_messages.put_nowait("CLOSE")
