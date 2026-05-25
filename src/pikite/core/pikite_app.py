@@ -531,13 +531,16 @@ class PiKiteApp:
         if self.on_close_callback is not None and isinstance(self.on_close_callback, Callable):
             self.on_close_callback()
 
+    def exit(self):
+        self.application_running = False
+
     def shutdown(self):
         self.register_on_close_callback(PowerManagement.shutdown)
-        self.application_running = False
+        self.exit()
 
     def reboot(self):
         self.register_on_close_callback(PowerManagement.reboot)
-        self.application_running = False
+        self.exit()
 
     async def cleanup(self):
         # Cleanup at End of Runtime
