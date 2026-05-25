@@ -150,7 +150,10 @@ function endCaptureSession(info) {
     sendCommand('FETCH_MEDIA_DIRS')
 }
 
+// Camera Feed
+
 let currentPreviewUrl = null;
+camera_preview_badge = document.getElementById("camera-preview-badge");
 
 function updateCapturePreview(obj) {
     if (document.getElementById("capture-preview-enable").dataset.enable == "True") {
@@ -168,9 +171,18 @@ function updateCapturePreview(obj) {
             };
 
             capturePreview.src = newUrl;
+
+            camera_preview_badge.classList.remove("last-capture");
+            camera_preview_badge.classList.add("preview");
+            camera_preview_badge.dataset.badgeCaption = "Live Preview";
+
         } else if (obj.type == "last_captured_photo") {
             file_path = obj.file_path;
             capturePreview.src = file_path + "?" + new Date().getTime();
+
+            camera_preview_badge.classList.remove("preview");
+            camera_preview_badge.classList.add("last-capture");
+            camera_preview_badge.dataset.badgeCaption = "Last Captured Image";
         }
     }
 }

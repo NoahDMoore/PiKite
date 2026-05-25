@@ -140,6 +140,20 @@ body {
   bottom: 2.25em;
 }
 
+#capture-preview-badge {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+}
+
+#capture-preview-badge.preview {
+  background-color: var(--md-secondary);
+}
+
+#capture-preview-badge.last-capture {
+  background-color: var(--md-error);
+}
+
 #status-badge {
   position: absolute;
   top: 12px;
