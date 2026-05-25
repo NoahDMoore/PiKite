@@ -146,7 +146,7 @@ class CameraController:
 
         self.preview_config = self.picam2.create_preview_configuration(
             main={"size": (1280, 720)},
-            lores={"size": (854, 480)},
+            lores={"size": (960, 540)},
             transform=self.transformation
         )
 
