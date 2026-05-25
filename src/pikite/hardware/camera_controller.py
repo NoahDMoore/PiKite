@@ -382,7 +382,9 @@ class PreviewStream:
         self._clear_frame_queue()
 
     async def close(self):
+        logger.info("Closing camera preview stream.")
         await self.stop()
+        logger.info("Camera preview stream stopped.")
         self._active = False
 
     def _clear_frame_queue(self):
@@ -443,3 +445,5 @@ class PreviewStream:
             frame = await self.latest_frame.get()
 
             self.server.send(frame)
+
+        logger.info("Camera preview stream has been closed.")
