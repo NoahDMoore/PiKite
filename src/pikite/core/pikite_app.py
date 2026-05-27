@@ -618,7 +618,8 @@ class PiKiteApp:
                 # Do not advance the progress bar on last iteration since the display_controller has been shutdown.
                 if i == (len(cleanup_tasks) - 1):
                     break
-
+                
+                # Advance the progress bar
                 _advance_progress()
 
         logger.info("PiKite clean-up complete. Closing application.")
