@@ -189,7 +189,7 @@ class GIF:
     Class to handle GIF images for display on the Mini PiTFT.
     """
 
-    def __init__(self, gif_image, display_controller):
+    def __init__(self, gif_image: Image.Image, display_controller: DisplayController):
         """
         Initialize the GIF object with a PIL Image and DisplayController.
         Args:
@@ -298,7 +298,7 @@ class GIF:
 class LoadingBar:
     """A loading bar that displays a GIF animation."""
 
-    def __init__(self, title, display_controller):
+    def __init__(self, title: str, display_controller: DisplayController):
         """
         Initialize the LoadingBar with a title and DisplayController.
         Args:
@@ -364,7 +364,7 @@ class LoadingBar:
 class PreLoader:
     """A preloader GIF animation for the display."""
 
-    def __init__(self, display_controller):
+    def __init__(self, display_controller: DisplayController):
         """
         Initialize the PreLoader with a DisplayController.
         
