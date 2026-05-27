@@ -192,10 +192,21 @@ class GIF:
     def __init__(self, gif_image: Image.Image, display_controller: DisplayController):
         """
         Initialize the GIF object with a PIL Image and DisplayController.
+        
         Args:
             gif_image (Image.Image): A PIL Image object representing the GIF.
             display_controller (DisplayController): An instance of DisplayController to display the GIF.
+
+        Raises:
+            TypeError: If gif_image is not an instance of Image.Image
+            TypeError: If a valid DisplayController is not provided.
         """
+        if not isinstance(gif_image, Image.Image):
+            raise TypeError(f"Image.Image instance must be provided to instantiate a GIF.")
+
+        if not isinstance(display_controller, DisplayController):
+            raise TypeError(f"DisplayController instance must be provided to instantiate a GIF.")
+
         self.image = gif_image
         self.display_controller = display_controller
 
@@ -301,10 +312,18 @@ class LoadingBar:
     def __init__(self, title: str, display_controller: DisplayController):
         """
         Initialize the LoadingBar with a title and DisplayController.
+
         Args:
             title (str): The title to display above the loading bar.
             display_controller (DisplayController): An instance of DisplayController to display the loading bar.
+
+        Raises:
+            TypeError: If a valid DisplayController is not provided.
         """
+
+        if not isinstance(display_controller, DisplayController):
+            raise TypeError(f"DisplayController instance must be provided to instantiate a LoadingBar.")
+
         self.display_controller = display_controller
         self.image = GIF(Image.open(MEDIA_DIR / "loading_bar.gif"), self.display_controller)
         self.value = 0
@@ -361,7 +380,7 @@ class LoadingBar:
         self.image.frame = int(self.value // 10)
         self.image.display_frame(self.title)
 
-class PreLoader:
+class PreLoader(GIF):
     """A preloader GIF animation for the display."""
 
     def __init__(self, display_controller: DisplayController):
@@ -371,9 +390,10 @@ class PreLoader:
         Args:
             display_controller (DisplayController): An instance of DisplayController to display the preloader GIF.
         """
-        super().__init__()
-        self.display_controller = display_controller
-        self.image = GIF(Image.open(MEDIA_DIR / "preloader.gif"), self.display_controller)
+        super().__init__(
+            gif_image = Image.open(MEDIA_DIR / "preloader.gif"),
+            display_controller = display_controller
+        )
 
     def __repr__(self):
         """Return a string representation of the PreLoader."""
@@ -382,10 +402,6 @@ class PreLoader:
     def __str__(self):
         """Return a string description of the PreLoader."""
         return "Preloader GIF for display"
-    
-    def play(self):
-        """Play the preloader GIF animation."""
-        self.image.play()
 
 def get_image_width(bbox: tuple[int, int, int, int]) -> int:
     """Calculate the width of an image given its bounding box.
