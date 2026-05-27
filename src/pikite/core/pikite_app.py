@@ -1,5 +1,6 @@
 import asyncio
 from typing import Callable
+from inspect import isawaitable
 
 from pikite.core.capture_session import CaptureSession
 import pikite.core.constants as CONSTANTS
@@ -556,66 +557,66 @@ class PiKiteApp:
     async def cleanup(self):
         # Cleanup at End of Runtime
         logger.info("Preparing to close PiKite. Cleaning up...")
+
+        # Create Progress Bar to Display Cleanup Progress
+        try:
+            cleanup_progress_bar = LoadingBar("Closing PiKite", self.display_controller)
+        except TypeError:
+            cleanup_progress_bar = None
         
-        # Create Progress Bar
+        # Advance the ProgressBar (if it exists)
         def _advance_progress():
             if cleanup_progress_bar is not None:
                 cleanup_progress_bar.advance(10)
 
-        try:
-            cleanup_progress_bar = LoadingBar("Closing PiKite", self.display_controller)
-        except:
-            cleanup_progress_bar = None
-        _advance_progress()
+        async def _cleanup_servos():
+            # Home the Servos
+            await self.home_pan_tilt()
 
+            # Stop the Pan Servo
+            self.pan_servo.stop()
 
-        # Cleanup Button Controller
-        self.button_controller.close()
-        _advance_progress()
+            # Stop the Tilt Servo
+            self.tilt_servo.stop()
 
-        # Cleanup Camera Preview Stream
-        await self.preview.close()
-        _advance_progress()
-        
-        # Cleanup RemoteInput
-        self.remote_input.close()
-        _advance_progress()
-        
-        # Shutdown ControllerServer
-        await self.remote_server.close()
-        _advance_progress()
-        
-        # Home Servos
-        await self.home_pan_tilt()
-        _advance_progress()
+        def _cleanup_timer():
+            runtime = self.timer.stop()
+            logger.info(f"PiKite has run for {self.timer.format_elapsed_time(runtime)}.")
 
-        # Stop the Pan Servo
-        self.pan_servo.stop()
+        def _cleanup_display_controller():
+            self.display_controller.print_message(
+                message="PiKite Closed",
+                bg_color=(0,0,0),
+                fg_color=(255,255,255)
+            )
 
-        # Stop the Tilt Servo
-        self.tilt_servo.stop()
-        _advance_progress()
-        
-        # Cleanup Camera Controller
-        self.camera_controller.close()
-        _advance_progress()
-        
-        # Get Final Runtime
-        runtime = self.timer.stop()
-        _advance_progress()
-        
-        logger.info(f"PiKite has run for {self.timer.format_elapsed_time(runtime)}.")
-        _advance_progress()
+            # Cleanup Display Controller
+            self.display_controller.close()
 
-        # Log and display message indicating the app has closed
-        
-        self.display_controller.print_message(
-            message="PiKite Closed",
-            bg_color=(0,0,0),
-            fg_color=(255,255,255)
-        )
+        # Define Cleanup Steps
+        cleanup_tasks = [
+            self.button_controller.close,   # Cleanup Button Controller
+            self.preview.close,             # Cleanup Camera Preview Stream
+            self.remote_input.close,        # Cleanup RemoteInput
+            self.remote_server.close,       # Shutdown ControllerServer
+            _cleanup_servos,                # Home and Then Stop the Pan and Tilt Servos
+            self.camera_controller.close,   # Cleanup Camera Controller
+            _cleanup_timer,                 # Stop the Timer and Log Runtime
+            _cleanup_display_controller     # Cleanup Display Controller
+        ]
 
-        # Cleanup Display Controller
-        self.display_controller.close()
+        # Call Each Cleanup Task
+        for task in cleanup_tasks:
+            try:
+                result = task()
+
+                if isawaitable(result):
+                    await result
+            except Exception as e:
+                logger.error(f"Failed to execute cleanup task {task.__name__ if hasattr(task, '__name__') else task}: {e}")
+            finally:
+                _advance_progress()
 
         logger.info("PiKite clean-up complete. Closing application.")
+
+    
