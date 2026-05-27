@@ -78,12 +78,15 @@ class StorageManager:
         self.WEB_ROOT = self.BASE_DIR / "remote" / "web"
 
         # Initialize Required Directories
-        self._initialize_dirs((self.LOG_DIR,
-            self.DATA_DIR,
-            self.CONFIG_DIR,
-            self.PHOTO_OUTPUT_DIR,
-            self.VIDEO_OUTPUT_DIR
-        ))
+        self._initialize_dirs(
+            (
+                self.LOG_DIR,
+                self.DATA_DIR,
+                self.CONFIG_DIR,
+                self.PHOTO_OUTPUT_DIR,
+                self.VIDEO_OUTPUT_DIR
+            )
+        )
 
     def _initialize_dirs(self, dirs: tuple[Path, ...]) -> None:
         """Ensure that all required user directories exist. If not, create them."""

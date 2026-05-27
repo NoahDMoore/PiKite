@@ -8,6 +8,7 @@ An integrated, kite aerial photography system for Raspberry Pi.
 
 A Python-based kite aerial photography system built on the Raspberry Pi Zero 2 W (though compatable with other models).  
 PiKite integrates camera control, altitude sensing, onboard display menus, and remote control over Wi-Fi via WebSockets.
+
 ## Badges
 
 Add badges from somewhere like: [shields.io](https://shields.io/)
@@ -15,8 +16,6 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![Poetry](https://img.shields.io/badge/packaging-poetry-5C2D91.svg)](https://python-poetry.org/)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-green.svg)](./LICENSE)
-[![Tests](https://img.shields.io/badge/tests-pending-yellow.svg)]()
-
 
 ## Authors
 
@@ -31,7 +30,7 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
   - Servo-based pan and tilt control (see also the included stl files for a 3D Printable rig) 
 
 - **Altitude Tracking**
-  - Reads altitude from a BMP280 pressure sensor
+  - Reads altitude from a BMP388 pressure sensor
   - Logs timestamped telemetry data and reports live data via an onboard WebSocket server.
 
 - **Onboard Display & Controls**
@@ -86,9 +85,6 @@ src/
         ├── __init__.py
         ├── power_management.py
         └── storage.py
-tests/               # Unit tests (in-progress)
-webapp/
-└──in progress
 pyproject.toml       # Poetry configuration
 LICENSE              # GNU GPLv3 license
 README.md            # PiKite Documentation
@@ -126,12 +122,25 @@ sudo ~/.local/bin/poetry run python -m pikite
 
 This runs the entrypoint defined in `__main__.py`. and expects hardware as defined below.
 
-### Setting Up a System Service to Run on Startup
-```bash
-sudo cp ~/PiKite/pikite.service /etc/systemd/system/pikite.service
-sudo nano /etc/systemd/system/pikite.service
-# Then update the service file to your username. Save and exit the service file.
+---
+## Recommended Hardware
 
+ - Raspberry Pi Zero 2W
+ - Raspberry Pi Camera V3 (other models also compatible)
+ - Adafruit MiniPiTFT
+ - Adafruit BMP388 Barometric Pressure & Altitude Sensor
+ - ES08MAII Analog Servo (tilt servo)
+ - FS90R Continuous Rotation Servo (pan servo)
+ - AS5600 Magnetic Encoder/Rotary Position Sensor (to control 360 degree rotation of the pan servo)
+
+***Note that deviations from this hardware setup may require adjustments to the package modules, or at minimum, changes to configuration files and hardware object initialization.***
+
+### Setting Up a System Service to Run PiKite on Startup
+```bash
+
+# Install the Service
+sudo cp ~/PiKite/pikite.service /etc/systemd/system/pikite.service
+sudo nano /etc/systemd/system/pikite.service  # Change the username to your account's, then save and exit.
 sudo systemctl daemon-reload
 sudo systemctl enable pikite.service
 
@@ -145,17 +154,6 @@ sudo systemctl stop pikite.service
 sudo systemctl disable pikite.service
 ```
 
----
-## Recommended Hardware
-
- - Raspberry Pi Zero 2W
- - Raspberry Pi Camera V3 (other models also compatible)
- - Adafruit MiniPiTFT
- - Adafruit BMP280 Barometric Pressure & Altitude Sensor
- - ES08MAII Analog Servo (tilt servo)
- - FS90R Continuous Rotation Servo (pan servo)
-
-***Note that deviations from this hardware setup will require adjustments in the module code, or, at minimum, changes to configuration files and hardware object initialization.***
 ## Screenshots
 
 ![PiKite KAP Rig](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
@@ -165,12 +163,6 @@ sudo systemctl disable pikite.service
 
 This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.  
 See the [LICENSE](./LICENSE) file for details.
-## Roadmap
-
-- develop test files
-
-- build out web app for remote configuration and control
-
 
 ## Contributing
 
@@ -181,6 +173,7 @@ Contributions are always welcome!
 1. Commit your changes (`git commit -m 'Add new feature'`)  
 1. Push the branch (`git push origin feature/my-feature`)  
 1. Open a Pull Request
+
 ## Contact
 
 For questions, bug reports, or suggestions:
