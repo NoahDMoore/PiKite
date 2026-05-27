@@ -564,7 +564,7 @@ class PiKiteApp:
         except TypeError:
             cleanup_progress_bar = None
         
-        # Advance the ProgressBar (if it exists)
+        # Advance the Progress Bar (if it exists)
         def _advance_progress():
             if cleanup_progress_bar is not None:
                 cleanup_progress_bar.advance(10)
@@ -606,7 +606,7 @@ class PiKiteApp:
         ]
 
         # Call Each Cleanup Task
-        for task in cleanup_tasks:
+        for i, task in enumerate(cleanup_tasks):
             try:
                 result = task()
 
@@ -615,6 +615,10 @@ class PiKiteApp:
             except Exception as e:
                 logger.error(f"Failed to execute cleanup task {task.__name__ if hasattr(task, '__name__') else task}: {e}")
             finally:
+                # Do not advance the progress bar on last iteration since the display_controller has been shutdown.
+                if i == (len(cleanup_tasks) - 1):
+                    break
+
                 _advance_progress()
 
         logger.info("PiKite clean-up complete. Closing application.")
