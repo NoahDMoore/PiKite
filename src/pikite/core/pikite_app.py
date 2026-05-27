@@ -6,9 +6,9 @@ from pikite.core.capture_session import CaptureSession
 import pikite.core.constants as CONSTANTS
 from pikite.core.input_handler import InputHandler, InputCommand, InputScope, RemoteInput
 from pikite.core.lcd_menu import Menu
-import pikite.core.logger as logger_module
+import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
-from pikite.core.timer import Timer
+from pikite.utils.timer import Timer
 from pikite.hardware.camera_controller import CameraController, PreviewStream
 from pikite.hardware.button_controller import ButtonController
 from pikite.hardware.display_controller import DisplayController, LoadingBar, PreLoader

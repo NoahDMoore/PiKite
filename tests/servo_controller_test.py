@@ -3,8 +3,8 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from pikite.core.logger import get_logger
-from pikite.core.timer import Timer
+from pikite.utils.logger import get_logger
+from pikite.utils.timer import Timer
 from pikite.hardware.servo_controller import TiltServo, PanServo, PanTiltPattern, DIRECTION
 from pikite.system.storage import StorageManager
 

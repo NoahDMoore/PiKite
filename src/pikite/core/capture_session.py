@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pikite.core.constants as CONSTANTS
 from pikite.core.input_handler import InputCommand, InputScope
-import pikite.core.logger as logger_module
+import pikite.utils.logger as logger_module
 from pikite.hardware.servo_controller import PanTiltPattern
 
 if TYPE_CHECKING:

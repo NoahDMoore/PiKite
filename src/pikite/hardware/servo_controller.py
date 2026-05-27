@@ -16,8 +16,8 @@ import sys
 from rpi_hardware_pwm import HardwarePWM    # type: ignore
 
 from ..hardware.encoder_controller import EncoderController
-from ..core.logger import get_logger, set_log_level
-from ..core.timer import Timer
+from ..utils.logger import get_logger
+from ..utils.timer import Timer
 
 # Setup Logger
 logger = get_logger(__name__)

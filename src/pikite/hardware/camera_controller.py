@@ -3,10 +3,10 @@ import cv2
 from pathlib import Path
 from PIL import Image
 
-from ..core.logger import get_logger
+from ..utils.logger import get_logger
 from ..core.settings import Settings
 from ..core.constants import CAMERA_MODELS, CAPTURE_MODES, MAX_RESOLUTIONS
-from ..core.timer import Timer
+from ..utils.timer import Timer
 from ..remote.microdot_server import ControllerServer
 from ..system.storage import StorageManager
 

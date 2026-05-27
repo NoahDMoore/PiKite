@@ -1,7 +1,7 @@
 import asyncio
 
 from pikite.core.pikite_app import PiKiteApp
-import pikite.core.logger as logger_module
+import pikite.utils.logger as logger_module
 
 # Setup Logger
 logger = logger_module.get_logger(__name__)

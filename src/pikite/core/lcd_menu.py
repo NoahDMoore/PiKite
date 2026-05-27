@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 from .constants import XMLTAG, XMLATTRIB, MENUACTION
 from ..core.input_handler import InputHandler, InputCommand, InputSource
-from .logger import get_logger
+from ..utils.logger import get_logger
 from .settings import Settings
 # Mock hardware controller class for testing on non-RPi system; remove when done testing
 try:

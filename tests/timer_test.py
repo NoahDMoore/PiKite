@@ -3,8 +3,8 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from pikite.core.logger import get_logger, set_log_level
-from pikite.core.timer import Timer
+from pikite.utils.logger import get_logger, set_log_level
+from pikite.utils.timer import Timer
 
 import time
 

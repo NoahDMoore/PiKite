@@ -3,7 +3,7 @@ import time
 import board        # type: ignore
 import digitalio    # type: ignore
 
-import pikite.core.logger as logger_module
+import pikite.utils.logger as logger_module
 from ..system.storage import StorageManager
 
 #Mini PiTFT

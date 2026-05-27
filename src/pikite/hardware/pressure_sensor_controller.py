@@ -3,7 +3,7 @@ import board            # type: ignore
 import digitalio        # type: ignore
 import adafruit_bmp3xx  # type: ignore
 
-from ..core.logger import get_logger
+from ..utils.logger import get_logger
 from ..core.constants import DISTANCE_UNITS
 from .display_controller import LoadingBar
 

@@ -5,7 +5,7 @@ from pikite.hardware import camera_controller
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from pikite.core.logger import get_logger
+from pikite.utils.logger import get_logger
 from pikite.core.settings import Settings
 from pikite.core.constants import CAPTURE_MODES, MEDIA_EXTENSIONS
 from pikite.hardware.camera_controller import CameraController

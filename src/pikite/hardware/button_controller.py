@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 from typing import Optional
 
 from ..core.input_handler import InputHandler, InputCommand, InputSource, InputScope
-from ..core.logger import get_logger
+from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
 
