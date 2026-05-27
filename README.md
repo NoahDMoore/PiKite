@@ -102,7 +102,6 @@ src/
     │               ├── media.js
     │               ├── pikite_settings.js
     │               └── websocket_client.js
-    |
     ├── static/
     │   ├── fonts/
     │   │   └── robotobold.ttf
@@ -118,7 +117,7 @@ src/
         ├── storage.py
         └── system_info.py
 LICENSE.md           # GNU GPLv3 license
-pikite.servie        # Linux systemd service configuration
+pikite.service        # Linux systemd service configuration
 pyproject.toml       # Poetry configuration
 README.md            # PiKite Documentation
 ```
