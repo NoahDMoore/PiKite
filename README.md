@@ -57,21 +57,52 @@ src/
     │   └── default_settings.ini
     ├── core/
     │   ├── __init__.py
+    │   ├── capture_session.py
     │   ├── constants.py
     │   ├── input_handler.py
     │   ├── lcd_menu.py
     │   ├── logger.py
+    │   ├── pikite_app.py
     │   ├── settings.py
     │   └── timer.py
     ├── hardware/
     │   ├── __init__.py
+    │   ├── button_controller.py
     │   ├── camera_controller.py
     │   ├── display_controller.py
+    │   ├── encoder_controller.py
     │   ├── pressure_sensor_controller.py
     │   └── servo_controller.py
     ├── remote/
     │   ├── __init__.py
-    │   └── microdot_server.py
+    │   ├── credentials.py
+    │   ├── microdot_server.py
+    │   └── web/
+    │       ├── index.html
+    │       ├── login.html
+    │       └── static/
+    │           ├── css/
+    │           |   ├── material_icons.css
+    │           |   ├── materialize.css
+    │           |   └── styles.css
+    │           ├── fonts/
+    │           |   ├── MaterialIcons-Regular.eot
+    │           |   ├── MaterialIcons-Regular.ttf
+    │           |   ├── MaterialIcons-Regular.woff
+    │           |   ├── MaterialIcons-Regular.woff2
+    │           |   └── Roboto.ttf
+    │           ├── images/
+    │           |   ├── favicon.svg
+    │           |   ├── logo.svg
+    │           |   └── placeholder.png
+    │           └── js/
+    │               ├── dashboard.js
+    │               ├── logging.js
+    │               ├── materialize.js
+    │               ├── media.js
+    │               ├── pikite_settings.js
+    │               └── websocket_client.js
+    |
     ├── static/
     │   ├── fonts/
     │   │   └── robotobold.ttf
@@ -84,9 +115,11 @@ src/
     └── system/
         ├── __init__.py
         ├── power_management.py
-        └── storage.py
+        ├── storage.py
+        └── system_info.py
+LICENSE.md           # GNU GPLv3 license
+pikite.servie        # Linux systemd service configuration
 pyproject.toml       # Poetry configuration
-LICENSE              # GNU GPLv3 license
 README.md            # PiKite Documentation
 ```
 ## Installation
