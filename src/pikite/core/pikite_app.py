@@ -2,7 +2,7 @@ import asyncio
 from typing import Callable
 from inspect import isawaitable
 
-from pikite.core.capture_session import CaptureSession
+from pikite.core.capture_manager import CaptureManager
 import pikite.core.constants as CONSTANTS
 from pikite.core.input_handler import InputHandler, InputCommand, InputScope, RemoteInput
 from pikite.core.lcd_menu import Menu
@@ -15,7 +15,7 @@ from pikite.hardware.display_controller import DisplayController, LoadingBar, Pr
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servo_controller import TiltServo, PanServo
 from pikite.remote.microdot_server import ControllerServer
-from pikite.system.storage import StorageManager, get_timestamp
+from pikite.system.storage import StorageManager
 import pikite.system.power_management as PowerManagement
 from pikite.system.system_info import display_system_info
 
@@ -80,6 +80,18 @@ class PiKiteApp:
         # Initialize Buttons
         self.button_controller = self.initialize_button_input()
         initialization_progress_bar.advance(10)
+
+        # Initialize CaptureManager
+        self.capture_manager = CaptureManager(
+            camera_controller=self.camera_controller,
+            display_controller=self.display_controller,
+            input_handler=self.input_handler,
+            pan_servo=self.pan_servo,
+            pressure_sensor=self.pressure_sensor,
+            remote_server=self.remote_server,
+            settings=self.settings,
+            tilt_servo=self.tilt_servo,
+        )
 
         # Run Preloader Animation
         preloader = PreLoader(self.display_controller)
@@ -247,8 +259,17 @@ class PiKiteApp:
             return
         self.menu.update_menu()
 
-
     """Remote Command Handlers"""
+
+    def tx_scope(self):
+        """Transmit the current scope to remote clients"""
+        scope_payload = {
+            "type": "scope_update",
+            "scope": self.input_handler.active_scope
+        }
+
+        self.remote_server.send(scope_payload)
+        logger.debug("Sent current settings and menu options to remote clients")
 
     def tx_settings(self, **kwargs):
         """Fetch current settings and menu options to send to remote clients."""
@@ -309,6 +330,8 @@ class PiKiteApp:
         self.timer.wait(0.5)
 
     def register_remote_handlers(self):
+        self.input_handler.add_scope_change_listener(self.tx_scope)
+
         self.input_handler.register(
             scope=InputScope.MENU,
             command=InputCommand.FETCH_SETTINGS,
@@ -351,149 +374,6 @@ class PiKiteApp:
             callback=self.rx_tilt_command
         )
 
-    """Capture Loop Helper Methods"""
-
-    def get_media_path(self, capture_mode, media_extension, session_dir):
-        if media_extension:
-            return self.storage_manager.media_file_path(
-                mode=capture_mode, 
-                extension=media_extension,
-                session_dir=session_dir
-            )
-        return None
-    
-    def capture_photo(self, media_path):
-        """
-        Capture a photo and send the file path to remote clients.
-        
-        Args:
-            media_path (Path): The file path where the captured photo will be saved.
-            session_dir (Path): The directory where the capture session is stored.
-        """
-        self.camera_controller.capture_image(media_path)
-        logger.info(f"Captured photo: {media_path}")
-        self.tx_last_captured_photo(media_path)
-
-    def tx_last_captured_photo(self, media_path):
-        """Send the obfuscated file path of the last captured photo to remote clients."""
-        file_path = f"/media/{self.storage_manager.PHOTO_OUTPUT_DIR.name}/{media_path.parent.name}/{media_path.name}"
-        file_paths_payload = {
-            "type": "last_captured_photo",
-            "file_path": file_path
-        }
-        self.remote_server.send(file_paths_payload)
-
-    def start_video(self, media_path):
-        self.camera_controller.start_video(media_path)
-        logger.info(f"Started video recording: {media_path}")
-
-    def stop_video(self):
-        if self.is_recording:
-            self.camera_controller.stop_video()
-            logger.info("Stopped video recording")
-
-    def log_altitude(self, csv_writer):
-        altitude = self.pressure_sensor.altitude
-        timestamp = get_timestamp()
-        csv_writer.writerow([timestamp, altitude])
-
-        logger.debug(f"Logged altitude: {altitude} at {timestamp}")
-
-        self.remote_server.send({
-            "type": "altitude_update",
-            "altitude": altitude,
-            "timestamp": timestamp
-        })
-
-    async def step_pan_tilt(self, pan_tilt_pattern):
-        pan_tilt_pattern.step()
-        await asyncio.sleep(0.5) # Small delay to allow servo movement before next step
-        logger.debug("Pan/tilt step executed")
-
-        self.remote_server.send({
-            "type": "pan_tilt_update",
-            "pan_angle": pan_tilt_pattern.current_pan_angle,
-            "tilt_angle": self.tilt_servo.angle
-        })
-
-    async def home_pan_tilt(self):
-        self.pan_servo.rotate_to(speed=0.5, target_angle=0)
-        await asyncio.sleep(0.5)
-        self.tilt_servo.angle = 0
-        await asyncio.sleep(0.5)
-        logger.info("Pan/Tilt homed to default position")
-
-    @property
-    def is_recording(self):
-        return self.camera_controller.is_recording
-
-    async def capture_loop(self):
-        """
-        Main capture loop for handling image capture and processing.
-        """
-        try:
-            logger.info("Starting Capture Loop")
-
-            with CaptureSession(self) as session:
-                while session.loop:
-                    if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
-                        self.display_controller.print_message(f"PiKite Running: {session.runtime_string}")
-                        session.tx_session_update() # Send session update to remote client
-
-                    if self.timer.interval_elapsed(session.altitude_interval, "altitude_interval"):
-                        self.log_altitude(session.csv_writer)
-
-                    if self.timer.interval_elapsed(session.capture_interval, "capture_interval") and not self.is_recording:
-                        # Get media path for capture
-                        media_path = self.get_media_path(**session.media_path_args)
-
-                        # Capture media based on mode
-                        match session.capture_mode:
-                            case CONSTANTS.CAPTURE_MODES.NONE:
-                                pass # Do Nothing if the capture mode is set to None
-                            case CONSTANTS.CAPTURE_MODES.STILL:
-                                self.capture_photo(media_path)
-                                session.capture_count += 1
-                            case CONSTANTS.CAPTURE_MODES.VIDEO:
-                                self.start_video(media_path)
-                                self.timer.set_named_interval("video_length")
-                                
-                    if self.is_recording:
-                        # If capture has been stopped but video is still recording, log time remaining until recording stops
-                        if session.preparing_to_stop:
-                            if self.timer.interval_elapsed(1.0, "time_remaining_check"):
-                                time_remaining = self.timer.interval_remaining(session.video_length, "video_length")
-                                logger.info(f"Capture loop ending, but video is still recording. Waiting for recording to finish... {time_remaining:.1f}s remaining.")
-                        
-                        if self.timer.interval_elapsed(session.video_length, "video_length"):
-                            self.stop_video()
-                            session.capture_count += 1
-                            self.timer.set_named_interval("capture_interval")
-                            self.timer.named_intervals.pop("video_length", None)  # Clear video length interval
-
-                    if self.timer.interval_elapsed(session.pan_tilt_interval, "pan_tilt_interval") and not self.is_recording:
-                        await self.step_pan_tilt(session.pan_tilt_pattern)
-
-                    if session.preparing_to_stop and not self.is_recording:
-                        session.loop = False
-
-                    await asyncio.sleep(0.01)
-        finally:
-            logger.info("Exiting Capture Loop, performing cleanup")
-
-            # Clear Capture Intervals
-            for key in [
-                            "runtime_and_session_info",
-                            "capture_interval",
-                            "altitude_interval",
-                            "pan_tilt_interval",
-                            "time_remaining_check"
-                        ]:
-                self.timer.named_intervals.pop(key, None)
-
-            # Home the Pan/Tilt Servos
-            await self.home_pan_tilt()
-
     async def main_loop(self):
         self.application_running = True
         try:
@@ -506,7 +386,8 @@ class PiKiteApp:
                 elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
                     await self.preview.stop()
 
-                    await self.capture_loop()
+                    await self.capture_manager.capture_loop()
+                    
                     await asyncio.sleep(2)
 
                     self.preview.start()
@@ -571,7 +452,10 @@ class PiKiteApp:
 
         async def _cleanup_servos():
             # Home the Servos
-            await self.home_pan_tilt()
+            self.pan_servo.home()
+            await asyncio.sleep(0.1)
+            self.tilt_servo.home()
+            await asyncio.sleep(0.1)
 
             # Stop the Pan Servo
             self.pan_servo.stop()
