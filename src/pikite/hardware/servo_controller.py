@@ -155,6 +155,10 @@ class TiltServo:
         """Stops the servo motor by setting the duty cycle to 0%."""
         self.pwm.stop()
 
+    def home(self) -> None:
+        """Returns the servo to 0 degrees."""
+        self.angle = 0
+
 
 class DIRECTION(Enum):
     CW = "cw"   # Clockwise
@@ -270,6 +274,10 @@ class PanServo:
         self.pwm.stop()                 # Stop the PWM signal
         self.speed = 0.0                # Reset the speed to 0
         self.direction = DIRECTION.CW   # Reset the direction to CW
+
+    def home(self) -> None:
+        """Returns the servo to 0 degrees."""
+        self.rotate_to(speed=0.5, target_angle=0)
 
     def rotate_by(self, speed: float, direction: DIRECTION, degrees: int, margin: int = 4, **kwargs) -> None:
         """
