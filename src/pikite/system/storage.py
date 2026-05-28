@@ -146,7 +146,7 @@ class StorageManager:
     def media_file_path(
         self,
         mode: CAPTURE_MODES,
-        extension: MEDIA_EXTENSIONS,
+        extension: MEDIA_EXTENSIONS | None,
         base_name: str = "",
         use_timestamp: bool = True,
         session_dir: Path | None = None
@@ -157,16 +157,20 @@ class StorageManager:
         Args:
             mode (CAPTURE_MODES): Type of Media (i.e., photo or video):
                                   CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO
+            extension (str): File extension (default: ".jpg")
             base_name (str): Base name of the file (default: "capture")
-            timestamp (bool): Whether to append a timestamp (default: True)
-            ext (str): File extension (default: ".jpg")
+            use_timestamp (bool): Whether to append a timestamp (default: True)
+            session_dir (Path): Location to store the media file.
 
         Returns:
             Path: Full path to the requested media file.
 
         Raises:
+            TypeError: If media_extension is not provided or is None
             ValueError: If mode is not CAPTURE_MODES.STILL or CAPTURE_MODES.VIDEO
         """
+        if not isinstance(extension, MEDIA_EXTENSIONS) or extension is None:
+            raise TypeError("Media file extension must be of type MEDIA_EXTENSIONS.")
 
         current_session_dir = session_dir or self.new_session_dir(mode) or self.PHOTO_OUTPUT_DIR
         filename = self.get_filename(base_name, extension, use_timestamp)
