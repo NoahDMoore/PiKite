@@ -80,6 +80,20 @@ updateButtonStates()
 var pikite_scope = null
 status_badge = document.getElementById("status-badge");
 
+function updateScope(info) {
+    if (info.scope == "CAPTURE_LOOP" && pikite_scope !== "CAPTURE_LOOP") {
+        pikite_scope = info.scope;
+        sendCommand("REQUEST_SESSION_INFO");  // Request full session info when scope changes to capture loop
+
+        status_badge.classList.remove("idle");
+        status_badge.classList.add("capture");
+        status_badge.dataset.badgeCaption = "Capture";
+
+        document.getElementById("idle-controls").style.display = "none";
+        document.getElementById("capture-session-controls").style.display = "block";
+    }
+}
+
 function loadSessionInfo(info) {
     document.getElementById("session-start").textContent = info.session_start || "N/A";
     document.getElementById("capture-mode").textContent = info.capture_mode || "N/A";
@@ -92,18 +106,6 @@ function loadSessionInfo(info) {
 }
 
 function updateSessionInfo(info) {
-    if (info.scope == "CAPTURE_LOOP" && pikite_scope !== "CAPTURE_LOOP") {
-        pikite_scope = info.scope;
-        sendCommand("REQUEST_SESSION_INFO");  // Request full session info when scope changes to capture loop
-
-        status_badge.classList.remove("idle");
-        status_badge.classList.add("capture");
-        status_badge.dataset.badgeCaption = "Capture";
-
-        document.getElementById("idle-controls").style.display = "none";
-        document.getElementById("capture-session-controls").style.display = "block";
-    }
-
     document.getElementById("capture-count").textContent = info.capture_count !== undefined ? info.capture_count : "N/A";
     document.getElementById("runtime").textContent = info.runtime || "N/A";
 }
