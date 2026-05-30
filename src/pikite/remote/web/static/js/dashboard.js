@@ -81,8 +81,7 @@ var pikite_scope = null
 status_badge = document.getElementById("status-badge");
 
 function updateScope(info) {
-    console.log("Scope RX: " + info.scope)
-    if (info.scope == "CAPTURE_LOOP" && pikite_scope !== "CAPTURE_LOOP") {
+    if (info.scope == "capture_loop" && pikite_scope !== "capture_loop") {
         pikite_scope = info.scope;
         sendCommand("REQUEST_SESSION_INFO");  // Request full session info when scope changes to capture loop
 
@@ -137,7 +136,7 @@ function updatePanTiltInfo(info) {
 }
 
 function endCaptureSession(info) {
-    pikite_scope = "MENU"
+    pikite_scope = "menu"
 
     status_badge.classList.remove("capture");
     status_badge.classList.add("idle");
