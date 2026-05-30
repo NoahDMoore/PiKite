@@ -379,7 +379,7 @@
             });
 
             document.getElementById('shutdown-btn').addEventListener('click', function() {
-                if (pikite_scope == "CAPTURE_LOOP") {
+                if (pikite_mode == "CAPTURE_LOOP") {
                     M.toast({html: `WARNING: Must stop capture session before shutdown.`, classes: 'orange darken-4'})
                     return;
                 } else {
@@ -393,7 +393,7 @@
             });
 
             document.getElementById('reboot-btn').addEventListener('click', function() {
-                if (pikite_scope == "CAPTURE_LOOP") {
+                if (pikite_mode == "CAPTURE_LOOP") {
                     M.toast({html: `WARNING: Must stop capture session before reboot.`, classes: 'orange darken-4'})
                     return;
                 } else {
@@ -407,7 +407,7 @@
             });
 
             document.getElementById('exit-btn').addEventListener('click', function() {
-                if (pikite_scope == "CAPTURE_LOOP") {
+                if (pikite_mode == "CAPTURE_LOOP") {
                     M.toast({html: `WARNING: Must stop capture session before stopping app.`, classes: 'orange darken-4'})
                     return;
                 } else {

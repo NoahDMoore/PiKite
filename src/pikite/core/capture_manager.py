@@ -2,8 +2,8 @@ import asyncio
 from enum import Enum, auto
 
 from pikite.core.capture_session import SessionContext, CaptureSession
-import pikite.core.constants as CONSTANTS
-from pikite.core.input_handler import InputHandler, InputCommand, InputScope
+from pikite.core.constants import PiKiteMode, CAPTURE_MODES
+from pikite.core.input_handler import InputHandler, InputCommand
 import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
 from pikite.utils.timer import Timer
@@ -58,7 +58,7 @@ class CaptureManager:
 
         # Register Handler for Stop command
         self.input_handler.register(
-            scope=InputScope.CAPTURE_LOOP,
+            mode=PiKiteMode.CAPTURE_LOOP,
             command=InputCommand.STOP_CAPTURE,
             callback=self._request_stop
         )
@@ -163,7 +163,7 @@ class CaptureManager:
 
                 # Register Handler for Session Info Requests
                 self._info_handler = {
-                    "scope":InputScope.CAPTURE_LOOP,
+                    "mode":PiKiteMode.CAPTURE_LOOP,
                     "command":InputCommand.REQUEST_SESSION_INFO,
                     "callback":lambda: self.tx_session_info(session)
                 }
@@ -187,12 +187,12 @@ class CaptureManager:
 
                         # Capture media based on mode
                         match session.capture_mode:
-                            case CONSTANTS.CAPTURE_MODES.NONE:
+                            case CAPTURE_MODES.NONE:
                                 pass # Do Nothing if the capture mode is set to None
-                            case CONSTANTS.CAPTURE_MODES.STILL:
+                            case CAPTURE_MODES.STILL:
                                 self.capture_photo(media_path)
                                 session.capture_count += 1
-                            case CONSTANTS.CAPTURE_MODES.VIDEO:
+                            case CAPTURE_MODES.VIDEO:
                                 self.start_video(media_path)
                                 self.timer.set_named_interval("video_length")
                                 

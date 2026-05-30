@@ -4,7 +4,7 @@ from inspect import isawaitable
 
 from pikite.core.capture_manager import CaptureManager
 import pikite.core.constants as CONSTANTS
-from pikite.core.input_handler import InputHandler, InputCommand, InputScope, RemoteInput
+from pikite.core.input_handler import InputHandler, InputCommand, RemoteInput
 from pikite.core.lcd_menu import Menu
 import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
@@ -148,24 +148,24 @@ class PiKiteApp:
             ButtonController: The initialized button controller instance.
         """
         button_controller = ButtonController(self.input_handler)
-        self.input_handler.add_scope_change_listener(button_controller.sync_scope)
+        self.input_handler.add_mode_change_listener(button_controller.sync_mode)
         
         button_controller.set_commands(
             next_command=InputCommand.NEXT,
             select_command=InputCommand.SELECT,
-            scope=InputScope.MENU
+            mode=CONSTANTS.PiKiteMode.MENU
         )
         
         button_controller.set_commands(
             next_command=InputCommand.STOP_CAPTURE,
             select_command=InputCommand.STOP_CAPTURE,
-            scope=InputScope.CAPTURE_LOOP
+            mode=CONSTANTS.PiKiteMode.CAPTURE_LOOP
         )
 
         button_controller.set_commands(
             next_command=InputCommand.NEXT,
             select_command=InputCommand.SELECT,
-            scope=InputScope.SYSTEM_INFO
+            mode=CONSTANTS.PiKiteMode.SYSTEM_INFO
         )
 
         return button_controller
@@ -184,30 +184,30 @@ class PiKiteApp:
         """
         menu = Menu(self.display_controller, self.settings, self.input_handler) #type: ignore
 
-        self.input_handler.set_scope(InputScope.MENU)
+        self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
 
-        self.input_handler.add_scope_change_listener(self._on_enter_menu_scope)
+        self.input_handler.add_mode_change_listener(self._on_enter_menu_mode)
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.NEXT,
             callback=menu.increment_element
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.SELECT,
             callback=menu.do_action
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.START_CAPTURE,
-            callback=lambda: self.input_handler.set_scope(InputScope.CAPTURE_LOOP)
+            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.CAPTURE_LOOP)
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.SET_BASELINE_PRESSURE,
             callback=lambda: self.pressure_sensor.get_baseline_pressure(
                 num_samples=80,
@@ -216,60 +216,60 @@ class PiKiteApp:
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.DISPLAY_SYSTEM_INFO,
-            callback=lambda: self.input_handler.set_scope(InputScope.SYSTEM_INFO)
+            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.SYSTEM_INFO)
         )
 
-        for scope in [InputScope.MENU, InputScope.SYSTEM_INFO]:
+        for mode in [CONSTANTS.PiKiteMode.MENU, CONSTANTS.PiKiteMode.SYSTEM_INFO]:
             self.input_handler.register(
-                scope=scope,
+                mode=mode,
                 command=InputCommand.SHUTDOWN,
                 callback=self.shutdown
             )
 
             self.input_handler.register(
-                scope=scope,
+                mode=mode,
                 command=InputCommand.REBOOT,
                 callback=self.reboot
             )
 
             self.input_handler.register(
-                scope=scope,
+                mode=mode,
                 command=InputCommand.EXIT,
                 callback=self.exit
             )
 
         self.input_handler.register(
-            scope=InputScope.SYSTEM_INFO,
+            mode=CONSTANTS.PiKiteMode.SYSTEM_INFO,
             command=InputCommand.NEXT,
-            callback=lambda: self.input_handler.set_scope(InputScope.MENU)
+            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
         )
 
         self.input_handler.register(
-            scope=InputScope.SYSTEM_INFO,
+            mode=CONSTANTS.PiKiteMode.SYSTEM_INFO,
             command=InputCommand.SELECT,
-            callback=lambda: self.input_handler.set_scope(InputScope.MENU)
+            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
         )
 
         return menu
     
-    def _on_enter_menu_scope(self, new_scope: InputScope):
-        """Redraw the menu upon entering the menu scope."""
-        if not new_scope == InputScope.MENU:
+    def _on_enter_menu_mode(self, new_mode: CONSTANTS.PiKiteMode):
+        """Redraw the menu upon entering the menu mode."""
+        if not new_mode == CONSTANTS.PiKiteMode.MENU:
             return
         self.menu.update_menu()
 
     """Remote Command Handlers"""
 
-    def tx_scope(self, new_scope: InputScope):
-        """Transmit the current scope to remote clients"""
-        scope_payload = {
-            "type": "scope_update",
-            "scope": new_scope
+    def tx_mode(self, new_mode: CONSTANTS.PiKiteMode):
+        """Transmit the current mode to remote clients"""
+        mode_payload = {
+            "type": "mode_update",
+            "mode": new_mode
         }
 
-        self.remote_server.send(scope_payload)
+        self.remote_server.send(mode_payload)
         logger.debug("Sent current settings and menu options to remote clients")
 
     def tx_settings(self, **kwargs):
@@ -331,46 +331,46 @@ class PiKiteApp:
         self.timer.wait(0.5)
 
     def register_remote_handlers(self):
-        self.input_handler.add_scope_change_listener(self.tx_scope)
+        self.input_handler.add_mode_change_listener(self.tx_mode)
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.FETCH_SETTINGS,
             callback=self.tx_settings
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.UPDATE_SETTINGS,
             callback=self.rx_settings_update
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.LOAD_DEFAULT_SETTINGS,
             callback=self.rx_default_settings_request
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.FETCH_MEDIA_DIRS,
             callback=self.tx_media_dirs
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.FETCH_MEDIA,
             callback=self.tx_media_file_paths
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.PAN,
             callback=self.rx_pan_command
         )
 
         self.input_handler.register(
-            scope=InputScope.MENU,
+            mode=CONSTANTS.PiKiteMode.MENU,
             command=InputCommand.TILT,
             callback=self.rx_tilt_command
         )
@@ -381,10 +381,10 @@ class PiKiteApp:
             self.preview.start()
 
             while self.application_running:
-                if self.input_handler.active_scope == InputScope.MENU:
+                if self.input_handler.active_mode == CONSTANTS.PiKiteMode.MENU:
                     pass
 
-                elif self.input_handler.active_scope == InputScope.CAPTURE_LOOP:
+                elif self.input_handler.active_mode == CONSTANTS.PiKiteMode.CAPTURE_LOOP:
                     await self.preview.stop()
 
                     await self.capture_manager.capture_loop()
@@ -393,12 +393,12 @@ class PiKiteApp:
 
                     self.preview.start()
 
-                    self.input_handler.set_scope(InputScope.MENU)
+                    self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
 
-                elif self.input_handler.active_scope == InputScope.SYSTEM_INFO:
+                elif self.input_handler.active_mode == CONSTANTS.PiKiteMode.SYSTEM_INFO:
                     display_system_info(self.display_controller) # type: ignore
 
-                    while self.input_handler.active_scope == InputScope.SYSTEM_INFO:
+                    while self.input_handler.active_mode == CONSTANTS.PiKiteMode.SYSTEM_INFO:
                         await asyncio.sleep(0.1)
 
                 await asyncio.sleep(0.1)

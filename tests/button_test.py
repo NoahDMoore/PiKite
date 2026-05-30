@@ -3,6 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
+from pikite.core.constants import PiKiteMode
 from pikite.utils.logger import get_logger
 from pikite.hardware.button_controller import ButtonController
 from pikite.core.input_handler import InputHandler, InputCommand, InputSource
@@ -16,18 +17,18 @@ logger.info("Starting Button/Input Tests")
 
 def test_input_handler_initialization():
     input_handler = InputHandler()
-    assert input_handler._active_scope == "default"
+    assert input_handler.active_mode == PiKiteMode.DEFAULT
     logger.info("InputHandler initialized correctly")
 
-def test_input_handler_scope_management():
+def test_input_handler_mode_management():
     input_handler = InputHandler()
-    input_handler.set_scope("test_scope")
-    assert input_handler._active_scope == "test_scope"
-    logger.info("InputHandler scope set correctly")
+    input_handler.set_mode(PiKiteMode.DEFAULT)
+    assert input_handler.active_mode == PiKiteMode.DEFAULT
+    logger.info("InputHandler mode set correctly")
 
-    input_handler.clear_scope("test_scope")
-    assert "test_scope" not in input_handler._listeners
-    logger.info("InputHandler scope cleared correctly")
+    input_handler.clear_mode(PiKiteMode.DEFAULT)
+    assert PiKiteMode.DEFAULT not in input_handler._listeners
+    logger.info("InputHandler mode cleared correctly")
 
 def test_input_handler_registration_and_handling():
     input_handler = InputHandler()
@@ -37,7 +38,7 @@ def test_input_handler_registration_and_handling():
         test_flag["called"] = True
         logger.info("Test callback executed")
 
-    input_handler.register("default", InputCommand.NEXT, test_callback)
+    input_handler.register(PiKiteMode.DEFAULT, InputCommand.NEXT, test_callback)
     input_handler.handle(command=InputCommand.NEXT, source=InputSource.SYSTEM)
 
     assert test_flag["called"] is True
@@ -62,8 +63,8 @@ def test_button_controller_initialization_and_callbacks():
             test_flag["select_called"] = True
             logger.info("SELECT button callback executed")
 
-        input_handler.register("default", InputCommand.NEXT, next_callback)
-        input_handler.register("default", InputCommand.SELECT, select_callback)
+        input_handler.register(PiKiteMode.DEFAULT, InputCommand.NEXT, next_callback)
+        input_handler.register(PiKiteMode.DEFAULT, InputCommand.SELECT, select_callback)
 
         # Simulate NEXT button press
         button_controller._on_next_pressed(channel=24)
@@ -91,8 +92,8 @@ def test_real_button_presses():
         def select_callback(**kwargs):
             logger.info("SELECT button pressed!")
 
-        input_handler.register("default", InputCommand.NEXT, next_callback)
-        input_handler.register("default", InputCommand.SELECT, select_callback)
+        input_handler.register(PiKiteMode.DEFAULT, InputCommand.NEXT, next_callback)
+        input_handler.register(PiKiteMode.DEFAULT, InputCommand.SELECT, select_callback)
 
         logger.info("Testing real button presses for 20 seconds. Please press the buttons now.")
         time.sleep(20)

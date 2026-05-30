@@ -1,6 +1,13 @@
 # pikite/core/constants.py
 from enum import Enum
 
+# Application Modes
+class PiKiteMode(str, Enum):
+    DEFAULT = "default"
+    MENU = "menu"
+    CAPTURE_LOOP = "capture_loop"
+    SYSTEM_INFO = "system_info"
+
 # Constants for XML tags and menu actions
 class XMLTAG(str, Enum):
     MENU = "menu"

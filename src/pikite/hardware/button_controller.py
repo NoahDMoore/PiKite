@@ -1,7 +1,8 @@
 import RPi.GPIO as GPIO
 from typing import Optional
 
-from ..core.input_handler import InputHandler, InputCommand, InputSource, InputScope
+from ..core.constants import PiKiteMode
+from ..core.input_handler import InputHandler, InputCommand, InputSource
 from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -12,8 +13,8 @@ class ButtonController:
     Handles physical GPIO button input and forwards events
     to the InputHandler as InputCommands.
     
-    Supports dynamic command assignment and scope-aware button mappings.
-    Button commands are automatically remembered and restored when entering/exiting scopes.
+    Supports dynamic command assignment and mode-aware button mappings.
+    Button commands are automatically remembered and restored when entering/exiting modes.
     """
 
     def __init__(
@@ -47,10 +48,10 @@ class ButtonController:
         self.next_command = next_command
         self.select_command = select_command
         
-        # Scope-aware command mappings: scope -> (next_command, select_command)
-        self._scope_commands: dict[InputScope, tuple[InputCommand, InputCommand]] = {}
-        # Store initial commands for default scope
-        self._scope_commands[input_handler.active_scope] = (next_command, select_command)
+        # mode-aware command mappings: mode -> (next_command, select_command)
+        self._mode_commands: dict[PiKiteMode, tuple[InputCommand, InputCommand]] = {}
+        # Store initial commands for default mode
+        self._mode_commands[input_handler.active_mode] = (next_command, select_command)
 
         GPIO.setmode(GPIO.BCM)
 
@@ -116,22 +117,22 @@ class ButtonController:
         GPIO.remove_event_detect(self.pin_select)
         GPIO.cleanup([self.pin_next, self.pin_select])
 
-    def set_commands(self, *, next_command: Optional[InputCommand] = None, select_command: Optional[InputCommand] = None, scope: Optional[InputScope] = None):
+    def set_commands(self, *, next_command: Optional[InputCommand] = None, select_command: Optional[InputCommand] = None, mode: Optional[PiKiteMode] = None):
         """
         Dynamically update the commands emitted by button presses.
         
-        Updates are stored per-scope and automatically recalled when entering/exiting scopes.
+        Updates are stored per-mode and automatically recalled when entering/exiting modes.
         
         Args:
             next_command (InputCommand, optional): New command for NEXT button. If None, unchanged.
             select_command (InputCommand, optional): New command for SELECT button. If None, unchanged.
-            scope (InputScope, optional): Scope to update. If None, uses current active scope.
+            mode (PiKiteMode, optional): mode to update. If None, uses current active mode.
         """
-        target_scope = scope or self.input_handler.active_scope
+        target_mode = mode or self.input_handler.active_mode
         
-        # Get existing commands for this scope, or use current if not yet set
-        existing_next, existing_select = self._scope_commands.get(
-            target_scope,
+        # Get existing commands for this mode, or use current if not yet set
+        existing_next, existing_select = self._mode_commands.get(
+            target_mode,
             (self.next_command, self.select_command)
         )
         
@@ -139,35 +140,35 @@ class ButtonController:
         new_next = next_command if next_command is not None else existing_next
         new_select = select_command if select_command is not None else existing_select
         
-        # Store in scope mapping
-        self._scope_commands[target_scope] = (new_next, new_select)
+        # Store in mode mapping
+        self._mode_commands[target_mode] = (new_next, new_select)
         
-        # If updating current scope, apply immediately
-        if target_scope == self.input_handler.active_scope:
+        # If updating current mode, apply immediately
+        if target_mode == self.input_handler.active_mode:
             self.next_command = new_next
             self.select_command = new_select
             
             if next_command is not None:
-                logger.info(f"Updated NEXT button command to {next_command} in scope '{target_scope}'")
+                logger.info(f"Updated NEXT button command to {next_command} in mode '{target_mode}'")
             if select_command is not None:
-                logger.info(f"Updated SELECT button command to {select_command} in scope '{target_scope}'")
+                logger.info(f"Updated SELECT button command to {select_command} in mode '{target_mode}'")
         else:
-            logger.info(f"Stored button commands for scope '{target_scope}' (not yet active)")
+            logger.info(f"Stored button commands for mode '{target_mode}' (not yet active)")
 
-    def sync_scope(self, new_scope: InputScope, **kwargs):
+    def sync_mode(self, new_mode: PiKiteMode, **kwargs):
         """
-        Synchronize button commands with a scope change in the InputHandler.
+        Synchronize button commands with a mode change in the InputHandler.
         
-        This method should be called when the InputHandler's active scope changes
-        to restore the button mappings for that scope.
+        This method should be called when the InputHandler's active mode changes
+        to restore the button mappings for that mode.
         
         Args:
-            new_scope (InputScope): The new active scope from InputHandler.
+            new_mode (PiKiteMode): The new active mode from InputHandler.
         """
-        if new_scope in self._scope_commands:
-            self.next_command, self.select_command = self._scope_commands[new_scope]
-            logger.info(f"Restored button commands for scope '{new_scope}': NEXT={self.next_command.name}, SELECT={self.select_command.name}")
+        if new_mode in self._mode_commands:
+            self.next_command, self.select_command = self._mode_commands[new_mode]
+            logger.info(f"Restored button commands for mode '{new_mode}': NEXT={self.next_command.name}, SELECT={self.select_command.name}")
         else:
-            # If scope not yet configured, use current commands as default for this scope
-            self._scope_commands[new_scope] = (self.next_command, self.select_command)
-            logger.info(f"Initialized scope '{new_scope}' with current button commands")
+            # If mode not yet configured, use current commands as default for this mode
+            self._mode_commands[new_mode] = (self.next_command, self.select_command)
+            logger.info(f"Initialized mode '{new_mode}' with current button commands")

@@ -5,7 +5,7 @@ from functools import partial
 import json
 from typing import Callable
 
-
+from ..core.constants import PiKiteMode
 from ..remote.microdot_server import ControllerServer
 from ..utils.logger import get_logger
 
@@ -47,129 +47,123 @@ class InputSource(Enum):
     WEBSOCKET = auto()
     SYSTEM = auto()
 
-class InputScope(str, Enum):
-    DEFAULT = "default"
-    MENU = "menu"
-    CAPTURE_LOOP = "capture_loop"
-    SYSTEM_INFO = "system_info"
-
 class InputHandler:
     """
     Centralized input handling system that manages input commands
     from various sources and dispatches them to registered callbacks.
     """
     def __init__(self):
-        """Initialize the InputHandler with empty listener mappings and default scope."""
+        """Initialize the InputHandler with empty listener mappings and default mode."""
 
         self._listeners: dict[str, dict[InputCommand, list[Callable]]] = defaultdict(lambda: defaultdict(list))
-        self._scope_change_listeners: list[Callable] = []
-        self.active_scope = InputScope.DEFAULT
-        logger.info(f"InputHandler initialized with scope '{self.active_scope}'")
+        self._mode_change_listeners: list[Callable] = []
+        self.active_mode = PiKiteMode.DEFAULT
+        logger.info(f"InputHandler initialized with mode '{self.active_mode}'")
 
-    def set_scope(self, scope: InputScope):
+    def set_mode(self, mode: PiKiteMode):
         """
-        Set the active input scope.
+        Set the active input mode.
         
           Args:
-            scope (InputScope): The scope to set as active.
+            mode (PiKiteMode): The mode to set as active.
         """
 
-        if scope == self.active_scope:
-            logger.debug(f"Scope already active: '{scope}'")
+        if mode == self.active_mode:
+            logger.debug(f"mode already active: '{mode}'")
             return
         
-        logger.info(f"Switching input scope from '{self.active_scope}' to '{scope}'")
+        logger.info(f"Switching input mode from '{self.active_mode}' to '{mode}'")
 
-        self.active_scope = scope
+        self.active_mode = mode
 
-        for callback in self._scope_change_listeners:
+        for callback in self._mode_change_listeners:
             try:
-                callback(new_scope=scope)
+                callback(new_mode=mode)
             except Exception as e:
                 logger.exception(
-                    f"Error while calling scope change listener {callback.__qualname__} "
+                    f"Error while calling mode change listener {callback.__qualname__} "
                     f" - {e}"
                 )
 
-    def clear_scope(self, scope: InputScope):
+    def clear_mode(self, mode: PiKiteMode):
         """
-        Clear all input bindings for a given scope.
+        Clear all input bindings for a given mode.
 
         Args:
-            scope (InputScope): The scope to clear.
+            mode (PiKiteMode): The mode to clear.
         """
 
-        if scope in self._listeners:
-            count = sum(len(cbs) for cbs in self._listeners[scope].values())
-            self._listeners[scope].clear()
-            logger.info(f"Cleared {count} input bindings from scope '{scope}'")
+        if mode in self._listeners:
+            count = sum(len(cbs) for cbs in self._listeners[mode].values())
+            self._listeners[mode].clear()
+            logger.info(f"Cleared {count} input bindings from mode '{mode}'")
         else:
-            logger.debug(f"Tried to clear non-existent scope '{scope}'")
+            logger.debug(f"Tried to clear non-existent mode '{mode}'")
 
-    def add_scope_change_listener(self, callback: Callable, **kwargs):
+    def add_mode_change_listener(self, callback: Callable, **kwargs):
         """
-        Register a listener to be called when the input scope changes.
+        Register a listener to be called when the input mode changes.
 
         Args:
-            callback (Callable): A function to call on scope change.
+            callback (Callable): A function to call on mode change.
         """
         callback = partial(callback, **kwargs) if kwargs else callback
 
-        if callback in self._scope_change_listeners:
-            logger.debug(f"Duplicate scope change listener ignored: {callback.__qualname__}")
+        if callback in self._mode_change_listeners:
+            logger.debug(f"Duplicate mode change listener ignored: {callback.__qualname__}")
             return
 
-        self._scope_change_listeners.append(callback)
-        logger.debug(f"Registered scope change listener: {callback.__qualname__}")
+        self._mode_change_listeners.append(callback)
+        logger.debug(f"Registered mode change listener: {callback.__qualname__}")
 
-    def register(self, scope: InputScope, command: InputCommand, callback: Callable):
+    def register(self, mode: PiKiteMode, command: InputCommand, callback: Callable):
         """
-        Register a callback for a specific input command within a given scope.
+        Register a callback for a specific input command within a given mode.
         
         Args:
-            scope (InputScope): The scope for the input command.
+            mode (PiKiteMode): The mode for the input command.
             command (InputCommand): The input command to register.
             callback (Callable): The function to call when the command is received.
         """
 
-        if callback in self._listeners[scope][command]:
+        if callback in self._listeners[mode][command]:
             logger.debug(
-                f"Duplicate input registration ignored: Scope={scope}: Command={command} -> {callback.__qualname__}"
+                f"Duplicate input registration ignored: mode={mode}: Command={command} -> {callback.__qualname__}"
             )
             return
 
-        self._listeners[scope][command].append(callback)
+        self._listeners[mode][command].append(callback)
 
         logger.debug(
-            f"Registered input: Scope='{scope}', Command={command.name}, "
+            f"Registered input: mode='{mode}', Command={command.name}, "
             f"Handler={callback.__qualname__}"
         )
 
-    def unregister(self, scope: InputScope, command: InputCommand, callback: Callable):
+    def unregister(self, mode: PiKiteMode, command: InputCommand, callback: Callable):
         """
-        Unregister a callback for a specific input command within a given scope.
+        Unregister a callback for a specific input command within a given mode.
 
         Args:
-            scope (InputScope): The scope for the input command.
+            mode (PiKiteMode): The mode for the input command.
             command (InputCommand): The input command to unregister.
             callback (Callable): The function to remove from the handlers list.
         """
 
-        if callback in self._listeners[scope][command]:
-            self._listeners[scope][command].remove(callback)
+        if callback in self._listeners[mode][command]:
+            self._listeners[mode][command].remove(callback)
             logger.debug(
-                f"Unregistered input: Scope='{scope}', Command={command.name}, "
+                f"Unregistered input: mode='{mode}', Command={command.name}, "
                 f"Handler={callback.__qualname__}"
             )
         else:
             logger.debug(
-                f"Tried to unregister non-existent handler: Scope='{scope}', "
+                f"Tried to unregister non-existent handler: mode='{mode}', "
                 f"Command={command.name} -> {callback.__qualname__}"
             )
 
     def handle(self, *, command: InputCommand, source: InputSource, **kwargs):
         """
-        Handle an input command by invoking all registered callbacks for the current scope.
+        Handle an input command by invoking all registered callbacks for the current mode.
 
         Args:
             command (InputCommand): The input command to handle.
@@ -178,15 +172,15 @@ class InputHandler:
         """        
         logger.info(
             f"Input received: Command={command.name}, "
-            f"Scope='{self.active_scope}', "
+            f"mode='{self.active_mode}', "
             f"Source={source.name}"
         )
 
-        callbacks = self._listeners[self.active_scope].get(command, [])
+        callbacks = self._listeners[self.active_mode].get(command, [])
         if not callbacks:
             logger.debug(
                 f"No handlers for Command={command.name} "
-                f"in Scope='{self.active_scope}' "
+                f"in mode='{self.active_mode}' "
                 f"(Source={source.name})"
             )
             return
@@ -201,7 +195,7 @@ class InputHandler:
             except Exception as e:
                 logger.exception(
                     f"Error while handling Command: {command.name} "
-                    f"in Scope:'{self.active_scope}' "
+                    f"in mode:'{self.active_mode}' "
                     f"with {callback.__qualname__}"
                     f" (Source={source.name})"
                     f" - {e}"

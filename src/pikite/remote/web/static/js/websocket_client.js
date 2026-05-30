@@ -60,9 +60,9 @@ function startWebsocket() {
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "last_captured_photo") {
 			// Preview Last Captured Photo
 			updateCapturePreview(obj)
-		} else if (obj.hasOwnProperty("type") && obj["type"] === "scope_update") {
+		} else if (obj.hasOwnProperty("type") && obj["type"] === "mode_update") {
 			// Handle session update
-			updateScope(obj);
+			updateMode(obj);
 		} else if (obj.hasOwnProperty("type") && obj["type"] === "session_update") {
 			// Handle session update
 			updateSessionInfo(obj);

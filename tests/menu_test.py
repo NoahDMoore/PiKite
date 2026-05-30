@@ -3,7 +3,8 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from pikite.core.input_handler import InputHandler, InputCommand, InputScope
+from pikite.core.constants import PiKiteMode
+from pikite.core.input_handler import InputHandler, InputCommand
 from pikite.utils.logger import get_logger
 from pikite.core.lcd_menu import Menu
 from pikite.core.settings import Settings
@@ -68,21 +69,21 @@ def test_menu_navigation_with_buttons():
     menu = Menu(display_controller, settings, None) # type: ignore
     logger.info("Menu initialized for button navigation test")
 
-    input_handler.set_scope(InputScope.MENU)
+    input_handler.set_mode(PiKiteMode.MENU)
     input_handler.register(
-        scope=InputScope.MENU,
+        mode=PiKiteMode.MENU,
         command=InputCommand.NEXT,
         callback=menu.increment_element
     )
 
     input_handler.register(
-        scope=InputScope.MENU,
+        mode=PiKiteMode.MENU,
         command=InputCommand.PREVIOUS,
         callback=menu.decrement_element
     )
 
     input_handler.register(
-        scope=InputScope.MENU,
+        mode=PiKiteMode.MENU,
         command=InputCommand.SELECT,
         callback=menu.do_action
     )

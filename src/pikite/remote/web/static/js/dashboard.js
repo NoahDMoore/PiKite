@@ -77,13 +77,13 @@ document.querySelectorAll("#tilt-slider").forEach(slider => {
 updateButtonStates()
 
 // Session Info
-var pikite_scope = null
+var pikite_mode = null
 status_badge = document.getElementById("status-badge");
 
-function updateScope(info) {
-    if (info.scope == "capture_loop" && pikite_scope !== "capture_loop") {
-        pikite_scope = info.scope;
-        sendCommand("REQUEST_SESSION_INFO");  // Request full session info when scope changes to capture loop
+function updateMode(info) {
+    if (info.mode == "capture_loop" && pikite_mode !== "capture_loop") {
+        pikite_mode = info.mode;
+        sendCommand("REQUEST_SESSION_INFO");  // Request full session info when mode changes to capture loop
 
         status_badge.classList.remove("idle");
         status_badge.classList.add("capture");
@@ -136,7 +136,7 @@ function updatePanTiltInfo(info) {
 }
 
 function endCaptureSession(info) {
-    pikite_scope = "menu"
+    pikite_mode = "menu"
 
     status_badge.classList.remove("capture");
     status_badge.classList.add("idle");
