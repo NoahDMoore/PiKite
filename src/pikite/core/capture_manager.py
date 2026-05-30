@@ -45,6 +45,7 @@ class CaptureManager:
         self.storage_manager = StorageManager()
         self.tilt_servo = tilt_servo
         self.timer = Timer()
+        self.timer.start()
         self.state = CaptureState.STOPPED
 
         self.session_context = SessionContext(
