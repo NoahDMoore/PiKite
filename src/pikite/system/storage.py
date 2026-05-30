@@ -10,7 +10,7 @@ Typical usage example:
     storage = StorageManager()
 
     # Get the log file path
-    log_file = storage.log_path
+    log_file_base = storage.LOG_FILE_BASE
 
     # Generate a new photo path with timestamp
     photo_file = storage.media_path("photos", filename="kite", ext=".jpg")
@@ -37,7 +37,7 @@ class StorageManager:
         MENU_DIR (Path): Directory for menu XML files.
         MENU_FILE (Path): Path to the main menu XML file.
         USER_ROOT (Path): Root directory for user-specific output files.
-        LOG_FILE (Path): Path to the main log file.
+        LOG_FILE_BASE (Path): Path to the base log file.
         CONFIG_FILE (Path): Path to the configuration file.
         LOG_DIR (Path): Directory for log files.
         DATA_DIR (Path): Directory for data files.
@@ -94,7 +94,7 @@ class StorageManager:
             path.mkdir(parents=True, exist_ok=True)
 
     @property
-    def LOG_FILE(self) -> Path:
+    def LOG_FILE_BASE(self) -> Path:
         """Return the path to the user's log file."""
         return self.LOG_DIR / "pikite.log"
     

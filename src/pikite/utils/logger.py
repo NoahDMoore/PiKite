@@ -1,8 +1,10 @@
 import logging
+from logging.handlers import TimedRotatingFileHandler
+
 from ..system.storage import StorageManager
 
 storage = StorageManager()
-LOG_FILE = storage.LOG_FILE
+LOG_FILE_BASE = storage.LOG_FILE_BASE
 
 logger = logging.getLogger("PiKite")    # Create a logger for the given name
 
@@ -21,7 +23,12 @@ if not logger.handlers:
     logger.addHandler(console_handler)
 
     # File Handler
-    file_handler = logging.FileHandler(LOG_FILE)
+    file_handler = TimedRotatingFileHandler(
+        filename=LOG_FILE_BASE, # Base log file location/file_name
+        when='midnight',        # Create a new log file at midnight
+        interval=1,             # Create the new log file every night
+        backupCount=30          # Store 30 days of logs
+    )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
