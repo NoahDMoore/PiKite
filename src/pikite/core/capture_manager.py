@@ -56,6 +56,13 @@ class CaptureManager:
             self.timer,
         )
 
+        # Register Handler for Stop command
+        self.input_handler.register(
+            scope=InputScope.CAPTURE_LOOP,
+            command=InputCommand.STOP_CAPTURE,
+            callback=self._request_stop
+        )
+
     def get_media_path(self, capture_mode, media_extension, session_dir):
         if media_extension:
             return self.storage_manager.media_file_path(
@@ -162,14 +169,6 @@ class CaptureManager:
                 }
                 self.input_handler.register(**self._info_handler)
 
-                # Register Handler for Stop command
-                self._stop_capture_handler = {
-                    "scope":InputScope.CAPTURE_LOOP,
-                    "command":InputCommand.STOP_CAPTURE,
-                    "callback":self._request_stop
-                }
-                self.input_handler.register(**self._stop_capture_handler)
-
                 while True:
                     if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
                         self.display_controller.print_message(f"PiKite Running: {session.runtime_string}")
@@ -245,6 +244,5 @@ class CaptureManager:
 
             # Unregister capture loop specific input handlers
             self.input_handler.unregister(**self._info_handler)
-            self.input_handler.unregister(**self._stop_capture_handler)
 
             self.state = CaptureState.STOPPED
