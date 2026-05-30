@@ -255,17 +255,18 @@ class PiKiteApp:
         return menu
     
     def _on_enter_menu_scope(self, new_scope: InputScope):
+        """Redraw the menu upon entering the menu scope."""
         if not new_scope == InputScope.MENU:
             return
         self.menu.update_menu()
 
     """Remote Command Handlers"""
 
-    def tx_scope(self):
+    def tx_scope(self, new_scope: InputScope):
         """Transmit the current scope to remote clients"""
         scope_payload = {
             "type": "scope_update",
-            "scope": self.input_handler.active_scope
+            "scope": new_scope
         }
 
         self.remote_server.send(scope_payload)
@@ -507,5 +508,3 @@ class PiKiteApp:
                 _advance_progress()
 
         logger.info("PiKite clean-up complete. Closing application.")
-
-    
