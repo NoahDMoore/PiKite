@@ -120,6 +120,10 @@ class CaptureManager:
         })
 
     def _request_stop(self):
+        if self.state != CaptureState.RUNNING:
+            logger.warning("Cannot request stop. PiKite is not running a capture loop.")
+            return
+        
         self.state = CaptureState.STOP_REQUESTED
 
     @property
@@ -144,6 +148,7 @@ class CaptureManager:
         """
         try:
             logger.info("Starting Capture Loop")
+            self.state = CaptureState.RUNNING
 
             with CaptureSession(self.session_context) as session:
                 # Transmit Initial Session Info
