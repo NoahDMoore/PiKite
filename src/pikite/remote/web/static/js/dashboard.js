@@ -81,6 +81,7 @@ var pikite_scope = null
 status_badge = document.getElementById("status-badge");
 
 function updateScope(info) {
+    console.log("Scope RX: " + info.scope)
     if (info.scope == "CAPTURE_LOOP" && pikite_scope !== "CAPTURE_LOOP") {
         pikite_scope = info.scope;
         sendCommand("REQUEST_SESSION_INFO");  // Request full session info when scope changes to capture loop
