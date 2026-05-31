@@ -317,7 +317,7 @@ class PanServo:
 
         self.proportional_rotate(speed, target_angle, margin)
 
-    def rotate_to(self, speed: float, target_angle: int, margin: int = 4, **kwargs) -> None:
+    def rotate_to(self, target_angle: int, speed: float = 0.5, margin: int = 4) -> None:
         """
         Rotate the servo motor to a specific target angle at a given speed and direction using proportional control.
         Uses EncoderController to measure the angle of rotation, halting when the desired angle is reached.
