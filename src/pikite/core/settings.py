@@ -86,8 +86,12 @@ class Settings:
             new_value (Any): The new value for the setting.
         
         Raises:
+            ValueError: If the setting_key is not a valid setting.
             ValueError: If the setting_key does not correspond to a known section.
         """
+        if not self.is_setting(setting_key):
+            raise ValueError(f"Cannot update unknown setting: {setting_key}")
+
         current_value = self.get(setting_key)
 
         if current_value == new_value:
@@ -129,6 +133,19 @@ class Settings:
         if read_after:
             self.config.read(self.config_path)
             logger.info(f"Configuration reloaded after restoring defaults.")
+
+    def update_from_dict(self, settings_to_update: dict):
+        """
+        Update settings from a dictionary.
+
+        Args:
+            settings_to_update (dict(new_setting_key, value)): The settings to update.
+        """
+        for new_setting, value in settings_to_update:
+            try:
+                self.set(new_setting, value)
+            except ValueError as e:
+                logger.warning("Warning: ", exc_info=e)
 
     def format_as_dict(self) -> dict:
         """
