@@ -304,9 +304,8 @@ class PiKiteApp:
             except Exception as e:
                 logger.error(f"Failed to execute cleanup task {task.__name__ if hasattr(task, '__name__') else task}: {e}")
             finally:
-                # Do not advance the progress bar on last iteration since the display_controller has been shutdown.
-                if i == (len(cleanup_tasks) - 1):
-                    break
+                if i == visible_tasks: # visible_tasks equals the index of the final task
+                    break # skip since DisplayController has been closed and cannot be updated.
                 
                 # Advance the progress bar
                 if cleanup_progress_bar is not None:
