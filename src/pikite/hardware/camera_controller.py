@@ -26,7 +26,7 @@ AwbModeEnum = controls.AwbModeEnum
 logger = get_logger(__name__)
 
 # Set PiCamera2 logging level to WARNING to reduce verbosity
-Picamera2.set_logging_level(Picamera2.WARNING)
+Picamera2.set_logging(Picamera2.WARNING)
 
 # Initialize Storage Manager
 storage = StorageManager()
