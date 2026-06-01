@@ -1,5 +1,6 @@
 import asyncio
 import cv2
+import os
 from pathlib import Path
 from PIL import Image
 
@@ -13,8 +14,14 @@ from ..system.storage import StorageManager
 from picamera2 import Picamera2 # type: ignore
 from picamera2.encoders import H264Encoder # type: ignore
 from picamera2.outputs import FfmpegOutput # type: ignore
+
 from libcamera import controls # type: ignore
 from libcamera import Transform # type: ignore
+
+os.environ['LIBCAMERA_LOG_LEVELS'] = '2' # Set libcamera logging level to WARNING to reduce verbosity
+
+# Set PiCamera2 logging level to WARNING to reduce verbosity
+Picamera2.set_logging(Picamera2.WARNING)
 
 # Libcamera Control Aliases
 AfModeEnum = controls.AfModeEnum
@@ -25,8 +32,6 @@ AwbModeEnum = controls.AwbModeEnum
 # Setup Logger
 logger = get_logger(__name__)
 
-# Set PiCamera2 logging level to WARNING to reduce verbosity
-Picamera2.set_logging(Picamera2.WARNING)
 
 # Initialize Storage Manager
 storage = StorageManager()
