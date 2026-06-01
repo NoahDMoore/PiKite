@@ -81,7 +81,7 @@ var pikite_mode = null
 status_badge = document.getElementById("status-badge");
 
 function updateMode(info) {
-    if (info.mode == "capture_loop" && pikite_mode !== "capture_loop") {
+    if (info.mode == "capture" && pikite_mode !== "capture") {
         pikite_mode = info.mode;
         sendCommand("REQUEST_SESSION_INFO");  // Request full session info when mode changes to capture loop
 
