@@ -332,16 +332,11 @@ class LoadingBar:
 
     def __repr__(self):
         """Return a string representation of the LoadingBar."""
-        return "Loading Bar, currently at {}%".format(self.percentage)
+        return f"Loading Bar, currently at {self.value}%"
 
     def __str__(self):
         """Return a string representation of the LoadingBar."""
-        return "Loading Bar, currently at {}%".format(self.percentage)
-
-    @property
-    def percentage(self):
-        """Return the current percentage of the loading bar."""
-        return ((self.value / 200) * 100)
+        return f"Loading Bar, currently at {self.value}%"
 
     @property
     def title(self):
@@ -366,18 +361,18 @@ class LoadingBar:
         Advance the loading bar by a specified amount.
         
         Args:
-            amount (int): The amount, as a percentage, to advance the loading bar by. Default is 5%.
+            amount (int): The amount to advance the loading bar by. Default is 5. Cumulative max is 100.
         """
-        self.value += ((amount/100) * 200)
+        self.value += amount
 
-        if self.value > 200:
-            self.value = 200
+        if self.value > 100:
+            self.value = 100
         else:
             self.update()
 
     def update(self):
         """Update the loading bar display."""
-        self.image.frame = int(self.value // 10)
+        self.image.frame = self.value
         self.image.display_frame(self.title)
 
 class PreLoader(GIF):
