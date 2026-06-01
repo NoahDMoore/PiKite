@@ -22,8 +22,11 @@ AfRangeEnum = controls.AfRangeEnum
 AfSpeedEnum = controls.AfSpeedEnum
 AwbModeEnum = controls.AwbModeEnum
 
-#Setup Logger
+# Setup Logger
 logger = get_logger(__name__)
+
+# Set PiCamera2 logging level to WARNING to reduce verbosity
+Picamera2.set_logging_level(Picamera2.WARNING)
 
 # Initialize Storage Manager
 storage = StorageManager()
