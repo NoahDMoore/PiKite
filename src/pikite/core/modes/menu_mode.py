@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Callable, TYPE_CHECKING
+from typing import Callable
 
 from pikite.core.modes.pikite_mode import BaseMode, PiKiteMode
 from pikite.core.input_handler import InputCommand
@@ -8,9 +7,6 @@ from pikite.hardware.camera_controller import PreviewStream
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.display_controller import DisplayController
 from pikite.remote.remote_api import RemoteAPI
-
-if TYPE_CHECKING:
-    from pikite.core.modes.mode_manager import ModeManager
 
 class MenuMode(BaseMode):
     def __init__(
@@ -23,7 +19,6 @@ class MenuMode(BaseMode):
             input_handler,
             display_controller: DisplayController,
             menu: Menu,
-            mode_manager: ModeManager,
             pressure_sensor: PressureSensorController,
             remote_api: RemoteAPI
         ):
@@ -34,7 +29,6 @@ class MenuMode(BaseMode):
         self.camera_preview = camera_preview
         self.display_controller = display_controller
         self.menu = menu
-        self.mode_manager = mode_manager
 
         self.mode = PiKiteMode.MENU # Override base mode
         self.pressure_sensor = pressure_sensor
@@ -64,12 +58,12 @@ class MenuMode(BaseMode):
         self.inputs = {
             InputCommand.NEXT: self.menu.increment_element,
             InputCommand.SELECT: self.menu.do_action,
-            InputCommand.START_CAPTURE: lambda: self.mode_manager.switch_to(PiKiteMode.CAPTURE),
+            InputCommand.START_CAPTURE: lambda: self.request_mode_switch(PiKiteMode.CAPTURE),
             InputCommand.SET_BASELINE_PRESSURE: lambda: self.pressure_sensor.get_baseline_pressure(
                 num_samples=80,
                 display_controller=self.display_controller
             ),
-            InputCommand.DISPLAY_SYSTEM_INFO: lambda: self.mode_manager.switch_to(PiKiteMode.SYSTEM_INFO),
+            InputCommand.DISPLAY_SYSTEM_INFO: lambda: self.request_mode_switch(PiKiteMode.SYSTEM_INFO),
             InputCommand.SHUTDOWN: self.app_shutdown,
             InputCommand.REBOOT: self.app_reboot,
             InputCommand.EXIT: self.app_exit,

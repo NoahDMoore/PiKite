@@ -44,6 +44,11 @@ class BaseMode(ABC):
     async def exit(self):
         self.exit_event.set()
 
+    def request_mode_switch(self, mode: PiKiteMode):
+        self.logger.info(f"Mode switch requested: {mode}")
+        self.next_mode = mode
+        self.exit_event.set()
+
     def _register_inputs(self):
         pass
 

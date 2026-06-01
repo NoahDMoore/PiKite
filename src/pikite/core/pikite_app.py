@@ -133,7 +133,6 @@ class PiKiteApp:
             camera_preview=self.preview,
             display_controller=self.display_controller,
             menu=self.menu,
-            mode_manager=self.mode_manager,
             pressure_sensor=self.pressure_sensor,
             remote_api=self.remote_api
         )
@@ -147,7 +146,6 @@ class PiKiteApp:
             **base_mode_context,
             **app_exit_context,
             display_controller=self.display_controller,
-            mode_manager=self.mode_manager
         )
 
         self.menu_mode.initialize_inputs()
