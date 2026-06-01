@@ -56,7 +56,7 @@ class BaseMode(ABC):
         if not self.inputs:
             self.logger.debug(f"{self.__class__.__name__} has no InputCommand callbacks to register.")
 
-        self.logger.info(f"Registering {len(self.inputs)} InputCommand callbacks.")
+        self.logger.debug(f"Registering {len(self.inputs)} InputCommand callbacks.")
 
         for input_command, callback in self.inputs.items():
             self.input_handler.register(
@@ -67,7 +67,7 @@ class BaseMode(ABC):
 
             self.logger.debug(f"Registered callback: {callback.__qualname__} for InputCommand: {input_command} in mode: {self.mode.name}")
 
-        self.logger.info(f"Successfully registered {len(self.inputs)} InputCommand callbacks.")
+        self.logger.info(f"Registered {len(self.inputs)} InputCommand callbacks.")
 
     def initialize_inputs(self):
         self._register_inputs()
