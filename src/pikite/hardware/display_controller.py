@@ -365,7 +365,7 @@ class LoadingBar:
         """
         self.value += amount
 
-        if self.value > 100:
+        if self.value >= 100:
             self.value = 100
         else:
             self.update()
