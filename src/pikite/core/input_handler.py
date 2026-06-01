@@ -170,7 +170,7 @@ class InputHandler:
             source (InputSource): The source of the input.
             **kwargs: Additional keyword arguments to pass to the callbacks.
         """        
-        logger.info(
+        logger.debug(
             f"Input received: Command={command.name}, "
             f"mode='{self.active_mode}', "
             f"Source={source.name}"
