@@ -1,4 +1,4 @@
-from __future__ import annotations  # post-pones evaluation so types aren't checked at runtime
+from __future__ import annotations  # postpones evaluation so types aren't checked at runtime
 import asyncio
 from abc import ABC, abstractmethod
 from enum import Enum, auto

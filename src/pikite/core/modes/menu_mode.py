@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Callable, TYPE_CHECKING
 
 from pikite.core.modes.pikite_mode import BaseMode, PiKiteMode
