@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 from typing import Optional
 
-from ..core.constants import PiKiteMode
+from ..core.modes.pikite_mode import PiKiteMode
 from ..core.input_handler import InputHandler, InputCommand, InputSource
 from ..utils.logger import get_logger
 

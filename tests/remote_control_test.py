@@ -1,12 +1,14 @@
 import sys
 from pathlib import Path
 
+from pikite.core.modes.pikite_mode import PiKiteMode
+
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 import asyncio
 
-from pikite.core.constants import PiKiteMode, CAPTURE_MODES
-from pikite.core.input_handler import InputCommand, InputSource, PiKiteMode, InputHandler
+from pikite.core.constants import CAPTURE_MODES
+from pikite.core.input_handler import InputCommand, InputSource, InputHandler
 from pikite.core.lcd_menu import Menu
 from pikite.utils.logger import set_log_level
 from pikite.remote.microdot_server import ControllerServer

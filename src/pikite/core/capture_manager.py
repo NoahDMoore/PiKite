@@ -1,8 +1,9 @@
 import asyncio
 from enum import Enum, auto
 
+from pikite.core.modes.pikite_mode import PiKiteMode
 from pikite.core.capture_session import SessionContext, CaptureSession
-from pikite.core.constants import PiKiteMode, CAPTURE_MODES
+from pikite.core.constants import CAPTURE_MODES
 from pikite.core.input_handler import InputHandler, InputCommand
 import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
@@ -12,6 +13,7 @@ from pikite.hardware.display_controller import DisplayController
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servo_controller import TiltServo, PanServo
 from pikite.remote.microdot_server import ControllerServer
+from pikite.remote.remote_api import RemoteAPI
 from pikite.system.storage import StorageManager, get_timestamp
 
 # Setup Logger
@@ -31,6 +33,7 @@ class CaptureManager:
         input_handler: InputHandler,
         pan_servo: PanServo,
         pressure_sensor: PressureSensorController,
+        remote_api: RemoteAPI,
         remote_server: ControllerServer,
         settings: Settings,
         tilt_servo: TiltServo
@@ -40,6 +43,7 @@ class CaptureManager:
         self.input_handler = input_handler
         self.pan_servo = pan_servo
         self.pressure_sensor = pressure_sensor
+        self.remote_api = remote_api
         self.remote_server = remote_server
         self.settings = settings
         self.storage_manager = StorageManager()
@@ -55,14 +59,6 @@ class CaptureManager:
             self.tilt_servo,
             self.timer,
         )
-
-        # Register Handler for Stop command
-        self.input_handler.register(
-            mode=PiKiteMode.CAPTURE_LOOP,
-            command=InputCommand.STOP_CAPTURE,
-            callback=self._request_stop
-        )
-
     def get_media_path(self, capture_mode, media_extension, session_dir):
         if media_extension:
             return self.storage_manager.media_file_path(
@@ -126,7 +122,7 @@ class CaptureManager:
             "tilt_angle": self.tilt_servo.angle
         })
 
-    def _request_stop(self):
+    def request_stop(self):
         if self.state != CaptureState.RUNNING:
             logger.warning("Cannot request stop. PiKite is not running a capture loop.")
             return
@@ -136,18 +132,6 @@ class CaptureManager:
     @property
     def is_recording(self):
         return self.camera_controller.is_recording
-    
-    def tx_session_info(self, session: CaptureSession):
-        """Send capture session info to remote clients."""
-        self.remote_server.send(session.get_info_payload())
-    
-    def tx_session_update(self, session: CaptureSession):
-        """Send capture session update to remote clients."""
-        self.remote_server.send(session.get_update_payload())
-
-    def tx_session_end(self, session: CaptureSession):
-        """Send session end notification to remote clients."""
-        self.remote_server.send(session.get_end_payload())
 
     async def capture_loop(self):
         """
@@ -159,20 +143,20 @@ class CaptureManager:
 
             with CaptureSession(self.session_context) as session:
                 # Transmit Initial Session Info
-                self.tx_session_info(session)
+                self.remote_api.tx_session_info(session)
 
                 # Register Handler for Session Info Requests
                 self._info_handler = {
-                    "mode":PiKiteMode.CAPTURE_LOOP,
+                    "mode":PiKiteMode.CAPTURE,
                     "command":InputCommand.REQUEST_SESSION_INFO,
-                    "callback":lambda: self.tx_session_info(session)
+                    "callback":lambda: self.remote_api.tx_session_info(session)
                 }
                 self.input_handler.register(**self._info_handler)
 
                 while True:
                     if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
                         self.display_controller.print_message(f"PiKite Running: {session.runtime_string}")
-                        self.tx_session_update(session) # Send session update to remote client
+                        self.remote_api.tx_session_update(session) # Send session update to remote client
 
                     if self.timer.interval_elapsed(session.altitude_interval, "altitude_interval"):
                         self.log_altitude(session.csv_writer)
@@ -220,7 +204,7 @@ class CaptureManager:
                 
                 # Transmit Session End Payload After Loop Ends
                 try:
-                    self.tx_session_end(session)
+                    self.remote_api.tx_session_end(session)
                 except Exception:
                     logger.exception("Failed to transmit session end payload.")
         finally:

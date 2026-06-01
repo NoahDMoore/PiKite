@@ -5,7 +5,7 @@ from functools import partial
 import json
 from typing import Callable
 
-from ..core.constants import PiKiteMode
+from .modes.pikite_mode import PiKiteMode
 from ..remote.microdot_server import ControllerServer
 from ..utils.logger import get_logger
 

@@ -2,9 +2,13 @@ import asyncio
 from typing import Callable
 from inspect import isawaitable
 
+from pikite.core.modes.capture_mode import CaptureMode
+from pikite.core.modes.menu_mode import MenuMode
+from pikite.core.modes.mode_manager import ModeManager
+from pikite.core.modes.pikite_mode import PiKiteMode
+from pikite.core.modes.system_info_mode import SystemInfoMode
 from pikite.core.capture_manager import CaptureManager
-import pikite.core.constants as CONSTANTS
-from pikite.core.input_handler import InputHandler, InputCommand, RemoteInput
+from pikite.core.input_handler import InputHandler, RemoteInput
 from pikite.core.lcd_menu import Menu
 import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
@@ -15,6 +19,7 @@ from pikite.hardware.display_controller import DisplayController, LoadingBar, Pr
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servo_controller import TiltServo, PanServo
 from pikite.remote.microdot_server import ControllerServer
+from pikite.remote.remote_api import RemoteAPI
 from pikite.system.storage import StorageManager
 import pikite.system.power_management as PowerManagement
 from pikite.system.system_info import display_system_info
@@ -71,14 +76,22 @@ class PiKiteApp:
         
         # Initialize Remote Input Handler
         self.remote_input = RemoteInput(self.remote_server, self.input_handler)
-        self.register_remote_handlers()
+        self.remote_api = RemoteAPI(
+            menu=self.menu,
+            pan_servo=self.pan_servo,
+            remote_server=self.remote_server,
+            settings=self.settings,
+            storage_manager=self.storage_manager,
+            tilt_servo=self.tilt_servo
+        )
 
         # Initialize Camera Preview Stream
         self.preview = PreviewStream(self.camera_controller, self.remote_server)
         initialization_progress_bar.advance(10)
 
         # Initialize Buttons
-        self.button_controller = self.initialize_button_input()
+        self.button_controller = ButtonController(self.input_handler)
+        self.input_handler.add_mode_change_listener(self.button_controller.sync_mode)
         initialization_progress_bar.advance(10)
 
         # Initialize CaptureManager
@@ -88,17 +101,66 @@ class PiKiteApp:
             input_handler=self.input_handler,
             pan_servo=self.pan_servo,
             pressure_sensor=self.pressure_sensor,
+            remote_api=self.remote_api,
             remote_server=self.remote_server,
             settings=self.settings,
             tilt_servo=self.tilt_servo,
         )
+
+        # Initialize Application Modes
+        self.mode_manager = ModeManager(
+            input_handler=self.input_handler,
+            remote_api=self.remote_api
+        )
+
+        base_mode_context = {
+            "input_handler": self.input_handler,
+            "button_controller": self.button_controller
+        }
+
+        app_exit_context = {
+            "app_exit_callback": self.exit,
+            "app_reboot_callback": self.reboot,
+            "app_shutdown_callback": self.shutdown,
+        }
+
+        self.menu_mode = MenuMode(
+            **base_mode_context,
+            **app_exit_context,
+            camera_preview=self.preview,
+            display_controller=self.display_controller,
+            menu=self.menu,
+            mode_manager=self.mode_manager,
+            pressure_sensor=self.pressure_sensor,
+            remote_api=self.remote_api
+        )
+
+        self.capture_mode = CaptureMode(
+            **base_mode_context,
+            capture_manager=self.capture_manager
+        )
+
+        self.system_info_mode = SystemInfoMode(
+            **base_mode_context,
+            **app_exit_context,
+            display_controller=self.display_controller,
+            mode_manager=self.mode_manager
+        )
+
+        self.menu_mode.initialize_inputs()
+        self.capture_mode.initialize_inputs()
+        self.system_info_mode.initialize_inputs()
+
+        self.mode_manager.register_mode(self.menu_mode)
+        self.mode_manager.register_mode(self.capture_mode)
+        self.mode_manager.register_mode(self.system_info_mode)
 
         # Run Preloader Animation
         preloader = PreLoader(self.display_controller)
         preloader.play()
 
         # Initialize Menu System
-        self.menu = self.initialize_menu()
+        self.menu = Menu(self.display_controller, self.settings, self.input_handler) #type: ignore
 
         logger.info("PiKite Application Initialized")
 
@@ -140,268 +202,13 @@ class PiKiteApp:
             logger.info("Logging to console disabled via settings.")
             logger_module.unset_stream_handler()
 
-    def initialize_button_input(self) -> ButtonController:
-        """
-        Initialize the ButtonController for GPIO input handling.
-
-        Returns:
-            ButtonController: The initialized button controller instance.
-        """
-        button_controller = ButtonController(self.input_handler)
-        self.input_handler.add_mode_change_listener(button_controller.sync_mode)
-        
-        button_controller.set_commands(
-            next_command=InputCommand.NEXT,
-            select_command=InputCommand.SELECT,
-            mode=CONSTANTS.PiKiteMode.MENU
-        )
-        
-        button_controller.set_commands(
-            next_command=InputCommand.STOP_CAPTURE,
-            select_command=InputCommand.STOP_CAPTURE,
-            mode=CONSTANTS.PiKiteMode.CAPTURE_LOOP
-        )
-
-        button_controller.set_commands(
-            next_command=InputCommand.NEXT,
-            select_command=InputCommand.SELECT,
-            mode=CONSTANTS.PiKiteMode.SYSTEM_INFO
-        )
-
-        return button_controller
-    
-    def initialize_menu(self) -> Menu:
-        """
-        Initialize the menu system and register input commands.
-
-        Args:
-            settings (Settings): Application settings.
-            display_controller (DisplayController): The display controller instance.
-            input_handler (InputHandler): The input handler instance.
-
-        Returns:
-            Menu: The initialized menu instance.
-        """
-        menu = Menu(self.display_controller, self.settings, self.input_handler) #type: ignore
-
-        self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
-
-        self.input_handler.add_mode_change_listener(self._on_enter_menu_mode)
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.NEXT,
-            callback=menu.increment_element
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.SELECT,
-            callback=menu.do_action
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.START_CAPTURE,
-            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.CAPTURE_LOOP)
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.SET_BASELINE_PRESSURE,
-            callback=lambda: self.pressure_sensor.get_baseline_pressure(
-                num_samples=80,
-                display_controller=self.display_controller
-            )
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.DISPLAY_SYSTEM_INFO,
-            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.SYSTEM_INFO)
-        )
-
-        for mode in [CONSTANTS.PiKiteMode.MENU, CONSTANTS.PiKiteMode.SYSTEM_INFO]:
-            self.input_handler.register(
-                mode=mode,
-                command=InputCommand.SHUTDOWN,
-                callback=self.shutdown
-            )
-
-            self.input_handler.register(
-                mode=mode,
-                command=InputCommand.REBOOT,
-                callback=self.reboot
-            )
-
-            self.input_handler.register(
-                mode=mode,
-                command=InputCommand.EXIT,
-                callback=self.exit
-            )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.SYSTEM_INFO,
-            command=InputCommand.NEXT,
-            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.SYSTEM_INFO,
-            command=InputCommand.SELECT,
-            callback=lambda: self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
-        )
-
-        return menu
-    
-    def _on_enter_menu_mode(self, new_mode: CONSTANTS.PiKiteMode):
-        """Redraw the menu upon entering the menu mode."""
-        if not new_mode == CONSTANTS.PiKiteMode.MENU:
-            return
-        self.menu.update_menu()
-
-    """Remote Command Handlers"""
-
-    def tx_mode(self, new_mode: CONSTANTS.PiKiteMode):
-        """Transmit the current mode to remote clients"""
-        mode_payload = {
-            "type": "mode_update",
-            "mode": new_mode
-        }
-
-        self.remote_server.send(mode_payload)
-        logger.debug("Sent current settings and menu options to remote clients")
-
-    def tx_settings(self, **kwargs):
-        """Fetch current settings and menu options to send to remote clients."""
-        current_settings = self.settings.format_as_dict()
-        menu_settings = self.menu.format_settings_and_options_as_dict()
-        settings_payload = {
-            "type": "settings_update",
-            "current_settings": current_settings,
-            "menu_settings": menu_settings
-        }
-
-        self.remote_server.send(settings_payload)
-        logger.debug("Sent current settings and menu options to remote clients")
-
-    def rx_settings_update(self, args):
-        for new_setting, new_setting_value in args.get("settings_to_update", {}).items():
-            if self.settings.is_setting(new_setting):
-                logger.debug(f"Remotely updating setting '{new_setting}' from {self.settings.get(new_setting)} to new value '{new_setting_value}'")
-                self.settings.set(new_setting, new_setting_value)
-                self.tx_settings()  # Send updated settings back to client
-            else:
-                logger.info(f"Remote user attempted to update unknown setting: {new_setting}")
-
-    def rx_default_settings_request(self, **kwargs):
-        self.settings.load_defaults()
-        self.tx_settings()  # Send updated settings back to client
-
-    def tx_media_dirs(self, **kwargs):
-        media_dirs = self.storage_manager.get_capture_session_dirs()
-        media_dirs_payload = {
-            "type": "media_dirs_update",
-            "media_dirs": media_dirs
-        }
-        self.remote_server.send(media_dirs_payload)
-
-    def tx_media_file_paths(self, args):
-        mode = CONSTANTS.CAPTURE_MODES.STILL if args.get("mode") == "STILL" else CONSTANTS.CAPTURE_MODES.VIDEO
-        path = args.get("path")
-        file_paths = self.storage_manager.get_capture_session_file_names(mode, path)
-        file_paths_payload = {
-            "type": "media_file_paths",
-            "file_paths": file_paths
-        }
-        self.remote_server.send(file_paths_payload)
-
-    def rx_pan_command(self, args):
-        angle = args.get("angle")
-        self.pan_servo.rotate_to(
-            speed = 0.5,
-            target_angle = int(angle),
-            margin = 4
-        )
-        self.timer.wait(0.5)
-
-    def rx_tilt_command(self, args):
-        angle = args.get("angle")
-        self.tilt_servo.angle = int(angle)
-        self.timer.wait(0.5)
-
-    def register_remote_handlers(self):
-        self.input_handler.add_mode_change_listener(self.tx_mode)
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.FETCH_SETTINGS,
-            callback=self.tx_settings
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.UPDATE_SETTINGS,
-            callback=self.rx_settings_update
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.LOAD_DEFAULT_SETTINGS,
-            callback=self.rx_default_settings_request
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.FETCH_MEDIA_DIRS,
-            callback=self.tx_media_dirs
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.FETCH_MEDIA,
-            callback=self.tx_media_file_paths
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.PAN,
-            callback=self.rx_pan_command
-        )
-
-        self.input_handler.register(
-            mode=CONSTANTS.PiKiteMode.MENU,
-            command=InputCommand.TILT,
-            callback=self.rx_tilt_command
-        )
-
     async def main_loop(self):
         self.application_running = True
         try:
-            self.preview.start()
+            await self.mode_manager.switch_to(PiKiteMode.MENU)
 
             while self.application_running:
-                if self.input_handler.active_mode == CONSTANTS.PiKiteMode.MENU:
-                    pass
-
-                elif self.input_handler.active_mode == CONSTANTS.PiKiteMode.CAPTURE_LOOP:
-                    await self.preview.stop()
-
-                    await self.capture_manager.capture_loop()
-                    
-                    await asyncio.sleep(2)
-
-                    self.preview.start()
-
-                    self.input_handler.set_mode(CONSTANTS.PiKiteMode.MENU)
-
-                elif self.input_handler.active_mode == CONSTANTS.PiKiteMode.SYSTEM_INFO:
-                    display_system_info(self.display_controller) # type: ignore
-
-                    while self.input_handler.active_mode == CONSTANTS.PiKiteMode.SYSTEM_INFO:
-                        await asyncio.sleep(0.1)
-
-                await asyncio.sleep(0.1)
+                await self.mode_manager.run_current_mode()
         finally:
             await self.cleanup()
 

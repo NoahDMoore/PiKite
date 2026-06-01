@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from pikite.core.constants import PiKiteMode
+from pikite.core.modes.pikite_mode import PiKiteMode
 from pikite.utils.logger import get_logger
 from pikite.hardware.button_controller import ButtonController
 from pikite.core.input_handler import InputHandler, InputCommand, InputSource
