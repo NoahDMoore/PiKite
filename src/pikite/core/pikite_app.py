@@ -71,6 +71,9 @@ class PiKiteApp:
         self.input_handler = InputHandler()
         initialization_progress_bar.advance(10)
 
+        # Initialize Menu System
+        self.menu = Menu(self.display_controller, self.settings, self.input_handler) #type: ignore
+
         # Initialize Remote Controller Server
         self.remote_server = ControllerServer(port=5000)
         
@@ -158,9 +161,6 @@ class PiKiteApp:
         # Run Preloader Animation
         preloader = PreLoader(self.display_controller)
         preloader.play()
-
-        # Initialize Menu System
-        self.menu = Menu(self.display_controller, self.settings, self.input_handler) #type: ignore
 
         logger.info("PiKite Application Initialized")
 
@@ -253,11 +253,6 @@ class PiKiteApp:
         except TypeError:
             cleanup_progress_bar = None
         
-        # Advance the Progress Bar (if it exists)
-        def _advance_progress():
-            if cleanup_progress_bar is not None:
-                cleanup_progress_bar.advance(10)
-
         async def _cleanup_servos():
             # Home the Servos
             self.pan_servo.home()
@@ -297,6 +292,8 @@ class PiKiteApp:
             _cleanup_display_controller     # Cleanup Display Controller
         ]
 
+        visible_tasks = len(cleanup_tasks) - 1 # Subtract one from cleanup_tasks to account for shutting down the display controller.
+
         # Call Each Cleanup Task
         for i, task in enumerate(cleanup_tasks):
             try:
@@ -312,6 +309,12 @@ class PiKiteApp:
                     break
                 
                 # Advance the progress bar
-                _advance_progress()
+                if cleanup_progress_bar is not None:
+                    completed_tasks = i + 1
+
+                    target_progress = round((completed_tasks / visible_tasks) * 100)
+                    advance_amount = target_progress - cleanup_progress_bar.value
+
+                    cleanup_progress_bar.advance(advance_amount)
 
         logger.info("PiKite clean-up complete. Closing application.")
