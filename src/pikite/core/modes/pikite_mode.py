@@ -28,14 +28,14 @@ class BaseMode(ABC):
         self.logger = logger_module.get_logger(self.__class__.__name__)
         
         self.mode = PiKiteMode.DEFAULT
-        self.auto_return = False                    # Return to previous mode on completion.
+        self.auto_return = False # If True, return to previous mode on completion.
         self.next_mode: PiKiteMode | None = None
         self.mode_change_requested = asyncio.Event()
         self.inputs: dict[InputCommand, Callable] = {}
 
     async def enter(self):
         self.mode_change_requested.clear()
-        await asyncio.sleep(0)
+        self.next_mode = None
 
     @abstractmethod
     async def run(self) -> PiKiteMode | None:
