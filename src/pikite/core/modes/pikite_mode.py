@@ -15,6 +15,7 @@ class PiKiteMode(str, Enum):
     MENU = "menu"
     CAPTURE = "capture"
     SYSTEM_INFO = "system_info"
+    BASELINE_ALTITUDE = "baseline_altitude"
 
 class BaseMode(ABC):
     def __init__(self,

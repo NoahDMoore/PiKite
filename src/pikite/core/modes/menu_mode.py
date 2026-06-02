@@ -77,10 +77,7 @@ class MenuMode(BaseMode):
         self.request_mode_switch(PiKiteMode.CAPTURE)
 
     def get_baseline_pressure(self):
-        self.pressure_sensor.get_baseline_pressure(
-            num_samples=80,
-            display_controller=self.display_controller
-        )
-    
+        self.request_mode_switch(PiKiteMode.BASELINE_ALTITUDE)
+
     def display_system_info(self):
         self.request_mode_switch(PiKiteMode.SYSTEM_INFO)

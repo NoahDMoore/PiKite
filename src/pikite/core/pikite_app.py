@@ -2,6 +2,7 @@ import asyncio
 from typing import Callable
 from inspect import isawaitable
 
+from pikite.core.modes.baseline_altitude_mode import BaselineAltitudeMode
 from pikite.core.modes.capture_mode import CaptureMode
 from pikite.core.modes.menu_mode import MenuMode
 from pikite.core.modes.mode_manager import ModeManager
@@ -142,6 +143,12 @@ class PiKiteApp:
             capture_manager=self.capture_manager
         )
 
+        self.baseline_altitude_mode = BaselineAltitudeMode(
+            **base_mode_context,
+            display_controller=self.display_controller,
+            pressure_sensor_controller=self.pressure_sensor
+        )
+
         self.system_info_mode = SystemInfoMode(
             **base_mode_context,
             **app_exit_context,
@@ -154,6 +161,7 @@ class PiKiteApp:
 
         self.mode_manager.register_mode(self.menu_mode)
         self.mode_manager.register_mode(self.capture_mode)
+        self.mode_manager.register_mode(self.baseline_altitude_mode)
         self.mode_manager.register_mode(self.system_info_mode)
 
         # Run Preloader Animation
