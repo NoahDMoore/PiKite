@@ -40,7 +40,7 @@ class ModeManager:
             logger.warning(f"Cannot change mode to {new_mode.__class__.__qualname__} because it is already active!")
             return
 
-        if self._current_mode is not None:
+        if self._current_mode is not None and not self._current_mode.exit_event.is_set():
             await self._current_mode.exit()
 
         self._previous_mode = self._current_mode
@@ -51,19 +51,21 @@ class ModeManager:
         await self._current_mode.enter()
 
     async def run_current_mode(self):
-        if self._current_mode is None:
+        mode = self._current_mode
+
+        if mode is None:
             raise RuntimeError("No active mode.")
         
         try:
-            await self._current_mode.run()
+            await mode.run()
             
-            if self._current_mode.auto_return and self._previous_mode is not None:
+            if mode.auto_return and self._previous_mode is not None:
                 await self.switch_to(self._previous_mode.mode)
                 return
             
-            if self._current_mode.next_mode is not None:
-                await self.switch_to(self._current_mode.next_mode)
+            if mode.next_mode is not None:
+                await self.switch_to(mode.next_mode)
                 return
             
         except NotImplementedError:
-            logger.exception(f"Cannot run current mode: {self._current_mode.__class__.__name__}. No run method implemented.")
+            logger.exception(f"Cannot run current mode: {mode.__class__.__name__}. No run method implemented.")
