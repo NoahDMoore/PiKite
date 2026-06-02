@@ -37,6 +37,7 @@ class BaseMode(ABC):
         self.mode_change_requested.clear()
         self.next_mode = None
         self.loop = asyncio.get_running_loop()
+        await asyncio.sleep(0)
 
     @abstractmethod
     async def run(self) -> PiKiteMode | None:
