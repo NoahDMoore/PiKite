@@ -36,6 +36,7 @@ class BaseMode(ABC):
     async def enter(self):
         self.mode_change_requested.clear()
         self.next_mode = None
+        self.loop = asyncio.get_running_loop()
 
     @abstractmethod
     async def run(self) -> PiKiteMode | None:
@@ -56,7 +57,7 @@ class BaseMode(ABC):
             f"Setting event id={id(self.mode_change_requested)} "
             f"before={self.mode_change_requested.is_set()}"
         )
-        self.mode_change_requested.set()
+        self.loop.call_soon_threadsafe(self.mode_change_requested.set)
         self.logger.info(f"mode_change_requested event set: {self.mode_change_requested.is_set()}")
 
     def _register_inputs(self):
