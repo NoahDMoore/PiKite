@@ -24,7 +24,9 @@ class SystemInfoMode(BaseMode):
 
     async def run(self):
         display_system_info(self.display_controller) # type: ignore
+        self.logger.info("System info displayed. Waiting for mode change request...")
         await self.mode_change_requested.wait()
+        self.logger.info(f"Mode change event received. Next mode: {self.next_mode}")
         return self.next_mode
 
     def _register_inputs(self):
