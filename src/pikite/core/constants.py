@@ -30,8 +30,6 @@ class MENUACTION (str, Enum):
             Select an option from the options menu
         LOAD_DEFAULTS:
             Load the default settings from the default configuration file
-        DISPLAY_SYSTEM_INFO:
-            Display system information on the screen
         INPUT_COMMAND:
             Trigger an input command defined in the InputCommand enum
     """
@@ -41,7 +39,6 @@ class MENUACTION (str, Enum):
     SELECT_OPTION = "selectOption"
     LOAD_DEFAULTS = "load_defaults"
     INPUT_COMMAND = "input_command"
-    DISPLAY_SYSTEM_INFO = "display_system_info"
 
 # Constants for Camera
 class CAPTURE_MODES(str, Enum):

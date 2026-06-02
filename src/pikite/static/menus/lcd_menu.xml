@@ -502,7 +502,7 @@
 		<menu_item name="settingsReturn" message="Exit Settings" action="return" parent="settings" />
 	</menu_item>
 	
-	<menu_item name="system" message="System Info" action="display_system_info" parent="root" />
+	<menu_item name="system" message="System Info" action="input_command" command="display_system_info" parent="root" />
 
 	<menu_item name="exitPiKite" message="Exit PiKite" action="submenu" parent="root">
 		<menu_item name="poweroff" message="Shut Down?" action="submenu" parent="root">

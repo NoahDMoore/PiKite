@@ -261,19 +261,8 @@ class Menu:
 
 				# Handle the input command via the input handler
 				self.input_handler.handle(command=command, source=InputSource.SYSTEM, **kwargs)
-			case MENUACTION.DISPLAY_SYSTEM_INFO:
-				if self.display_controller is None:
-					logger.warning("No display controller available for displaying system info")
-					return
 
-				if self.input_handler is None:
-					logger.error("No input handler available for input menu action")
-					return
-			
-				self.input_handler.handle(
-					command=InputCommand.DISPLAY_SYSTEM_INFO,
-					source=InputSource.SYSTEM
-				)
+				return  # Don't update menu after input command; assume input command will trigger its own menu update if needed
 					
 			case _:
 				logger.warning(f"No action defined for menu element: {self.current_element}")
