@@ -268,10 +268,8 @@ class PiKiteApp:
             self.tilt_servo.home()
             await asyncio.sleep(0.1)
 
-            # Stop the Pan Servo
+            # Stop the Servos
             self.pan_servo.stop()
-
-            # Stop the Tilt Servo
             self.tilt_servo.stop()
 
         def _cleanup_timer():
