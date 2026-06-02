@@ -23,7 +23,6 @@ from pikite.remote.remote_server import RemoteServer
 from pikite.remote.remote_api import RemoteAPI
 from pikite.system.storage import StorageManager
 import pikite.system.power_management as PowerManagement
-from pikite.system.system_info import display_system_info
 
 # Setup Logger
 logger = logger_module.get_logger(__name__)
