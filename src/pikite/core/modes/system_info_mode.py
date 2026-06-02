@@ -37,9 +37,12 @@ class SystemInfoMode(BaseMode):
 
         # Register InputHandler Actions
         self.inputs = {
-            InputCommand.NEXT:lambda: self.request_mode_switch(PiKiteMode.MENU),
-            InputCommand.SELECT: lambda: self.request_mode_switch(PiKiteMode.MENU),
+            InputCommand.NEXT: self.return_to_menu,
+            InputCommand.SELECT: self.return_to_menu,
             InputCommand.SHUTDOWN: self.app_shutdown,
             InputCommand.REBOOT: self.app_reboot,
             InputCommand.EXIT: self.app_exit,
         }
+
+    def return_to_menu(self):
+        self.request_mode_switch(PiKiteMode.MENU)

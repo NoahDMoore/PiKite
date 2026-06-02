@@ -58,12 +58,9 @@ class MenuMode(BaseMode):
         self.inputs = {
             InputCommand.NEXT: self.menu.increment_element,
             InputCommand.SELECT: self.menu.do_action,
-            InputCommand.START_CAPTURE: lambda: self.request_mode_switch(PiKiteMode.CAPTURE),
-            InputCommand.SET_BASELINE_PRESSURE: lambda: self.pressure_sensor.get_baseline_pressure(
-                num_samples=80,
-                display_controller=self.display_controller
-            ),
-            InputCommand.DISPLAY_SYSTEM_INFO: lambda: self.request_mode_switch(PiKiteMode.SYSTEM_INFO),
+            InputCommand.START_CAPTURE: self.start_capture,
+            InputCommand.SET_BASELINE_PRESSURE: self.get_baseline_pressure,
+            InputCommand.DISPLAY_SYSTEM_INFO: self.display_system_info,
             InputCommand.SHUTDOWN: self.app_shutdown,
             InputCommand.REBOOT: self.app_reboot,
             InputCommand.EXIT: self.app_exit,
@@ -75,3 +72,15 @@ class MenuMode(BaseMode):
             InputCommand.PAN: self.remote_api.rx_pan_command,
             InputCommand.TILT: self.remote_api.rx_tilt_command
         }
+
+    def start_capture(self):
+        self.request_mode_switch(PiKiteMode.CAPTURE)
+
+    def get_baseline_pressure(self):
+        self.pressure_sensor.get_baseline_pressure(
+            num_samples=80,
+            display_controller=self.display_controller
+        )
+    
+    def display_system_info(self):
+        self.request_mode_switch(PiKiteMode.SYSTEM_INFO)
