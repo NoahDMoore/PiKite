@@ -46,19 +46,9 @@ class BaseMode(ABC):
         pass
 
     def request_mode_switch(self, mode: PiKiteMode):
-        import threading
-
-        self.logger.info(
-            f"request_mode_switch thread={threading.get_ident()}"
-        )
         self.logger.info(f"Mode switch requested: {mode}")
         self.next_mode = mode
-        self.logger.info(
-            f"Setting event id={id(self.mode_change_requested)} "
-            f"before={self.mode_change_requested.is_set()}"
-        )
         self.loop.call_soon_threadsafe(self.mode_change_requested.set)
-        self.logger.info(f"mode_change_requested event set: {self.mode_change_requested.is_set()}")
 
     def _register_inputs(self):
         pass

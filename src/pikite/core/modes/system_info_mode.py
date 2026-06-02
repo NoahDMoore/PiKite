@@ -24,17 +24,7 @@ class SystemInfoMode(BaseMode):
 
     async def run(self):
         display_system_info(self.display_controller) # type: ignore
-        import threading
-
-        self.logger.info(
-            f"run thread={threading.get_ident()}"
-        )
-        self.logger.info(
-            f"Waiting on event id={id(self.mode_change_requested)} "
-            f"is_set={self.mode_change_requested.is_set()}"
-        )
         await self.mode_change_requested.wait()
-        self.logger.info(f"Mode change event received. Next mode: {self.next_mode}")
         return self.next_mode
 
     def _register_inputs(self):
