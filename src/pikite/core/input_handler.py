@@ -6,7 +6,7 @@ import json
 from typing import Callable
 
 from .modes.pikite_mode import PiKiteMode
-from ..remote.microdot_server import ControllerServer
+from ..remote.remote_server import RemoteServer
 from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -204,7 +204,7 @@ class InputHandler:
                 raise
 
 class RemoteInput:
-    def __init__(self, server: ControllerServer, input_handler: InputHandler):
+    def __init__(self, server: RemoteServer, input_handler: InputHandler):
         self.server = server
         self.input_handler = input_handler
         self._active = True

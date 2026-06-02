@@ -4,7 +4,7 @@ from ..core.modes.pikite_mode import PiKiteMode
 from ..core.lcd_menu import Menu
 from ..core.settings import Settings
 from ..hardware.servo_controller import PanServo, TiltServo
-from ..remote.microdot_server import ControllerServer
+from .remote_server import RemoteServer
 from ..system.storage import StorageManager
 from ..utils.logger import get_logger
 from ..utils.timer import Timer
@@ -15,7 +15,7 @@ class RemoteAPI:
     def __init__(self,
         menu: Menu,
         pan_servo: PanServo,
-        remote_server: ControllerServer,
+        remote_server: RemoteServer,
         settings: Settings,
         storage_manager: StorageManager,
         tilt_servo: TiltServo

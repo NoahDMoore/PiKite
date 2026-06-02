@@ -11,14 +11,14 @@ from pikite.core.constants import CAPTURE_MODES
 from pikite.core.input_handler import InputCommand, InputSource, InputHandler
 from pikite.core.lcd_menu import Menu
 from pikite.utils.logger import set_log_level
-from pikite.remote.microdot_server import ControllerServer
+from pikite.remote.remote_server import RemoteServer
 from pikite.core.input_handler import RemoteInput
 from pikite.core.settings import Settings
 from pikite.system.storage import StorageManager
 
 set_log_level("DEBUG")
 
-server = ControllerServer()
+server = RemoteServer()
 settings = Settings()
 input_handler = InputHandler()
 menu = Menu(None, settings, input_handler)

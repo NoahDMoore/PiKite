@@ -8,7 +8,7 @@ from ..utils.logger import get_logger
 from ..core.settings import Settings
 from ..core.constants import CAMERA_MODELS, CAPTURE_MODES, MAX_RESOLUTIONS
 from ..utils.timer import Timer
-from ..remote.microdot_server import ControllerServer
+from ..remote.remote_server import RemoteServer
 from ..system.storage import StorageManager
 
 from picamera2 import Picamera2 # type: ignore
@@ -344,7 +344,7 @@ class CameraController:
         
 
 class PreviewStream:
-    def __init__(self, camera: CameraController, server: ControllerServer):
+    def __init__(self, camera: CameraController, server: RemoteServer):
         self.camera = camera
         self.server = server
 

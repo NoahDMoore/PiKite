@@ -12,7 +12,7 @@ from pikite.hardware.camera_controller import CameraController
 from pikite.hardware.display_controller import DisplayController
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servo_controller import TiltServo, PanServo
-from pikite.remote.microdot_server import ControllerServer
+from pikite.remote.remote_server import RemoteServer
 from pikite.remote.remote_api import RemoteAPI
 from pikite.system.storage import StorageManager, get_timestamp
 
@@ -34,7 +34,7 @@ class CaptureManager:
         pan_servo: PanServo,
         pressure_sensor: PressureSensorController,
         remote_api: RemoteAPI,
-        remote_server: ControllerServer,
+        remote_server: RemoteServer,
         settings: Settings,
         tilt_servo: TiltServo
     ):

@@ -25,7 +25,7 @@ from ..system.storage import StorageManager, resolve_safe_path
 # Setup Logger
 logger = get_logger(__name__)
 
-class ControllerServer:
+class RemoteServer:
     """
     A simple web server using Microdot to handle WebSocket connections for real-time communication and control.
     """
