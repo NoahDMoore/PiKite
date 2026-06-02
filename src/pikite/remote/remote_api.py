@@ -37,7 +37,7 @@ class RemoteAPI:
         }
 
         self.remote_server.send(mode_payload)
-        logger.debug("Sent current settings and menu options to remote clients")
+        logger.debug("Sent current mode to remote clients")
 
     # Settings Endpoints
     def tx_settings(self, **kwargs):
