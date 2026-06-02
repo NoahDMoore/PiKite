@@ -16,6 +16,7 @@ class CaptureMode(BaseMode):
 
     async def run(self):
         await self.capture_manager.capture_loop()
+        return self.next_mode
 
     def _register_inputs(self):
         # Map Buttons to InputCommands

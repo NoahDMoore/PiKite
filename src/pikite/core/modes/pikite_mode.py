@@ -31,6 +31,7 @@ class BaseMode(ABC):
         self.auto_return = False                    # Return to previous mode on completion.
         self.next_mode: PiKiteMode | None = None
         self.exit_event = asyncio.Event()
+        self.mode_change_requested = asyncio.Event()
         self.inputs: dict[InputCommand, Callable] = {}
 
     async def enter(self):
@@ -47,7 +48,7 @@ class BaseMode(ABC):
     def request_mode_switch(self, mode: PiKiteMode):
         self.logger.info(f"Mode switch requested: {mode}")
         self.next_mode = mode
-        self.exit_event.set()
+        self.mode_change_requested.set()
 
     def _register_inputs(self):
         pass
