@@ -139,6 +139,8 @@ class DisplayController:
         """
         lcd_image, canvas = None, None
 
+        logger.debug("DISPLAY UPDATE")
+
         if isinstance(message, Image.Image):
             # If the message is already an Image object, use it directly
             lcd_image = message.convert('RGBA')
