@@ -69,3 +69,8 @@ class ModeManager:
             
         except NotImplementedError:
             logger.exception(f"Cannot run current mode: {mode.__class__.__name__}. No run method implemented.")
+
+    def request_exit(self):
+        logger.info("Exit requested. Shutting down application.")
+        if self._current_mode is not None:
+            self._current_mode.mode_change_requested.set() # Unblock mode if waiting for mode change to allow clean exit.

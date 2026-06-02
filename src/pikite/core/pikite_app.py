@@ -241,6 +241,7 @@ class PiKiteApp:
     def exit(self):
         logger.info("Exit command received. Closing PiKite application.")
         self.application_running = False
+        self.mode_manager.request_exit()
 
     def shutdown(self):
         self.register_on_close_callback(PowerManagement.shutdown)
