@@ -9,7 +9,7 @@ import asyncio
 
 from pikite.core.constants import CAPTURE_MODES
 from pikite.core.input_handler import InputCommand, InputSource, InputHandler
-from pikite.core.lcd_menu import Menu
+from pikite.core.menu import Menu
 from pikite.utils.logger import set_log_level
 from pikite.remote.remote_server import RemoteServer
 from pikite.core.input_handler import RemoteInput

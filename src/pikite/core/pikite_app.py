@@ -10,7 +10,7 @@ from pikite.core.modes.pikite_mode import PiKiteMode
 from pikite.core.modes.system_info_mode import SystemInfoMode
 from pikite.core.capture_manager import CaptureManager
 from pikite.core.input_handler import InputHandler, RemoteInput
-from pikite.core.lcd_menu import Menu
+from pikite.core.menu import Menu
 import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
 from pikite.utils.timer import Timer

@@ -1,7 +1,7 @@
 from ..core.capture_session import CaptureSession
 from ..core.constants import CAPTURE_MODES
 from ..core.modes.pikite_mode import PiKiteMode
-from ..core.lcd_menu import Menu
+from ..core.menu import Menu
 from ..core.settings import Settings
 from ..hardware.servo_controller import PanServo, TiltServo
 from .remote_server import RemoteServer

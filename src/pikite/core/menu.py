@@ -8,7 +8,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from .constants import XMLTAG, XMLATTRIB, MENUACTION
-from ..core.input_handler import InputHandler, InputCommand, InputSource
+from .input_handler import InputHandler, InputCommand, InputSource
 from ..utils.logger import get_logger
 from .settings import Settings
 # Mock hardware controller class for testing on non-RPi system; remove when done testing

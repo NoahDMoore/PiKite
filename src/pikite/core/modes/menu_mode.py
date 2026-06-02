@@ -2,7 +2,7 @@ from typing import Callable
 
 from pikite.core.modes.pikite_mode import BaseMode, PiKiteMode
 from pikite.core.input_handler import InputCommand
-from pikite.core.lcd_menu import Menu
+from pikite.core.menu import Menu
 from pikite.hardware.camera_controller import PreviewStream
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.display_controller import DisplayController
