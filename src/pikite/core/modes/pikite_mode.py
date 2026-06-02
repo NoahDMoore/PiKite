@@ -47,7 +47,9 @@ class BaseMode(ABC):
     def request_mode_switch(self, mode: PiKiteMode):
         self.logger.info(f"Mode switch requested: {mode}")
         self.next_mode = mode
+        self.logger.info("Setting mode_change_requested event.")
         self.mode_change_requested.set()
+        self.logger.info(f"mode_change_requested event set: {self.mode_change_requested.is_set()}")
 
     def _register_inputs(self):
         pass
