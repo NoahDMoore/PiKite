@@ -1,8 +1,8 @@
 import asyncio
 import cv2
+import logging
 import os
 from pathlib import Path
-from PIL import Image
 
 from ..utils.logger import get_logger
 from ..core.settings import Settings
@@ -21,7 +21,7 @@ from libcamera import Transform # type: ignore
 os.environ['LIBCAMERA_LOG_LEVELS'] = '2' # Set libcamera logging level to WARNING to reduce verbosity
 
 # Set PiCamera2 logging level to WARNING to reduce verbosity
-Picamera2.set_logging(Picamera2.WARNING)
+Picamera2.set_logging(logging.WARNING)
 
 # Libcamera Control Aliases
 AfModeEnum = controls.AfModeEnum
