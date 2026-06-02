@@ -38,7 +38,7 @@ class BaseMode(ABC):
         await asyncio.sleep(0)
 
     @abstractmethod
-    async def run(self):
+    async def run(self) -> PiKiteMode | None:
         raise NotImplementedError
 
     async def exit(self):

@@ -25,6 +25,7 @@ class SystemInfoMode(BaseMode):
     async def run(self):
         display_system_info(self.display_controller) # type: ignore
         await self.mode_change_requested.wait()
+        return self.next_mode
 
     def _register_inputs(self):
         # Map Buttons to InputCommands

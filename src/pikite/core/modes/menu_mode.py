@@ -41,6 +41,7 @@ class MenuMode(BaseMode):
 
     async def run(self):
         await self.mode_change_requested.wait()
+        return self.next_mode
 
     async def exit(self):
         await self.camera_preview.stop()

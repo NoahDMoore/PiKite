@@ -40,7 +40,7 @@ class ModeManager:
             logger.warning(f"Cannot change mode to {new_mode.__class__.__qualname__} because it is already active!")
             return
 
-        if self._current_mode is not None and not self._current_mode.exit_event.is_set():
+        if self._current_mode is not None:
             await self._current_mode.exit()
 
         self._previous_mode = self._current_mode
@@ -57,14 +57,14 @@ class ModeManager:
             raise RuntimeError("No active mode.")
         
         try:
-            await mode.run()
+            next_mode = await mode.run()
             
             if mode.auto_return and self._previous_mode is not None:
                 await self.switch_to(self._previous_mode.mode)
                 return
             
-            if mode.next_mode is not None:
-                await self.switch_to(mode.next_mode)
+            if next_mode is not None:
+                await self.switch_to(next_mode)
                 return
             
         except NotImplementedError:
