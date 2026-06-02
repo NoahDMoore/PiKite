@@ -24,6 +24,11 @@ class SystemInfoMode(BaseMode):
 
     async def run(self):
         display_system_info(self.display_controller) # type: ignore
+        import threading
+
+        self.logger.info(
+            f"run thread={threading.get_ident()}"
+        )
         self.logger.info(
             f"Waiting on event id={id(self.mode_change_requested)} "
             f"is_set={self.mode_change_requested.is_set()}"

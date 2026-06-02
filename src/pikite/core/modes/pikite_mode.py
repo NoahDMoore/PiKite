@@ -45,6 +45,11 @@ class BaseMode(ABC):
         pass
 
     def request_mode_switch(self, mode: PiKiteMode):
+        import threading
+
+        self.logger.info(
+            f"request_mode_switch thread={threading.get_ident()}"
+        )
         self.logger.info(f"Mode switch requested: {mode}")
         self.next_mode = mode
         self.logger.info(
