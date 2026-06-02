@@ -212,12 +212,12 @@ class CaptureManager:
 
             # Clear Capture Intervals
             for key in [
-                            "runtime_and_session_info",
-                            "capture_interval",
-                            "altitude_interval",
-                            "pan_tilt_interval",
-                            "time_remaining_check"
-                        ]:
+                "runtime_and_session_info",
+                "capture_interval",
+                "altitude_interval",
+                "pan_tilt_interval",
+                "time_remaining_check"
+            ]:
                 self.timer.named_intervals.pop(key, None)
 
             # Home the Pan/Tilt Servos
