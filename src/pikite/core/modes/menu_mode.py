@@ -44,7 +44,6 @@ class MenuMode(BaseMode):
 
     async def exit(self):
         await self.camera_preview.stop()
-        await super().exit()
 
     def _register_inputs(self):
         # Map Buttons to InputCommands
