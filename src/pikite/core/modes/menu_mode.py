@@ -59,7 +59,7 @@ class MenuMode(BaseMode):
             InputCommand.NEXT: self.menu.increment_element,
             InputCommand.SELECT: self.menu.do_action,
             InputCommand.START_CAPTURE: self.start_capture,
-            InputCommand.SET_BASELINE_PRESSURE: self.get_baseline_pressure,
+            InputCommand.SET_BASELINE_ALTITUDE: self.get_baseline_pressure,
             InputCommand.DISPLAY_SYSTEM_INFO: self.display_system_info,
             InputCommand.SHUTDOWN: self.app_shutdown,
             InputCommand.REBOOT: self.app_reboot,

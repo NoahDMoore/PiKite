@@ -25,8 +25,8 @@ class InputCommand(Enum):
     PAN = auto()
     TILT = auto()
 
-    # Set Baseline Pressure
-    SET_BASELINE_PRESSURE = auto()
+    # Set Baseline Altitude
+    SET_BASELINE_ALTITUDE = auto()
 
     # System Commands
     DISPLAY_SYSTEM_INFO = auto()
