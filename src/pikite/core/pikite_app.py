@@ -60,8 +60,8 @@ class PiKiteApp:
         initialization_progress_bar.advance(5)
 
         # Initialize Servo Controllers
-        offset = int(self.settings.get("pan_tilt_zero_angle_offset", 0))
-        self.tilt_servo = TiltServo(zero_angle_offset=offset) # Adjust zero angle offset to ensure camera is level when tilt angle is set to 0
+        offset = int(self.settings.get("pan_tilt_tilt_zero_position_offset", 0))
+        self.tilt_servo = TiltServo(tilt_zero_position_offset=offset) # Adjust zero angle offset to ensure camera is level when tilt angle is set to 0
         initialization_progress_bar.advance(5)
 
         self.pan_servo = PanServo()
@@ -184,8 +184,8 @@ class PiKiteApp:
             self.timer.wait(0.5) # Small delay to allow camera to reconfigure before use
             logger.info("Camera controller reconfigured due to camera settings change.")
 
-        if setting_key == "pan_tilt_zero_angle_offset":
-            self.tilt_servo.zero_angle_offset = new_value
+        if setting_key == "pan_tilt_tilt_zero_position_offset":
+            self.tilt_servo.tilt_zero_position_offset = new_value
             logger.info(f"Updated tilt servo zero angle offset to {new_value} due to settings change.")
 
     def configure_logger(self):

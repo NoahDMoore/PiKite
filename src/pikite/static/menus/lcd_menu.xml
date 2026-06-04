@@ -432,7 +432,7 @@
 			</menu_item>
 
 			<menu_item name="panTiltZeroAngleOffset" message="Zero Angle Offset" action="options" parent="panTiltSettings">
-				<setting type="int">pan_tilt_zero_angle_offset</setting>
+				<setting type="int">pan_tilt_tilt_zero_position_offset</setting>
 				<option_item name="zero" message="Angle Offset: [0]" action="selectOption" value="0" />
 				<option_item name="one" message="Angle Offset: [1]" action="selectOption" value="1" />
 				<option_item name="two" message="Angle Offset: [2]" action="selectOption" value="2" />

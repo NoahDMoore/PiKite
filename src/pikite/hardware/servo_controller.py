@@ -32,7 +32,7 @@ class TiltServo:
     This class allows for controlling a traditional servo motor using PWM signals to set the angle of the servo.
     It supports setting the angle in degrees, where 0 degrees is the minimum position and a specified maximum angle is the maximum position.
     """
-    def __init__(self, pwm_channel=0, frequency=50, chip=0, max_angle=180, min_pulse_width=500, max_pulse_width=2500, zero_angle_offset: int = 0):
+    def __init__(self, pwm_channel=0, frequency=50, chip=0, max_angle=180, min_pulse_width=500, max_pulse_width=2500, tilt_zero_position_offset: int = 0):
         """
         Initializes the TiltServo with the specified parameters.
         
@@ -75,13 +75,13 @@ class TiltServo:
         self.max_pulse_width = max_pulse_width
 
         # Apply zero angle offset to angle calculations
-        if not isinstance(zero_angle_offset, int):
+        if not isinstance(tilt_zero_position_offset, int):
             try:
                 raise ValueError("Zero angle offset must be an integer.")
             except ValueError as e:
                 logger.error(f"Value Error: {e}. Defaulting zero angle offset to 0.")
-                zero_angle_offset = 0
-        self.zero_angle_offset = zero_angle_offset
+                tilt_zero_position_offset = 0
+        self.tilt_zero_position_offset = tilt_zero_position_offset
 
         # Calculate the pulse width per degree
         self.pulse_width_per_degree = (self.max_pulse_width - self.min_pulse_width) / self.max_angle
@@ -107,7 +107,7 @@ class TiltServo:
         Returns:
             int: Current angle in degrees.
         """
-        return self._angle - self.zero_angle_offset
+        return self._angle - self.tilt_zero_position_offset
 
     @angle.setter
     def angle(self, angle: int = 0) -> None:
@@ -120,7 +120,7 @@ class TiltServo:
         Raises:
             ValueError: If angle is not between 0 and max_angle.
         """
-        angle += self.zero_angle_offset  # Apply zero angle offset to the input angle
+        angle += self.tilt_zero_position_offset  # Apply zero angle offset to the input angle
 
         if 0 <= angle <= self.max_angle:
             pulse_width = self.min_pulse_width + (angle * self.pulse_width_per_degree)
