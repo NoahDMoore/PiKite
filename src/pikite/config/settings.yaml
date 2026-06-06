@@ -59,7 +59,7 @@ camera:
       min: 0
       max: 180
       step: 180
-      unit: "Degrees"
+      unit: "Deg."
   
   resolution:
     label: "Camera Resolution"
@@ -339,7 +339,7 @@ pan_tilt:
       min: 0
       max: 10
       step: 1
-      unit: "Degrees"
+      unit: "Deg."
   
 logging:
   label: "Logging Settings"
