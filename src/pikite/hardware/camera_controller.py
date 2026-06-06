@@ -333,7 +333,7 @@ class CameraController:
             CAMERA_MODELS | None: Detected camera model or None if detection fails.
         """
         camera_list = Picamera2.global_camera_info()
-        detected_model = camera_list[0].get("model", None) if camera_list else None
+        detected_model = camera_list[0].get("Model", None) if camera_list else None
         logger.debug(f"The system reports camera model ... {detected_model}")
 
         if detected_model in CAMERA_MODELS.__members__ and detected_model is not None:
