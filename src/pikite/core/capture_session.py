@@ -54,7 +54,7 @@ class CaptureSession:
 
         # Initialize altitude logging
         self.alt_csv, self.csv_writer = self._open_altitude_csv()
-        self.altitude_interval = self.context.settings.get("altitide.interval", self.capture_interval)
+        self.altitude_interval = self.context.settings.get("altitude.interval", self.capture_interval)
 
         # Initialize pan/tilt pattern
         self.pan_tilt_pattern = self._create_pan_tilt_pattern()
