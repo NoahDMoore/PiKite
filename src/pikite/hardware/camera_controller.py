@@ -336,8 +336,9 @@ class CameraController:
         detected_model = camera_list[0].get("Model", None) if camera_list else None
         logger.debug(f"The system reports camera model ... {detected_model}")
 
-        if detected_model in CAMERA_MODELS.__members__ and detected_model is not None:
-            return CAMERA_MODELS[detected_model]
+        if detected_model in CAMERA_MODELS and detected_model is not None:
+            logger.info(f"Camera model identified: CAMERA_MODELS.{CAMERA_MODELS(detected_model).name}")
+            return CAMERA_MODELS(detected_model)
         else:
             logger.warning("Unable to match detected camera model with compatable models.")
             return None
