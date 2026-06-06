@@ -397,7 +397,7 @@ class Settings:
         Add a callback function that will be run whenever a setting is changed.
         
         Args:
-            callback (callable): A function that takes three arguments (setting_key, setting_section, new_value) and will be called on setting changes.
+            callback (callable): A function that takes two arguments (setting_key, new_value) and will be called on setting changes.
         """
         if callable(callback):
             self._setting_change_listeners.append(callback)

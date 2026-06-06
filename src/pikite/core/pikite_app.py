@@ -172,19 +172,19 @@ class PiKiteApp:
         self.application_running = False
         self.on_close_callback = None
 
-    def _on_setting_change(self, setting_key, section, new_value):
-        logger.info(f"Setting Change Detected: {setting_key} changed to {new_value} in section {section}")
+    def _on_setting_change(self, setting_key, new_value):
+        logger.info(f"Setting Change Detected: {setting_key} changed to {new_value}.")
         
-        if section == "logging_settings":
+        if setting_key.startswith("logging"):
             self.configure_logger()
             logger.info("Logger reconfigured due to logging settings change.")
 
-        if section == "camera_settings":
+        if setting_key.startswith("camera"):
             self.camera_controller.reconfigure_camera()
             self.timer.wait(0.5) # Small delay to allow camera to reconfigure before use
             logger.info("Camera controller reconfigured due to camera settings change.")
 
-        if setting_key == "pan_tilt_tilt_zero_position_offset":
+        if setting_key == "pan_tilt.tilt_zero_position_offset":
             self.tilt_servo.tilt_zero_position_offset = int(new_value)
             logger.info(f"Updated tilt servo zero angle offset to {new_value} due to settings change.")
 
