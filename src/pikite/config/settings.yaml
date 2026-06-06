@@ -1,0 +1,382 @@
+altitude:
+  label: "Altitude Settings"
+  description: "Settings related to altitude measurement and logging."
+  type: settings_group
+
+  interval:
+    label: "Alt. Reading Interval"
+    description: "Interval between altitude readings."
+    type: setting
+    data_type: int
+    current_value: 2
+    default: 2
+    options:
+      min: 1
+      max: 90
+      step: 1
+      unit: "Seconds"
+
+camera:
+  label: "Camera Settings"
+  description: "Settings related to camera configuration."
+  type: settings_group
+
+  model:
+    label: "Camera Model"
+    description: "Raspberry Pi Camera Module model."
+    type: setting
+    data_type: str
+    current_value: "imx708_wide"
+    default: "imx708_wide"
+    options:
+      - label: "V1"
+        value: "imx647"
+      - label: "V2"
+        value: "imx219"
+      - label: "V3"
+        value: "imx708"
+      - label: "V3 Wide"
+        value: "imx708_wide"
+      - label: "HQ Camera"
+        value: "imx477"
+  
+  has_ir_filter:
+    label: "Camera IR Filter"
+    description: "Whether the camera has an IR filter. False for NoIR cameras."
+    type: setting
+    data_type: bool
+    current_value: true
+    default: true
+
+  rotation:
+    label: "Camera Rotation"
+    description: "Rotation of the camera image in degrees."
+    type: setting
+    data_type: int
+    current_value: 0
+    default: 0
+    options:
+      min: 0
+      max: 180
+      step: 180
+      unit: "Degrees"
+  
+  resolution:
+    label: "Camera Resolution"
+    description: "Resolution for photo and video capture."
+    type: setting
+    data_type: tuple
+    current_value: "(4608,2592)"
+    default: "(4608,2592)"
+    options:
+      - label: "HD (1280,720)"
+        value: "(1280,720)"
+      - label: "FHD (1920,1080)"
+        value: "(1920,1080)"
+      - label: "QHD (2560,1440)"
+        value: "(2560,1440)"
+      - label: "V1 Max (2592,1944)"
+        value: "(2592,1944)"
+      - label: "V2 Max(3280,2464)"
+        value: "(3280,2464)"
+      - label: "HQ Max (4056,3040)"
+        value: "(4056,3040)"
+      - label: "V3 Max (4608,2592)"
+        value: "(4608,2592)"
+
+  image_adjustments:
+    label: "Image Adjustments"
+    description: "Settings for image adjustments like exposure, white balance, etc."
+    type: settings_group
+
+    ae_enable:
+      label: "Auto Exposure"
+      description: "Enable or disable auto exposure."
+      type: setting
+      data_type: bool
+      current_value: true
+      default: true
+    
+    af_mode:
+      label: "Auto Focus Mode"
+      description: "Auto focus mode for the camera."
+      type: setting
+      data_type: str
+      current_value: "continuous"
+      default: "continuous"
+      options:
+        - label: "Auto"
+          value: "auto"
+        - label: "Continuous"
+          value: "continuous"
+        - label: "Manual"
+          value: "manual"
+
+    af_range:
+      label: "Auto Focus Range"
+      description: "Focus range for auto focus mode."
+      type: setting
+      data_type: str
+      current_value: "normal"
+      default: "normal"
+      options:
+        - label: "Normal"
+          value: "normal"
+        - label: "Macro"
+          value: "macro"
+        - label: "Full"
+          value: "full"
+
+    af_speed:
+      label: "Auto Focus Speed"
+      description: "Speed of auto focus adjustments."
+      type: setting
+      data_type: str
+      current_value: "normal"
+      default: "normal"
+      options:
+        - label: "Normal"
+          value: "normal"
+        - label: "Fast"
+          value: "fast"
+
+    awb_enable:
+      label: "Auto White Balance"
+      description: "Enable or disable auto white balance."
+      type: setting
+      data_type: bool
+      current_value: true
+      default: true
+    
+    awb_mode:
+      label: "Auto White Balance Mode"
+      description: "Auto white balance mode for the camera."
+      type: setting
+      data_type: str
+      current_value: "auto"
+      default: "auto"
+      options:
+        - label: "Auto"
+          value: "auto"
+        - label: "Tungsten"
+          value: "tungsten"
+        - label: "Fluorescent"
+          value: "fluorescent"
+        - label: "Indoor"
+          value: "indoor"
+        - label: "Daylight"
+          value: "daylight"
+        - label: "Cloudy"
+          value: "cloudy"
+
+    brightness:
+      label: "Brightness"
+      description: "Brightness level for the camera."
+      type: setting
+      data_type: float
+      current_value: 0.0
+      default: 0.0
+      options:
+        min: -1.0
+        max: 1.0
+        step: 0.1
+
+    contrast:
+      label: "Contrast"
+      description: "Contrast level for the camera."
+      type: setting
+      data_type: float
+      current_value: 1.0
+      default: 1.0
+      options:
+        min: 0.0
+        max: 32.0
+        step: 0.5
+
+    exposure_value:
+      label: "Exposure Value"
+      description: "Exposure compensation value for the camera."
+      type: setting
+      data_type: float
+      current_value: 0.0
+      default: 0.0
+      options:
+        min: -8.0
+        max: 8.0
+        step: 0.5
+    
+    saturation:
+      label: "Saturation"
+      description: "Saturation level for the camera."
+      type: setting
+      data_type: float
+      current_value: 1.0
+      default: 1.0
+      options:
+        min: 0.0
+        max: 32.0
+        step: 0.5
+
+    sharpness:
+      label: "Sharpness"
+      description: "Sharpness level for the camera."
+      type: setting
+      data_type: float
+      current_value: 1.0
+      default: 1.0
+      options:
+        min: 0.0
+        max: 16.0
+        step: 0.5
+  
+capture:
+  label: "Capture Settings"
+  description: "Settings related to media capture."
+  type: settings_group
+
+  mode:
+    label: "Capture Mode"
+    description: "Mode for capturing images."
+    type: setting
+    data_type: str
+    current_value: "pic"
+    default: "pic"
+    options:
+      - "Photo": "pic"
+      - "Video": "vid"
+      - "None": "none"
+
+  interval:
+    label: "Capture Interval"
+    description: "Interval in seconds between photo/video captures."
+    type: setting
+    data_type: int
+    current_value: 2
+    default: 2
+    options:
+      min: 1
+      max: 60
+      step: 1
+      unit: "Seconds"
+  
+  recording_delay:
+    label: "Capture Recording Delay"
+    description: "Delay in seconds before starting video recording after launch."
+    type: setting
+    data_type: int
+    current_value: 0
+    default: 0
+    options:
+      min: 0
+      max: 60
+      step: 1
+      unit: "Seconds"
+
+  recording_duration:
+    label: "Capture Recording Duration"
+    description: "Duration in seconds for video recording."
+    type: setting
+    data_type: int
+    current_value: 15
+    default: 15
+    options:
+      min: 1
+      max: 300
+      step: 5
+      unit: "Seconds"
+
+pan_tilt:
+  label: "Pan/Tilt Settings"
+  description: "Settings related to pan/tilt control."
+  type: settings_group
+
+  mode:
+    label: "Pan/Tilt Mode"
+    description: "Mode for pan/tilt control."
+    type: setting
+    data_type: str
+    current_value: "grid_360"
+    default: "grid_360"
+    options:
+      - label: "Pan/Tilt Grid 360°"
+        value: "grid_360"
+      - label: "Pan/Tilt Grid 180°"
+        value: "grid_180"
+      - label: "Pan 30°"
+        value: "pan_30"
+      - label: "Pan 45°"
+        value: "pan_45"
+      - label: "Pan 90°"
+        value: "pan_90"
+      - label: "Tilt 30°"
+        value: "tilt_30"
+      - label: "Tilt 45°"
+        value: "tilt_45"
+      - label: "None"
+        value: "none"
+  
+  interval:
+    label: "Pan/Tilt Interval"
+    description: "Interval in seconds between pan/tilt movements."
+    type: setting
+    data_type: int
+    current_value: 30
+    default: 30
+    options:
+      min: 5
+      max: 60
+      step: 5
+      unit: "Seconds"
+
+  tilt_zero_position_offset:
+    label: "Tilt Zero Position Offset"
+    description: "Offset in degrees for the tilt servo zero position."
+    type: setting
+    data_type: int
+    current_value: 0
+    default: 0
+    options:
+      min: 0
+      max: 10
+      step: 1
+      unit: "Degrees"
+  
+logging:
+  label: "Logging Settings"
+  description: "Settings related to logging behavior."
+  type: settings_group
+  
+  log_to_file:
+    label: "Log to File"
+    description: "Whether to save logs to a file."
+    type: setting
+    data_type: bool
+    current_value: true
+    default: true
+  
+  log_to_console:
+    label: "Log to Console"
+    description: "Whether to print logs to the console."
+    type: setting
+    data_type: bool
+    current_value: true
+    default: true
+
+  log_level:
+    label: "Log Level"
+    description: "Minimum level of logs to record."
+    type: setting
+    data_type: str
+    current_value: "INFO"
+    default: "INFO"
+    options:
+      - label: "DEBUG"
+        value: "DEBUG"
+      - label: "INFO"
+        value: "INFO"
+      - label: "WARNING"
+        value: "WARNING"
+      - label: "ERROR"
+        value: "ERROR"
+      - label: "CRITICAL"
+        value: "CRITICAL"

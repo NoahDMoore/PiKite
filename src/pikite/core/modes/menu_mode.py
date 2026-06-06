@@ -56,7 +56,7 @@ class MenuMode(BaseMode):
 
         # Register InputHandler Actions
         self.inputs = {
-            InputCommand.NEXT: self.menu.increment_element,
+            InputCommand.NEXT: self.menu.increment,
             InputCommand.SELECT: self.menu.do_action,
             InputCommand.START_CAPTURE: self.start_capture,
             InputCommand.SET_BASELINE_ALTITUDE: self.get_baseline_pressure,

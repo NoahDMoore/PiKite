@@ -1,0 +1,55 @@
+logo:
+  label: "PiKite Logo"
+  type: image
+  file_name: "logo.jpg"
+
+launch_pikite:
+  label: "Launch Pikite"
+  type: input_command
+  command: "START_CAPTURE"
+
+baseline_altitude:
+  label: "Baseline Altitude"
+  type: input_command
+  command: "SET_BASELINE_ALTITUDE"
+
+settings:
+  label: "Settings"
+  type: submenu
+  submenu:
+    configure_settings:
+      label: "Configure Settings"
+      type: settings_menu
+
+    reset_settings:
+      label: "Reset Settings"
+      type: input_command
+      command: "LOAD_DEFAULT_SETTINGS"
+      requires_confirmation: true
+
+system_info:
+  label: "System Info"
+  type: input_command
+  command: "DISPLAY_SYSTEM_INFO"
+
+exit_pikite:
+  label: "Exit PiKite"
+  type: submenu
+  submenu:
+    poweroff:
+      label: "Shutdown"
+      type: input_command
+      command: "SHUTDOWN"
+      requires_confirmation: true
+
+    reboot:
+      label: "Reboot"
+      type: input_command
+      command: "REBOOT"
+      requires_confirmation: true
+
+    close_application:
+      label: "Close App"
+      type: input_command
+      command: "EXIT"
+      requires_confirmation: true

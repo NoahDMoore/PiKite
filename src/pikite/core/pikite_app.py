@@ -60,7 +60,7 @@ class PiKiteApp:
         initialization_progress_bar.advance(5)
 
         # Initialize Servo Controllers
-        offset = int(self.settings.get("pan_tilt_tilt_zero_position_offset", 0))
+        offset = int(self.settings.get("pan_tilt.tilt_zero_position_offset", 0))
         self.tilt_servo = TiltServo(tilt_zero_position_offset=offset) # Adjust zero angle offset to ensure camera is level when tilt angle is set to 0
         initialization_progress_bar.advance(5)
 
@@ -195,15 +195,15 @@ class PiKiteApp:
         Args:
             settings (Settings): Application settings.
         """
-        log_level = self.settings.get("log_level", "INFO")
+        log_level = self.settings.get("logging.log_level", "INFO")
         logger_module.set_log_level(log_level)
         logger.info(f"Log level set to {log_level}")
 
-        if self.settings.get("log_to_file", True) is False:
+        if self.settings.get("logging.log_to_file", True) is False:
             logger.info("Logging to file disabled via settings.")
             logger_module.unset_file_handler()
         
-        if self.settings.get("log_to_console", True) is False:
+        if self.settings.get("logging.log_to_console", True) is False:
             logger.info("Logging to console disabled via settings.")
             logger_module.unset_stream_handler()
 

@@ -130,14 +130,14 @@ class CameraController:
         """
         # Get camera model
         detected_model = self.detect_camera_model()
-        model_value_in_settings = self.settings.get("cam_model", None)
+        model_value_in_settings = self.settings.get("camera.model", None)
 
         if detected_model is not None:
             self.camera_model = detected_model
 
             if detected_model.value != model_value_in_settings:
                 logger.info("Updating settings configuration to match detected camera model.")
-                self.settings.set("cam_model", detected_model.value)
+                self.settings.set("camera.model", detected_model.value)
         else:
             self.camera_model = CAMERA_MODELS(model_value_in_settings) if model_value_in_settings in CAMERA_MODELS else None
         
@@ -149,12 +149,12 @@ class CameraController:
                 raise
         
         #Get IR filter setting from settings
-        self.ir_filter = self.settings.get("cam_ir_filter", True)  # NOIR cameras = False
+        self.ir_filter = self.settings.get("camera.has_ir_filter", True)  # NOIR cameras = False
 
         #Configure camera settings based on the provided settings
-        self.capture_mode = CAPTURE_MODES(self.settings.get("cam_capture_mode", CAPTURE_MODES.STILL))  # Default to STILL if not specified or invalid
+        self.capture_mode = CAPTURE_MODES(self.settings.get("capture.mode", CAPTURE_MODES.STILL))  # Default to STILL if not specified or invalid
         self.resolution = self.get_resolution()
-        self.transformation = Transform(hflip=True, vflip=True) if self.settings.get("cam_rotation") == 180 else Transform(hflip=False, vflip=False)
+        self.transformation = Transform(hflip=True, vflip=True) if self.settings.get("camera.rotation") == 180 else Transform(hflip=False, vflip=False)
 
         self.preview_config = self.picam2.create_preview_configuration(
             main={"size": (1280, 720)},
@@ -179,17 +179,17 @@ class CameraController:
         self.picam2.configure(self.preview_config)
 
         self.picam2.set_controls({
-            "AeEnable": self.settings.get("cam_ae_enable", True),                                   # Enable auto exposure
-            "AfMode": AF_MODE.get(str(self.settings.get("cam_af_mode")), AfModeEnum.Continuous),    # Auto Focus Mode, AfModeEnum values: Manual, Auto, Continuous
-            "AfRange": AF_RANGE.get(str(self.settings.get("cam_af_range")), AfRangeEnum.Normal),    # Auto Focus Range, AfRangeEnum values: Normal, Macro, Full
-            "AfSpeed": AF_SPEED.get(str(self.settings.get("cam_af_speed")), AfSpeedEnum.Normal),    # Auto Focus Speed, AfSpeedEnum values: Normal, Fast
-            "AwbEnable": self.settings.get("cam_awb_enable", True),                                 # Enable auto white balance
-            "AwbMode": AWB_MODE.get(str(self.settings.get("cam_awb_mode")), AwbModeEnum.Auto),      # Auto White Balance Mode, AwbModeEnum values: Auto, Tungsten, Fluorescent, Indoor, Daylight, Cloudy, Custom)
-            "Brightness": self.settings.get("cam_brightness", 0.0),                                 # Floating point value from -1.0 to 1.0; 0.0 is default, -1.0 is minimum brightness, 1.0 is maximum brightness
-            "Contrast": self.settings.get("cam_contrast", 1.0),                                     # Floating point value from 0.0 to 32.0; 0.0 is no contrast, 1.0 is default, 32.0 is maximum contrast
-            "ExposureValue": self.settings.get("cam_exposure_value", 0.0),                          # Floating point value from -8.0 to 8.0; 0.0 is default, positive values brighten the image
-            "Saturation": self.settings.get("cam_saturation", 1.0),                                 # Floating point value from 0.0 to 32.0; 0.0 is no saturation, 1.0 is default, 32.0 is maximum saturation
-            "Sharpness": self.settings.get("cam_sharpness", 1.0),                                   # Floating point value from 0.0 to 16.0; 1.0 is default, 16.0 is maximum sharpness
+            "AeEnable": self.settings.get("camera.image_adjustments.ae_enable", True),                                   # Enable auto exposure
+            "AfMode": AF_MODE.get(str(self.settings.get("camera.image_adjustments.af_mode")), AfModeEnum.Continuous),    # Auto Focus Mode, AfModeEnum values: Manual, Auto, Continuous
+            "AfRange": AF_RANGE.get(str(self.settings.get("camera.image_adjustments.af_range")), AfRangeEnum.Normal),    # Auto Focus Range, AfRangeEnum values: Normal, Macro, Full
+            "AfSpeed": AF_SPEED.get(str(self.settings.get("camera.image_adjustments.af_speed")), AfSpeedEnum.Normal),    # Auto Focus Speed, AfSpeedEnum values: Normal, Fast
+            "AwbEnable": self.settings.get("camera.image_adjustments.awb_enable", True),                                 # Enable auto white balance
+            "AwbMode": AWB_MODE.get(str(self.settings.get("camera.image_adjustments.awb_mode")), AwbModeEnum.Auto),      # Auto White Balance Mode, AwbModeEnum values: Auto, Tungsten, Fluorescent, Indoor, Daylight, Cloudy, Custom)
+            "Brightness": self.settings.get("camera.image_adjustments.brightness", 0.0),                                 # Floating point value from -1.0 to 1.0; 0.0 is default, -1.0 is minimum brightness, 1.0 is maximum brightness
+            "Contrast": self.settings.get("camera.image_adjustments.contrast", 1.0),                                     # Floating point value from 0.0 to 32.0; 0.0 is no contrast, 1.0 is default, 32.0 is maximum contrast
+            "ExposureValue": self.settings.get("camera.image_adjustments.exposure_value", 0.0),                          # Floating point value from -8.0 to 8.0; 0.0 is default, positive values brighten the image
+            "Saturation": self.settings.get("camera.image_adjustments.saturation", 1.0),                                 # Floating point value from 0.0 to 32.0; 0.0 is no saturation, 1.0 is default, 32.0 is maximum saturation
+            "Sharpness": self.settings.get("camera.image_adjustments.sharpness", 1.0),                                   # Floating point value from 0.0 to 16.0; 1.0 is default, 16.0 is maximum sharpness
         })
 
         self.picam2.start()
@@ -233,7 +233,7 @@ class CameraController:
         Raises:
             ValueError: If the requested resolution exceeds the maximum supported resolution.
         """
-        requested_resolution = self.settings.get("cam_resolution", self.max_resolution)
+        requested_resolution = self.settings.get("camera.resolution", self.max_resolution)
 
         if requested_resolution is None:
             requested_resolution = self.max_resolution

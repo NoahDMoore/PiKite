@@ -54,11 +54,11 @@ class CaptureSession:
 
         # Initialize altitude logging
         self.alt_csv, self.csv_writer = self._open_altitude_csv()
-        self.altitude_interval = self.context.settings.get("alt_reading_interval", self.capture_interval)
+        self.altitude_interval = self.context.settings.get("altitide.interval", self.capture_interval)
 
         # Initialize pan/tilt pattern
         self.pan_tilt_pattern = self._create_pan_tilt_pattern()
-        self.pan_tilt_interval = self.context.settings.get("pan_tilt_interval", 30)
+        self.pan_tilt_interval = self.context.settings.get("pan_tilt.interval", 30)
 
     def __enter__(self):
         logger.debug("Entering CaptureSession context manager")
@@ -70,7 +70,7 @@ class CaptureSession:
     
     def _get_capture_mode(self) -> CONSTANTS.CAPTURE_MODES:
         """Determine the capture mode based on application settings."""
-        capture_mode_key = self.context.settings.get("cam_capture_mode", "none")
+        capture_mode_key = self.context.settings.get("capture.mode", "none")
         capture_mode = CONSTANTS.CAPTURE_MODES(capture_mode_key)
         if capture_mode is CONSTANTS.CAPTURE_MODES.NONE:
             logger.info("Capture mode is NONE; no media capture will be performed.")
@@ -88,16 +88,16 @@ class CaptureSession:
     def _get_video_length(self) -> int:
         """Determine the video length based on the current capture mode."""
         if self.capture_mode == CONSTANTS.CAPTURE_MODES.VIDEO:
-            return self.context.settings.get("vid_length", 15)
+            return self.context.settings.get("capture.recording_duration", 15)
         else:
             return 0  # No video length for STILL or NONE capture modes
 
     def _get_capture_interval(self) -> int:
         """Determine the capture interval based on the current capture mode."""
         if self.capture_mode == CONSTANTS.CAPTURE_MODES.STILL:
-            return self.context.settings.get("pic_interval", 2)
+            return self.context.settings.get("capture.interval", 2)
         elif self.capture_mode == CONSTANTS.CAPTURE_MODES.VIDEO:
-            return self.context.settings.get("vid_interval", 30)
+            return self.context.settings.get("capture.interval", 30)
         else:
             return 2  # Default interval for NONE capture mode
         
@@ -124,8 +124,8 @@ class CaptureSession:
     
     def _create_pan_tilt_pattern(self) -> PanTiltPattern:
         """Create a PanTiltPattern instance based on application settings."""
-        logger.debug(f"Creating pan/tilt pattern for capture session: {self.context.settings.get('pan_tilt_mode')}")
-        pan_tilt_mode = PanTiltPattern.PAN_TILT_MODES(self.context.settings.get("pan_tilt_mode"))
+        logger.debug(f"Creating pan/tilt pattern for capture session: {self.context.settings.get('pan_tilt.mode')}")
+        pan_tilt_mode = PanTiltPattern.PAN_TILT_MODES(self.context.settings.get("pan_tilt.mode"))
         pan_tilt_pattern = PanTiltPattern(
             mode=pan_tilt_mode,
             pan_servo=self.context.pan_servo,

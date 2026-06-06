@@ -34,8 +34,8 @@ class StorageManager:
         DEFAULT_CONFIG_FILE (Path): Path to the default configuration file.
         FONTS_DIR (Path): Directory for font files.
         MEDIA_DIR (Path): Directory for static media files.
-        MENU_DIR (Path): Directory for menu XML files.
-        MENU_FILE (Path): Path to the main menu XML file.
+        MENU_DIR (Path): Directory for menu files.
+        MENU_FILE (Path): Path to the main menu yaml file.
         USER_ROOT (Path): Root directory for user-specific output files.
         LOG_FILE_BASE (Path): Path to the base log file.
         CONFIG_FILE (Path): Path to the configuration file.
@@ -57,27 +57,35 @@ class StorageManager:
         """
         # PiKite Library Paths
         self.BASE_DIR = Path(__file__).resolve().parent.parent
-        self.DEFAULT_CONFIG_FILE  = self.BASE_DIR / "config" / "default_settings.ini"
+        self.DEFAULT_CONFIG_FILE  = self.BASE_DIR / "config" / "settings.yaml"
         self.FONTS_DIR = self.BASE_DIR / "static" / "fonts"
         self.MEDIA_DIR = self.BASE_DIR / "static" / "media"
         self.MENU_DIR = self.BASE_DIR / "static" / "menus"
-        self.MENU_FILE = self.MENU_DIR / "lcd_menu.xml"
-
-        # Set User Root Directory
-        self.USER_ROOT = Path(root or Path.home() / "pikite_output")
-
-        # Define User Paths
-        self.LOG_DIR = self.USER_ROOT / "logs"
-        self.DATA_DIR = self.USER_ROOT / "data"
-        self.CONFIG_DIR = self.USER_ROOT / "config"
-        self.MEDIA_OUTPUT_DIR = self.USER_ROOT / "media"
-        self.PHOTO_OUTPUT_DIR = self.MEDIA_OUTPUT_DIR / "photos"
-        self.VIDEO_OUTPUT_DIR = self.MEDIA_OUTPUT_DIR / "videos"
+        self.MENU_FILE = self.MENU_DIR / "menu.yaml"
 
         # Web Server Paths
         self.WEB_ROOT = self.BASE_DIR / "remote" / "web"
 
-        # Initialize Required Directories
+        # Set User Root Directory
+        self.USER_ROOT = Path(root or Path.home() / "pikite_output")
+
+        # Logging Paths
+        self.LOG_DIR = self.USER_ROOT / "logs"
+        self.LOG_FILE_BASE = self.LOG_DIR / "pikite.log"
+        
+        # Data Directory (e.g., for altitude logs, sensor data, etc.)
+        self.DATA_DIR = self.USER_ROOT / "data"
+
+        # Configuration Paths
+        self.CONFIG_DIR = self.USER_ROOT / "config"
+        self.CONFIG_FILE = self.CONFIG_DIR / "settings.yaml"
+
+        # Media Output Paths
+        self.MEDIA_OUTPUT_DIR = self.USER_ROOT / "media"
+        self.PHOTO_OUTPUT_DIR = self.MEDIA_OUTPUT_DIR / "photos"
+        self.VIDEO_OUTPUT_DIR = self.MEDIA_OUTPUT_DIR / "videos"
+
+        # Initialize Required User Directories
         self._initialize_dirs(
             (
                 self.LOG_DIR,
@@ -92,16 +100,6 @@ class StorageManager:
         """Ensure that all required user directories exist. If not, create them."""
         for path in dirs:
             path.mkdir(parents=True, exist_ok=True)
-
-    @property
-    def LOG_FILE_BASE(self) -> Path:
-        """Return the path to the user's log file."""
-        return self.LOG_DIR / "pikite.log"
-    
-    @property
-    def CONFIG_FILE(self) -> Path:
-        """Return the path to the user's configuration file."""
-        return self.CONFIG_DIR / "pikite_settings.ini"
     
     def get_data_file_path(
         self,

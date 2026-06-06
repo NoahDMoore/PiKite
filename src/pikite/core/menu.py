@@ -3,24 +3,25 @@ Menu class for PiKite
 This class handles the menu system for the PiKite project, allowing navigation through different menu states,
 executing actions, and updating the display based on the current menu state.
 """
+from __future__ import annotations 
 import ast
 from pathlib import Path
-import xml.etree.ElementTree as ET
+import yaml
 
-from .constants import XMLTAG, XMLATTRIB, MENUACTION
 from .input_handler import InputHandler, InputCommand, InputSource
 from ..utils.logger import get_logger
 from .settings import Settings
+
 # Mock hardware controller class for testing on non-RPi system; remove when done testing
 try:
-	from ..hardware.display_controller import DisplayController # type: ignore
-except:
-	class DisplayController:
-		"""
-		Placeholder DisplayController class for type hinting. Replace with actual implementation.
-		"""
-		def print_message(self, message: str):
-			print(f"Display Message: {message}")
+    from ..hardware.display_controller import DisplayController  # type: ignore
+except Exception:
+    class DisplayController:
+        """
+        Placeholder DisplayController class for type hinting. Replace with actual implementation.
+        """
+        def print_message(self, message: str):
+            print(f"Display Message: {message}")
 
 from ..system.storage import StorageManager
 
@@ -32,300 +33,413 @@ storage_manager = StorageManager()
 MENU_FILE = storage_manager.MENU_FILE
 
 class MenuElement:
-	"""
-	Represents a single element in the menu structure.
-	Attributes:
-		element (ET.Element): The XML element representing the menu item.
-		tag (str): The tag of the XML element.
-		name (str): The name attribute of the menu item.
-		message (str): The message attribute of the menu item.
-		action (str): The action attribute of the menu item.
-		parent (MenuElement): The parent MenuElement, if any.
-		value (str | None): The value associated with the menu item, if any.
-		setting (str | None): The setting associated with the menu item, if any.
-		options (list[MenuElement] | None): List of option MenuElements if action is 'option'.
-		submenu (list[MenuElement] | None): List of submenu MenuElements if action is 'menu' or 'submenu'.
-	"""
-	def __init__(self, element: ET.Element, parent: "MenuElement | None"=None):
-		"""
-		Initializes a MenuElement instance.
-		
-		Args:
-			element (ET.Element): The XML element representing the menu item.
-			parent (MenuElement | None): The parent MenuElement, if any. Defaults to None.
-		"""
-		self.element = element	# ElementTree Object
-		self.tag = self.element.tag
-		self.name = self.element.attrib.get("name", f"Tag: {self.tag}")
-		self.message = self.element.attrib.get("message", f"Tag: {self.tag}")
-		self.action = self.element.attrib.get("action", "pass")
-		self.command = self.element.attrib.get("command", None)
-		self.parent = parent if parent is not None else self
-		self.value = self.element.attrib.get(XMLATTRIB.VALUE, None)
+    """
+    Represents a single element in the menu structure.
+    """
 
-		# Check for 'setting' element and get setting text if it exists
-		setting_elem = self.element.find(XMLTAG.SETTING)
-		if setting_elem is not None:
-			self.setting = setting_elem.text
-			self.setting_type = setting_elem.attrib.get("type", "str") # Default to string if type not specified
-		else:
-			self.setting = None
-		
-		# If element action is 'option', parse child 'option_item' elements
-		if self.action == MENUACTION.OPTIONS:
-			option_item_elems = self.element.findall(XMLTAG.OPTION_ITEM)
-		else:
-			option_item_elems = None
-		self.options = [MenuElement(option, parent=self) for option in option_item_elems] if option_item_elems is not None else None
+    def __init__(
+        self,
+        element_dict: dict,
+        app_settings: Settings,
+        parent: MenuElement | None = None,
+        element_path: str | None = None
+    ):
+        self.dict = element_dict
+        self.name = self.dict.get("label")
+        self.type = self.dict.get("type")
+        self.command = self.dict.get("command")
+        self.command_params = self.dict.get("command_params")
+        self.value = self.dict.get("value")
+        self.setting_key = self.dict.get("setting_key")
+        self.requires_confirmation = self.dict.get("requires_confirmation")
+        self.parent = parent
+        self.app_settings = app_settings
+        self.element_path = element_path
 
-		# If element action is 'menu' or 'submenu', parse child 'menu_item' elements
-		if self.tag == XMLTAG.MENU or self.action == MENUACTION.SUBMENU:
-			menu_item_elems = self.element.findall(XMLTAG.MENU_ITEM)
-		else:
-			menu_item_elems = None
-		self.submenu = [MenuElement(menu_item, parent=self) for menu_item in menu_item_elems] if menu_item_elems is not None else None
+        if self.setting_key is None and self.type == "setting" and self.element_path is not None:
+            self.setting_key = self.element_path
 
-	def __repr__(self):
-		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, command={self.command}, value={self.value}, parent_name={self.parent.name}>"
+        # Set the Display Message
+        if self.dict.get("display_message"):
+            self.display_message = self.dict.get("display_message")
+        elif self.type == "image" and self.dict.get("file_name"):
+            self.display_message = self.dict.get("file_name")
+        else:
+            self.display_message = self.dict.get("message", self.name)
 
-	def __str__(self):
-		return f"MenuElement: <{self.tag} name={self.name}, self.message={self.message}, action={self.action}, command={self.command}, value={self.value}, parent_name={self.parent.name}>"
+        # If the element has a submenu, create the submenu level
+        if self.type in ("submenu", "settings_menu", "settings_group"):
+            self.submenu = self._get_submenu()
+        else:
+            self.submenu = None
 
+    def __repr__(self):
+        repr = []
+        
+        repr.append(f"MenuElement: <name={self.name}, type={self.type}, display_message={self.display_message}")
+            
+        if self.command is not None:
+            repr.append(f", command={self.command}")
+
+        if self.command_params is not None:
+            repr.append(f", command_params={self.command_params}") 
+
+        if self.value is not None:
+            repr.append(f", value={self.value}")
+
+        if self.setting_key is not None:
+            repr.append(f", setting_key={self.setting_key}")
+
+        if self.requires_confirmation is not None:
+            repr.append(f", requires_confirmation={self.requires_confirmation}")
+            
+        if self.parent is not None:
+            repr.append(f", parent={self.parent.name}")
+
+        repr.append(f">")
+        
+        return "".join(repr)
+
+    def _get_submenu(self):
+        if self.type == "settings_menu":
+            submenu_dict = self.app_settings.config
+        else:
+            submenu_dict = self.dict.get("submenu")
+
+        match self.type:
+            case "submenu":
+                submenu_dict = self.dict.get("submenu")
+            case "settings_menu":
+                submenu_dict = self.app_settings.config
+            case "settings_group":
+                submenu_dict = {
+                    k: v for k, v in self.dict.items() 
+                    if k not in ("label", "description", "type") and isinstance(v, dict)
+                }
+
+        if isinstance(submenu_dict, dict):
+            # On entering a settings_group element, start propogating the path down to the setting to track the setting_key
+            if self.type == "settings_group":
+                submenu_path = self.element_path or ""
+            else:
+                submenu_path = ""
+
+            return MenuLevel(
+                level_dict = submenu_dict,
+                app_settings = self.app_settings,
+                parent=self,
+                submenu=True,
+                path=submenu_path
+            )
+        
+        return None
+
+class MenuLevel:
+    def __init__(
+            self,
+            level_dict: dict,
+            app_settings: Settings,
+            parent: MenuElement | None = None,
+            submenu: bool = False,
+            path: str = ""
+        ):
+        self.dict = level_dict
+        self.parent = parent
+        self.app_settings = app_settings
+        self.path = path
+        self.elements: list[MenuElement] = list(self._yield_elements())
+        self.submenu = submenu
+
+        self._index = 0
+
+        if self.submenu:
+            self._insert_return_element()
+
+    def _yield_elements(self):
+        for key, item in self.dict.items():
+            element_path = f"{self.path}.{key}" if self.path else key
+            yield MenuElement(
+                element_dict = item,
+                app_settings = self.app_settings,
+                parent = self.parent,
+                element_path = element_path
+            )
+
+    def _insert_return_element(self):
+        if self.parent is None:
+            parent_name = "Parent"
+        else:
+            parent_name = self.parent.name
+
+        return_element_dict = {
+            "label": f"Exit '{parent_name}'",
+            "type": "return"
+        }
+
+        self.elements.append(
+            MenuElement(
+                element_dict = return_element_dict,
+                app_settings = self.app_settings,
+                parent = self.parent
+            )
+        )
+
+    @property
+    def current_element(self) -> MenuElement:
+        return self.elements[self._index]
+    
+    @current_element.setter
+    def current_element(self, element: MenuElement):
+        self._index = self.elements.index(element)
+        
+    @property
+    def previous_element(self) -> MenuElement:
+        if self._index == 0:
+            return self.elements[-1]
+        else:
+            return self.elements[self._index - 1]
+
+    @property
+    def next_element(self) -> MenuElement:
+        if self._index == (len(self.elements) - 1):
+            return self.elements[0]
+        else:
+            return self.elements[self._index + 1]
+    
+    def decrement(self):
+        self.current_element = self.previous_element
+
+    def increment(self):
+        self.current_element = self.next_element
+
+    def reset(self):
+        """Reset current_element to the first element in the level"""
+        self._index = 0
 
 class Menu:
-	"""
-	Manages the menu system for PiKite, allowing navigation and execution of various functions.
+    """
+    Manages the menu system for PiKite, allowing navigation and execution of various functions.
+    """
+    def __init__(self, display_controller: DisplayController | None, settings: Settings, input_handler: InputHandler | None, menu_file: Path=MENU_FILE):
+        """
+        Initializes the Menu instance by loading the menu structure from an XML file.
+        
+        Args:
+            display_controller (DisplayController | None): Instance of DisplayController to manage display output.
+            settings (Settings): Instance of Settings to manage application settings.
+            input_handler (InputHandler | None): Instance of InputHandler to manage input commands.
+            menu_file (Path): Path to the XML file defining the menu structure.
+                              Defaults to utils.StorageManager.MENU_FILE
+        """
+        self.display_controller = display_controller
+        self.app_settings = settings
+        self.input_handler = input_handler
 
-	Attributes:
-		root (MenuElement): The root menu element parsed from the menu structure in an XML file.
-		current_element (MenuElement): The currently selected menu element.
-		default_element (MenuElement): The default menu element to reset to.
-		previous_element (MenuElement): The previous menu element in the current context.
-		next_element (MenuElement): The next menu element in the current context.
-		display_controller (DisplayController): Instance of DisplayController to manage display output.
-		settings (Settings): Instance of Settings to manage application settings.
-		input_handler (InputHandler): Instance of InputHandler to manage input commands.
-	"""
-	def __init__(self, display_controller: DisplayController | None, settings: Settings, input_handler: InputHandler | None, menu_file: Path=MENU_FILE):
-		"""
-		Initializes the Menu instance by loading the menu structure from an XML file.
-		
-		Args:
-			display_controller (DisplayController | None): Instance of DisplayController to manage display output.
-			settings (Settings): Instance of Settings to manage application settings.
-			input_handler (InputHandler | None): Instance of InputHandler to manage input commands.
-			menu_file (Path): Path to the XML file defining the menu structure.
-							  Defaults to utils.StorageManager.MENU_FILE
+        self.menu_file = menu_file
+        self.dict = self._load_menu(self.menu_file) # Load the menu yaml into self.menu
+        self.root = MenuLevel(
+            level_dict = self.dict,
+            app_settings = self.app_settings
+        )
+        
+        self.current_level = self.root
+        self._ancestors: list[MenuLevel] = []
 
-		Raises:
-			AssertionError: If the root menu does not contain any submenu items.
-		"""
-		self.root = MenuElement(ET.parse(menu_file).getroot())
-		try:
-			assert self.root.submenu is not None, "Root menu must not be empty"
-		except AssertionError as e:
-			logger.critical(e)
-			raise
-		self.current_element = self.root.submenu[0]
-		self.default_element = self.current_element
+    def __repr__(self):
+        return f"<Current Menu Element: {self.current_element}>"
 
-		self.display_controller = display_controller
-		self.settings = settings
-		self.input_handler = input_handler
+    def __str__(self):
+        """Returns the name of the current menu element."""
+        return f"MenuElement: {self.current_element.name}>"
+    
+    @property
+    def current_element(self):
+        return self.current_level.current_element
+    
+    def _load_menu(self, menu_file) -> dict:
+        """Load the YAML configuration file into a dictionary."""
+        try:
+            with open(menu_file, 'r') as f:
+                menu_dict = yaml.load(f, Loader=yaml.SafeLoader)
+                logger.info(f"Menu loaded successfully from {menu_file}")
+                return menu_dict
+        except Exception as e:
+            logger.error(f"Failed to load menu from {menu_file}: {e}")
+            raise e
 
-		self.update_menu()
+    def update_menu(self):
+        """Print the current menu message on the display"""
+        message = self.current_element.display_message
+        
+        if message is None:
+            message = "No Message Defined"
+            logger.warning(f"No message defined for menu element: {self.current_element}")
 
-	def __repr__(self):
-		return f"<Current Menu Element: {self.current_element}>"
+        if ".jpg" in message or ".png" in message:
+            message = str(storage_manager.MEDIA_DIR / message)
+        
+        if self.display_controller is None:
+            logger.warning("No display controller available to print menu message")
+            return
+        else:
+            self.display_controller.print_message(message)
+        
+        logger.debug(f"Menu Updated: {self.current_element.name}")
 
-	def __str__(self):
-		"""Returns the message of the current menu element."""
-		return f"{self.current_element.message}>"	# Prints element message
-	
-	def update_menu(self):
-		"""Update the menu state, including adjacent elements, and display it."""
-		self._get_adjacent_elements()
-		self._print_menu()
+    def decrement(self):
+        """Decrement the current menu element to the previous one in the list."""
+        self.current_level.decrement()
+        self.update_menu()
 
-	def _get_adjacent_elements(self):
-		"""Sets the previous_element and next_element properties based on the current element's context."""
-		parent_element_options = self.current_element.parent.options
-		if self.current_element.tag == XMLTAG.OPTION_ITEM and parent_element_options is not None:
-			current_index = parent_element_options.index(self.current_element)
-			max_index = len(parent_element_options) - 1
-			self.previous_element = parent_element_options[current_index - 1]
-			self.next_element = parent_element_options[current_index + 1] if current_index != max_index else parent_element_options[0]
-			return
-		
-		parent_element_submenu = self.current_element.parent.submenu
-		if parent_element_submenu is not None:
-			current_index = parent_element_submenu.index(self.current_element)
-			max_index = len(parent_element_submenu) - 1
-			self.previous_element = parent_element_submenu[current_index - 1]
-			self.next_element = parent_element_submenu[current_index + 1] if current_index != max_index else parent_element_submenu[0]
-			return
+    def increment(self):
+        """Increment the current menu element to the next one in the list."""
+        self.current_level.increment()
+        self.update_menu()
 
-	def _print_menu(self):
-		"""Print the current menu message on the display"""
-		message = self.current_element.message
-		
-		if message is None:
-			message = "No Message Defined"
-			logger.warning(f"No message defined for menu element: {self.current_element}")
+    def enter_submenu(self):
+        if self.current_element.submenu is None:
+            logger.error(f"Cannot enter submenu. Current element '{self.current_element.name}' does not have a submenu.")
+            return
 
-		if ".jpg" in message or ".png" in message:
-			message = str(storage_manager.MEDIA_DIR / message)
-		
-		if self.display_controller is None:
-			logger.warning("No display controller available to print menu message")
-			return
-		else:
-			self.display_controller.print_message(message)
-		
-		logger.debug(f"Menu Updated: {self.current_element}")
+        self._ancestors.append(self.current_level)
+        self.current_element.submenu.reset()
+        self.current_level = self.current_element.submenu
+        self.update_menu()
 
-	def increment_element(self):
-		"""Increment the current menu element to the next one in the list."""
-		self.current_element = self.next_element
-		self.update_menu()
+    def return_to_parent(self):
+        if self.current_element.parent is None:
+            logger.error(f"Cannot return to parent element. Current element '{self.current_element.name}' does not have a parent or is already at the root level.")
+            return
+        
+        parent_level = self._ancestors.pop()
+        self.current_level = parent_level
+        self.update_menu()
 
-	def decrement_element(self):
-		"""Decrement the current menu element to the previous one in the list."""
-		self.current_element = self.previous_element
-		self.update_menu()
+    def reset(self):
+        """Reset the menu to the default element."""
+        self.current_level = self.root
+        self.root.reset()
 
-	def reset(self):
-		"""Reset the menu to the default element."""
-		self.current_element = self.default_element
+    def do_action(self):
+        match self.current_element.type:
+            case "submenu":
+                self._handle_submenu_action()
+            case "settings_menu":
+                self._handle_submenu_action()
+            case "settings_group":
+                self._handle_submenu_action()
+            case "return":
+                self.return_to_parent()
+            case "input_command":
+                self._handle_command()
+            case "confirm_input_command":
+                self._handle_command()
+                self.return_to_parent()
+            case "setting":
+                self._get_options()
+            case "setting_option":
+                self._update_setting()
+                self.return_to_parent()
+            case "image":
+                self.update_menu()
+            case _:
+                logger.error(f"Error executing action for element '{self.current_element.name}'. Could not match type '{self.current_element.type}' to a valid action.")
+                return
 
-	def do_action(self):
-		"""Execute the action associated with the current menu element."""
-		match self.current_element.action:
-			case MENUACTION.SUBMENU:
-				if self.current_element.submenu is not None:
-					self.current_element = self.current_element.submenu[0]
-				else:
-					logger.error(f"'Submenu' action called, but no submenu exists for element: {self.current_element}")
-					return
-			case MENUACTION.OPTIONS:
-				if self.current_element.options is not None and self.current_element.setting is not None:
-					current_setting = self.settings.get(self.current_element.setting)
-					self.current_element = next(
-						(option for option in self.current_element.options if str(option.value) == str(current_setting)),
-						self.current_element.options[0] if self.current_element.options else self.current_element
-					)
-				else:
-					logger.error(f"'Options' action called, but no options and/or setting exists for element: {self.current_element}")
-					return
-			case MENUACTION.SELECT_OPTION:
-				self.settings.set(self.current_element.parent.setting, self.current_element.value)
-				self.current_element = self.current_element.parent
-			case MENUACTION.RETURN:
-				self.current_element = self.current_element.parent
-			case MENUACTION.LOAD_DEFAULTS:
-				self.settings.load_defaults()
-				self.reset()
-			case MENUACTION.INPUT_COMMAND:
-				if self.input_handler is None:
-					logger.error("No input handler available for input menu action")
-					return
-				logger.debug(f"Handling input command for menu element: {self.current_element}")
-				command_name = self.current_element.__getattribute__("command")  # use command attribute for command name (enum NAME)
-				if not command_name:
-					logger.error("Input action with no command specified")
-					return
+    def _handle_submenu_action(self):
+        if self.current_element.submenu is not None:
+            self.enter_submenu()
+        else:
+            logger.error(f"'Submenu' action called, but no submenu exists for element: {self.current_element}")
 
-				try:
-					command = InputCommand[command_name]  # expect enum NAME like START_CAPTURE
-				except KeyError:
-					logger.error(f"Unknown InputCommand: {command_name}")
-					return
+    def _handle_command(self):
+        command_name = self.current_element.command
+        
+        if command_name is None:
+            logger.error(f"Error executing action. No command was provided for element '{self.current_element.name}' of type '{self.current_element.type}'")
+            return
+        
+        if self.current_element.requires_confirmation:
+            self._await_confirmation(command_name)
+            return
 
-				# parse optional params node of element (e.g. "mode=vid,length=15")
-				params_elem = self.current_element.element.find("params")
-				kwargs: dict = {}
+        if self.input_handler is None:
+            logger.error("Error executing action. No input handler available.")
+            return
+        
+        logger.debug(f"Handling input command for menu element: {self.current_element}")
 
-				if params_elem is not None and params_elem.text:
-					for pair in params_elem.text.split(","):
-						pair = pair.strip()
-						if not pair:
-							continue
-						key, val = pair.split("=", 1)
-						val = val.strip()
-						try:
-							parsed = ast.literal_eval(val)   # safe parsing of numbers, tuples, booleans, lists, etc.
-						except (ValueError, SyntaxError):
-							parsed = val                     # fallback to raw string
-						kwargs[key.strip()] = parsed
+        try:
+            command = InputCommand[command_name]  # expect enum NAME like START_CAPTURE
+        except KeyError:
+            logger.error(f"Error executing action. Unknown InputCommand: {command_name}")
+            return
 
-				# Handle the input command via the input handler
-				self.input_handler.handle(command=command, source=InputSource.SYSTEM, **kwargs)
+        # Handle the input command via the input handler
+        self.input_handler.handle(command=command, source=InputSource.MENU)
 
-				return  # Don't update menu after input command; assume input command will trigger its own menu update if needed
-					
-			case _:
-				logger.warning(f"No action defined for menu element: {self.current_element}")
-				return
-		
-		self.update_menu()
+    def _await_confirmation(self, command_name):
+        confirmation_level_dict = {
+            "deny": {
+                "label": "Deny",
+                "display_message":  "Really? [No]",
+                "type": "return",
+            },
 
-	def get_all_option_elements(self) -> list[MenuElement]:
-		"""
-		Get a list of all MenuElements in the menu structure that have the 'option' action.
+            "confirm": {
+                "label": "Confirm",
+                "display_message": "Really? [Yes]",
+                "type": "confirm_input_command",
+                "command": command_name
+            }
+        }
 
-		Returns:
-			list[MenuElement]: A list of MenuElements with the 'option' action.
-		"""
-		option_elements = []
+        confirmation_submenu = MenuLevel(
+            level_dict = confirmation_level_dict,
+            app_settings = self.app_settings,
+            parent = self.current_element
+        )
 
-		def traverse(element: MenuElement):
-			if element.options:
-				option_elements.append(element)
-			if element.submenu is not None:
-				for sub in element.submenu:
-					traverse(sub)
-			if element.options is not None:
-				for opt in element.options:
-					traverse(opt)
+        self._ancestors.append(self.current_level)
+        self.current_level = confirmation_submenu
+        self.update_menu()
 
-		traverse(self.root)
-		return option_elements
-	
-	def format_settings_and_options_as_dict(self) -> dict[str, dict]:
-		"""
-		Formats the menu settings and their associated option elements into
-		a JSON-serializable dictionary for websocket clients, including type info.
+    def _get_options(self):
+        if self.current_element.type != "setting":
+            logger.error(f"Error getting options for element '{self.current_element.name}'. Element type '{self.current_element.type}' is not 'settings'.")
+            return
 
-		Returns:
-			dict[str, dict]: A dictionary where keys are setting names and values are dicts with 'type' and 'options' keys.
-		"""
-		settings_options_dict = {}
-		option_elements = self.get_all_option_elements()
+        if self.current_element.setting_key is None:
+            logger.error(f"Error getting options for element '{self.current_element.name}'. No setting key provided.")
+            return
+        
+        valid_options = self.app_settings.get_valid_options(self.current_element.setting_key)
 
-		for element in option_elements:
-			if element.setting is None:
-				logger.warning(f"Option element '{element}' does not have an associated setting and will be skipped in the settings-options dictionary.")
-				continue
+        options_level_dict = {}
 
-			# Prepare a list of option dicts for this setting
-			options_list = []
-			if element.options:
-				for opt in element.options:
-					message = opt.message.replace("[", "").replace("]", "")
-					options_list.append({
-						"name": opt.name,
-						"value": opt.value,
-						"message": message,
-					})
-			# Compose the setting entry with type and options
-			setting_type = getattr(element, "setting_type", "str")
-			if element.setting not in settings_options_dict:
-				settings_options_dict[element.setting] = {
-					"type": setting_type,
-					"options": options_list
-				}
-			else:
-				# If multiple option elements share the same setting, extend the list of options
-				settings_options_dict[element.setting]["options"].extend(options_list)
+        for option in valid_options:
+            option["type"] = "setting_option"
+            option["setting_key"] = self.current_element.setting_key
 
-		return settings_options_dict
+            options_level_dict[option["label"]] = option
+
+        options_submenu = MenuLevel(
+            level_dict = options_level_dict,
+            app_settings = self.app_settings,
+            parent = self.current_element
+        )
+
+        self._ancestors.append(self.current_level)
+        self.current_level = options_submenu
+        self.update_menu()
+
+    def _update_setting(self):
+        if self.current_element.type != "setting_option":
+            logger.error(f"Cannot update settings. Current element is not a valid setting option.")
+            return
+
+        if self.current_element.setting_key is None:
+            logger.error(f"Cannot update settings. No setting key provided.")
+            return
+
+        self.app_settings.set(self.current_element.setting_key, self.current_element.value)

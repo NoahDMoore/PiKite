@@ -1,45 +1,6 @@
 # pikite/core/constants.py
 from enum import Enum
 
-# Constants for XML tags and menu actions
-class XMLTAG(str, Enum):
-    MENU = "menu"
-    MENU_ITEM = "menu_item"
-    OPTION_ITEM = "option_item"
-    SETTING = "setting"
-
-class XMLATTRIB(str, Enum):
-    NAME = "name"
-    MESSAGE = "message"
-    ACTION = "action"
-    SETTING = "setting"
-    VALUE = "value"
-
-class MENUACTION (str, Enum):
-    """
-    Menu actions supported by PiKite
-
-    Actions:
-        SUBMENU:
-            Navigate to a submenu
-        RETURN:
-            Return to the previous menu / exit a submenu
-        OPTIONS:
-            Open the options menu for the current menu item
-        SELECT_OPTION:
-            Select an option from the options menu
-        LOAD_DEFAULTS:
-            Load the default settings from the default configuration file
-        INPUT_COMMAND:
-            Trigger an input command defined in the InputCommand enum
-    """
-    SUBMENU = "submenu"
-    RETURN = "return"
-    OPTIONS = "options"
-    SELECT_OPTION = "selectOption"
-    LOAD_DEFAULTS = "load_defaults"
-    INPUT_COMMAND = "input_command"
-
 # Constants for Camera
 class CAPTURE_MODES(str, Enum):
     """
@@ -57,7 +18,7 @@ class CAPTURE_MODES(str, Enum):
     VIDEO = "vid"
     NONE = "none"
 
-class CAMERA_MODELS(Enum):
+class CAMERA_MODELS(str, Enum):
     """
     Camera models supported by PiKite, values returned represent the sensor model used by each model
     
