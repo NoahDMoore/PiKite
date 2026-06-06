@@ -129,14 +129,17 @@ class CameraController:
             ValueError: If the camera model is invalid or unspecified in settings.
         """
         # Get camera model
-        camera_model = self.detect_camera_model()
-        if camera_model is not None:
-            self.camera_model = camera_model
-            self.settings.set("cam_model", camera_model.value)
-        else:
-            camera_model = self.settings.get("cam_model", None)
+        detected_model = self.detect_camera_model()
+        model_value_in_settings = self.settings.get("cam_model", None)
 
-        self.camera_model = CAMERA_MODELS(camera_model) if camera_model is not None else None  # Default to None if not specified or invalid
+        if detected_model is not None:
+            self.camera_model = detected_model
+
+            if detected_model.value != model_value_in_settings:
+                logger.info("Updating settings configuration to match detected camera model.")
+                self.settings.set("cam_model", detected_model.value)
+        else:
+            self.camera_model = CAMERA_MODELS(model_value_in_settings) if model_value_in_settings in CAMERA_MODELS else None
         
         if self.camera_model is None:
             try:
@@ -336,7 +339,7 @@ class CameraController:
         detected_model = camera_list[0].get("Model", None) if camera_list else None
         logger.debug(f"The system reports camera model ... {detected_model}")
 
-        if detected_model in CAMERA_MODELS and detected_model is not None:
+        if detected_model is not None and detected_model in CAMERA_MODELS:
             logger.info(f"Camera model identified: CAMERA_MODELS.{CAMERA_MODELS(detected_model).name}")
             return CAMERA_MODELS(detected_model)
         else:
