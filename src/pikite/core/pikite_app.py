@@ -185,7 +185,7 @@ class PiKiteApp:
             logger.info("Camera controller reconfigured due to camera settings change.")
 
         if setting_key == "pan_tilt_tilt_zero_position_offset":
-            self.tilt_servo.tilt_zero_position_offset = new_value
+            self.tilt_servo.tilt_zero_position_offset = int(new_value)
             logger.info(f"Updated tilt servo zero angle offset to {new_value} due to settings change.")
 
     def configure_logger(self):
