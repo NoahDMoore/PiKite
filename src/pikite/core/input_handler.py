@@ -44,8 +44,9 @@ class InputCommand(Enum):
 
 class InputSource(Enum):
     GPIO = auto()
-    WEBSOCKET = auto()
+    MENU = auto()
     SYSTEM = auto()
+    WEBSOCKET = auto()
 
 class InputHandler:
     """
