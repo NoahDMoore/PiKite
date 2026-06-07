@@ -1,9 +1,9 @@
 import RPi.GPIO as GPIO
 from typing import Optional
 
-from ..core.modes.pikite_mode import PiKiteMode
-from ..core.input_handler import InputHandler, InputCommand, InputSource
-from ..utils.logger import get_logger
+from pikite.core.modes.pikite_mode import PiKiteMode
+from pikite.core.input_handler import InputHandler, InputCommand, InputSource
+from pikite.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

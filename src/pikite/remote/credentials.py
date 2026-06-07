@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv, set_key, dotenv_values
 from getpass import getpass
 
-from ..system.storage import StorageManager
+from pikite.system.storage import StorageManager
 
 storage_manager = StorageManager()
 

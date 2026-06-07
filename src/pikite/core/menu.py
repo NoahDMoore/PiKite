@@ -8,13 +8,12 @@ import ast
 from pathlib import Path
 import yaml
 
-from .input_handler import InputHandler, InputCommand, InputSource
-from ..utils.logger import get_logger
-from .settings import Settings
+from pikite.core.input_handler import InputHandler, InputCommand, InputSource
+from pikite.core.settings import Settings
 
 # Mock hardware controller class for testing on non-RPi system; remove when done testing
 try:
-    from ..hardware.display_controller import DisplayController  # type: ignore
+    from pikite.hardware.display_controller import DisplayController  # type: ignore
 except Exception:
     class DisplayController:
         """
@@ -23,7 +22,8 @@ except Exception:
         def print_message(self, message: str):
             print(f"Display Message: {message}")
 
-from ..system.storage import StorageManager
+from pikite.system.storage import StorageManager
+from pikite.utils.logger import get_logger
 
 # Setup Logger
 logger = get_logger(__name__)

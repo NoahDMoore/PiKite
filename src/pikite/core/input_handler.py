@@ -5,9 +5,9 @@ from functools import partial
 import json
 from typing import Callable
 
-from .modes.pikite_mode import PiKiteMode
-from ..remote.remote_server import RemoteServer
-from ..utils.logger import get_logger
+from pikite.core.modes.pikite_mode import PiKiteMode
+from pikite.remote.remote_server import RemoteServer
+from pikite.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -2,7 +2,7 @@ import shutil
 import socket
 import subprocess
 
-from ..hardware.display_controller import DisplayController, get_image_height
+from pikite.hardware.display_controller import DisplayController, get_image_height
 
 def display_system_info(display_controller: DisplayController):
     display = display_controller

@@ -4,7 +4,7 @@ import board        # type: ignore
 import digitalio    # type: ignore
 
 import pikite.utils.logger as logger_module
-from ..system.storage import StorageManager
+from pikite.system.storage import StorageManager
 
 #Mini PiTFT
 from adafruit_rgb_display import st7789             # type: ignore

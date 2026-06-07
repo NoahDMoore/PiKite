@@ -1,7 +1,7 @@
 from __future__ import annotations  # postpones evaluation so types aren't checked at runtime
 import asyncio
 from abc import ABC, abstractmethod
-from enum import Enum, auto
+from enum import Enum
 from typing import TYPE_CHECKING, Callable
 
 import pikite.utils.logger as logger_module

@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-from ..system.storage import StorageManager
+from pikite.system.storage import StorageManager
 
 storage = StorageManager()
 LOG_FILE_BASE = storage.LOG_FILE_BASE

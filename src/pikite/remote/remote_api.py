@@ -1,18 +1,18 @@
 from __future__ import annotations 
 from typing import TYPE_CHECKING, Callable
 
-from ..core.constants import CAPTURE_MODES
-from ..utils.logger import get_logger
-from ..utils.timer import Timer
+from pikite.core.constants import CAPTURE_MODES
+from pikite.utils.logger import get_logger
+from pikite.utils.timer import Timer
 
 if TYPE_CHECKING:
-    from ..core.capture_session import CaptureSession
-    from ..core.menu import Menu
-    from ..core.modes.pikite_mode import PiKiteMode
-    from ..core.settings import Settings
-    from ..hardware.servo_controller import PanServo, TiltServo
-    from .remote_server import RemoteServer
-    from ..system.storage import StorageManager
+    from pikite.core.capture_session import CaptureSession
+    from pikite.core.menu import Menu
+    from pikite.core.modes.pikite_mode import PiKiteMode
+    from pikite.core.settings import Settings
+    from pikite.hardware.servo_controller import PanServo, TiltServo
+    from pikite.remote.remote_server import RemoteServer
+    from pikite.system.storage import StorageManager
 
 
 logger = get_logger(__name__)

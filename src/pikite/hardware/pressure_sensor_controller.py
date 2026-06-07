@@ -3,9 +3,9 @@ import board            # type: ignore
 import digitalio        # type: ignore
 import adafruit_bmp3xx  # type: ignore
 
-from ..utils.logger import get_logger
-from ..core.constants import DISTANCE_UNITS
-from .display_controller import LoadingBar
+from pikite.utils.logger import get_logger
+from pikite.core.constants import DISTANCE_UNITS
+from pikite.hardware.display_controller import LoadingBar
 
 # Setup Logger
 logger = get_logger(__name__)

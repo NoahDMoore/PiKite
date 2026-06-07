@@ -19,8 +19,8 @@ from dotenv import load_dotenv
 from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
 
-from ..utils.logger import get_logger, register_websocket_handler
-from ..system.storage import StorageManager, resolve_safe_path
+from pikite.utils.logger import get_logger, register_websocket_handler
+from pikite.system.storage import StorageManager, resolve_safe_path
 from pikite.remote.remote_api import RemoteAPI
 
 # Setup Logger

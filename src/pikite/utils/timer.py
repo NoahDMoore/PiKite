@@ -9,7 +9,7 @@ from math import floor
 import sys
 import time
 from enum import Enum, auto
-from .logger import get_logger
+from pikite.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

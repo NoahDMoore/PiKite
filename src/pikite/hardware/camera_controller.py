@@ -4,12 +4,12 @@ import logging
 import os
 from pathlib import Path
 
-from ..utils.logger import get_logger
-from ..core.settings import Settings
-from ..core.constants import CAMERA_MODELS, CAPTURE_MODES, MAX_RESOLUTIONS
-from ..utils.timer import Timer
-from ..remote.remote_server import RemoteServer
-from ..system.storage import StorageManager
+from pikite.utils.logger import get_logger
+from pikite.core.settings import Settings
+from pikite.core.constants import CAMERA_MODELS, CAPTURE_MODES, MAX_RESOLUTIONS
+from pikite.utils.timer import Timer
+from pikite.remote.remote_server import RemoteServer
+from pikite.system.storage import StorageManager
 
 from picamera2 import Picamera2 # type: ignore
 from picamera2.encoders import H264Encoder # type: ignore
