@@ -11,6 +11,9 @@ class ModeManager:
     def __init__(self, input_handler: InputHandler, remote_api: RemoteAPI):
         self.input_handler = input_handler
         self.remote_api = remote_api
+        if isinstance(self.remote_api, RemoteAPI):
+            self.remote_api.register_mode_provider(self.get_current_mode_type)
+        
         self._modes: Dict[PiKiteMode, BaseMode] = {}
         self._current_mode: BaseMode | None = None
         self._previous_mode: BaseMode | None = None
@@ -32,6 +35,9 @@ class ModeManager:
         if self._current_mode is None:
             return None
         return self._current_mode.mode
+    
+    def get_current_mode_type(self) -> PiKiteMode | None:
+        return self.current_mode_type
 
     async def switch_to(self, mode: PiKiteMode):
         new_mode = self._modes[mode]
@@ -46,7 +52,7 @@ class ModeManager:
         self._previous_mode = self._current_mode
         self._current_mode = new_mode
         self.input_handler.set_mode(self._current_mode.mode)
-        self.remote_api.tx_mode(self._current_mode.mode)
+        self.remote_api.tx_new_mode(self._current_mode.mode)
 
         await self._current_mode.enter()
 

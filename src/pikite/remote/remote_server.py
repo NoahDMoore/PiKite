@@ -21,6 +21,7 @@ from microdot.websocket import WebSocket, with_websocket
 
 from ..utils.logger import get_logger, register_websocket_handler
 from ..system.storage import StorageManager, resolve_safe_path
+from pikite.remote.remote_api import RemoteAPI
 
 # Setup Logger
 logger = get_logger(__name__)
@@ -38,6 +39,7 @@ class RemoteServer:
         """
         self.app = Microdot()
         self.port = port
+        self.api = None
 
         # Connections
         self.server_task: asyncio.Task | None = None
@@ -102,6 +104,10 @@ class RemoteServer:
                 
                 self.active_websockets.add(ws)
                 self.websocket_connected = True
+
+                if self.api is not None:
+                    self.api.tx_current_mode()
+                    self.api.tx_servo_positions()
                 
                 try:
                     await self.register_websocket_client(ws) # Register the WebSocket connection
@@ -348,6 +354,13 @@ class RemoteServer:
         token = secrets.token_urlsafe(32)
         self.active_tokens[token] = time.time() + 1800  # Token valid for 30 minutes
         return token
+    
+    def register_api(self, api: RemoteAPI):
+        if not isinstance(api, RemoteAPI):
+            logger.error("Error registering api. The api to register must be of type RemoteAPI.")
+        
+        self.api = api
+        logger.info("Successfully registered api to remote server.")
 
     async def _rx_loop(self, ws: WebSocket):
         """

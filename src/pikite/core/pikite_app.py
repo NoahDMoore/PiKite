@@ -87,6 +87,7 @@ class PiKiteApp:
             storage_manager=self.storage_manager,
             tilt_servo=self.tilt_servo
         )
+        self.remote_server.register_api(self.remote_api)
 
         # Initialize Camera Preview Stream
         self.preview = PreviewStream(self.camera_controller, self.remote_server)

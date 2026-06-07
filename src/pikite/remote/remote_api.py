@@ -1,13 +1,19 @@
-from ..core.capture_session import CaptureSession
+from __future__ import annotations 
+from typing import TYPE_CHECKING, Callable
+
 from ..core.constants import CAPTURE_MODES
-from ..core.modes.pikite_mode import PiKiteMode
-from ..core.menu import Menu
-from ..core.settings import Settings
-from ..hardware.servo_controller import PanServo, TiltServo
-from .remote_server import RemoteServer
-from ..system.storage import StorageManager
 from ..utils.logger import get_logger
 from ..utils.timer import Timer
+
+if TYPE_CHECKING:
+    from ..core.capture_session import CaptureSession
+    from ..core.menu import Menu
+    from ..core.modes.pikite_mode import PiKiteMode
+    from ..core.settings import Settings
+    from ..hardware.servo_controller import PanServo, TiltServo
+    from .remote_server import RemoteServer
+    from ..system.storage import StorageManager
+
 
 logger = get_logger(__name__)
 
@@ -27,9 +33,10 @@ class RemoteAPI:
         self.storage_manager = storage_manager
         self.tilt_servo = tilt_servo
         self.timer = Timer()
+        self._get_current_mode: Callable[[], PiKiteMode | None] | None = None
 
     # Mode Endpoint
-    def tx_mode(self, new_mode: PiKiteMode):
+    def tx_new_mode(self, new_mode: PiKiteMode):
         """Transmit the current mode to remote clients"""
         mode_payload = {
             "type": "mode_update",
@@ -38,6 +45,25 @@ class RemoteAPI:
 
         self.remote_server.send(mode_payload)
         logger.debug("Sent current mode to remote clients")
+
+    def register_mode_provider(self, provider: Callable[[], PiKiteMode | None]):
+        if not isinstance(provider, Callable):
+            logger.error("Mode provider must be a callback method returning a PiKiteMode enum or None.")
+            return
+        
+        self._get_current_mode = provider
+
+    def tx_current_mode(self):
+        if self._get_current_mode is None:
+            logger.warning("Could not transmit current mode to remote client. No mode provider registered.")
+            return
+
+        mode_payload = {
+            "type": "mode_update",
+            "mode": self._get_current_mode()
+        }
+
+        self.remote_server.send(mode_payload)
 
     # Settings Endpoints
     def tx_settings(self, **kwargs):
@@ -81,16 +107,25 @@ class RemoteAPI:
         self.remote_server.send(payload)
 
 
-    # Servo Control Endpoints
+    # Servo Endpoints
     def rx_pan_command(self, args):
         angle = int(args.get("angle"))
         self.pan_servo.rotate_to(angle)
         self.timer.wait(0.5)
+        self.tx_servo_positions()
 
     def rx_tilt_command(self, args):
         angle = args.get("angle")
         self.tilt_servo.angle = int(angle)
         self.timer.wait(0.5)
+        self.tx_servo_positions()
+
+    def tx_servo_positions(self):
+        self.remote_server.send({
+            "type": "pan_tilt_update",
+            "pan_servo": round(self.pan_servo.encoder.get_smoothed_angle()),
+            "tilt_servo": self.tilt_servo.angle
+        })
 
 
     # Capture Session Endpoints
