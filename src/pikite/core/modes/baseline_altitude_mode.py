@@ -1,5 +1,5 @@
 from pikite.core.modes.pikite_mode import BaseMode, PiKiteMode
-from pikite.hardware.display_controller import DisplayController
+from pikite.hardware.display.display_controller import DisplayController
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 
 class BaselineAltitudeMode(BaseMode):

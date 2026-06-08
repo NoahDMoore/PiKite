@@ -8,8 +8,8 @@ from pikite.core.input_handler import InputHandler, InputCommand
 from pikite.utils.logger import get_logger
 from pikite.core.menu import Menu
 from pikite.core.settings import Settings
-from pikite.hardware.display_controller import DisplayController
 from pikite.hardware.button_controller import ButtonController
+from pikite.hardware.display.display_controller import DisplayController
 
 import time
 

@@ -1,10 +1,13 @@
 import sys
 from pathlib import Path
 
+from pikite.hardware.display.pre_loader import PreLoader
+
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
+from pikite.hardware.display.loading_bar import LoadingBar
 from pikite.utils.logger import get_logger
-from pikite.hardware.display_controller import DisplayController, LoadingBar, PreLoader
+from pikite.hardware.display.display_controller import DisplayController
 
 import time
 

@@ -9,7 +9,7 @@ import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
 from pikite.utils.timer import Timer
 from pikite.hardware.camera_controller import CameraController
-from pikite.hardware.display_controller import DisplayController
+from pikite.hardware.display.display_controller import DisplayController
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servo_controller import TiltServo, PanServo
 from pikite.remote.remote_server import RemoteServer

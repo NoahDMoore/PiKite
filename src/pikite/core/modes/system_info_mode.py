@@ -2,7 +2,7 @@ from typing import Callable
 
 from pikite.core.modes.pikite_mode import BaseMode, PiKiteMode
 from pikite.core.input_handler import InputCommand
-from pikite.hardware.display_controller import DisplayController
+from pikite.hardware.display.display_controller import DisplayController
 from pikite.system.system_info import display_system_info
 
 class SystemInfoMode(BaseMode):

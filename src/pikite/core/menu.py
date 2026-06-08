@@ -13,7 +13,7 @@ from pikite.core.settings import Settings
 
 # Mock hardware controller class for testing on non-RPi system; remove when done testing
 try:
-    from pikite.hardware.display_controller import DisplayController  # type: ignore
+    from pikite.hardware.display.display_controller import DisplayController  # type: ignore
 except Exception:
     class DisplayController:
         """

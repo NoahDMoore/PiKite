@@ -5,8 +5,8 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from pikite.utils.logger import get_logger
 from pikite.core.constants import DISTANCE_UNITS
+from pikite.hardware.display.display_controller import DisplayController
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
-from pikite.hardware.display_controller import DisplayController
 
 # Setup Logger
 logger = get_logger(__name__)

@@ -16,7 +16,9 @@ from pikite.core.settings import Settings
 from pikite.utils.timer import Timer
 from pikite.hardware.camera_controller import CameraController, PreviewStream
 from pikite.hardware.button_controller import ButtonController
-from pikite.hardware.display_controller import DisplayController, LoadingBar, PreLoader
+from pikite.hardware.display.display_controller import DisplayController
+from pikite.hardware.display.loading_bar import LoadingBar
+from pikite.hardware.display.pre_loader import PreLoader
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servo_controller import TiltServo, PanServo
 from pikite.remote.remote_server import RemoteServer
