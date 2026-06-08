@@ -183,10 +183,9 @@ class DisplayController:
         bg_color: tuple[int, int, int] = (255, 255, 255),
         fg_color: tuple[int, int, int] = (0, 0, 0)
     ):
-        if "\n" not in text:
+        if "\n" not in text and len(text.split()) > 1:
             logger.warning("The text string provided was not explicitly multiline. Wrapping text first.")
             text = self._wrap_text(text)
-            return
 
         lcd_image, canvas = self.new_image(color=bg_color)
 
