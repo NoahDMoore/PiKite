@@ -15,12 +15,12 @@ import os
 import secrets
 import time
 
-from dotenv import load_dotenv
 from microdot import Request, Microdot, send_file
 from microdot.websocket import WebSocket, with_websocket
 
 from pikite.utils.logger import get_logger, register_websocket_handler
 from pikite.system.storage import StorageManager, resolve_safe_path
+from pikite.remote.credentials import get_current_password_hash
 from pikite.remote.remote_api import RemoteAPI
 
 # Setup Logger
@@ -52,9 +52,6 @@ class RemoteServer:
 
         # Initialize Storage Manager
         self.storage = StorageManager()
-
-        # Load password hash from .env
-        load_dotenv(self.storage.BASE_DIR / ".env", override=True)
 
         # Register Remote Logging Handler if enabled
         if remote_logging:
@@ -292,7 +289,7 @@ class RemoteServer:
             username = data.get('username') # type: ignore
             password = data.get('password').encode() # type: ignore
 
-            stored_password_hash = os.environ.get('PIKITE_PASSWORD_HASH').encode() # type: ignore
+            stored_password_hash = get_current_password_hash().encode() # type: ignore
 
             # Placeholder for actual authentication logic
             if not username == "pikite_admin" or not bcrypt.checkpw(password, stored_password_hash):
