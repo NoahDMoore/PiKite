@@ -169,14 +169,10 @@ class PiKiteApp:
         self.mode_manager.register_mode(self.baseline_altitude_mode)
         self.mode_manager.register_mode(self.system_info_mode)
 
-        # Run Preloader Animation
-        preloader = PreLoader(self.display_controller)
-        preloader.play()
-
-        logger.info("PiKite Application Initialized")
-
         self.application_running = False
         self.on_close_callback = None
+
+        logger.info("PiKite Application Initialized")
 
     def _on_setting_change(self, setting_key, new_value):
         logger.info(f"Setting Change Detected: {setting_key} changed to {new_value}.")
@@ -225,6 +221,10 @@ class PiKiteApp:
 
     async def run(self):
         logger.info("Starting PiKite Application")
+
+        # Run Preloader Animation
+        preloader = PreLoader(self.display_controller)
+        await preloader.run()
 
         self.remote_server.start()
         

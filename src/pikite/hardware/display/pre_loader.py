@@ -28,3 +28,6 @@ class PreLoader(GIF):
     def __str__(self):
         """Return a string description of the PreLoader."""
         return "Preloader GIF for display"
+    
+    async def run(self):
+        self.play()
