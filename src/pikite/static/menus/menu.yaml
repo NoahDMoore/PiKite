@@ -18,7 +18,7 @@ settings:
   type: submenu
   submenu:
     configure_settings:
-      label: "Configure Settings"
+      label: "Edit Settings"
       type: settings_menu
 
     reset_settings:
