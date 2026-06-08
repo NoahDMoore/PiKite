@@ -242,9 +242,12 @@ capture:
     current_value: "pic"
     default: "pic"
     options:
-      - "Photo": "pic"
-      - "Video": "vid"
-      - "None": "none"
+      - label: "Photo"
+        value: "pic"
+      - label: "Video"
+        value: "vid"
+      - label: "None"
+        value: "none"
 
   interval:
     label: "Capture Interval"
