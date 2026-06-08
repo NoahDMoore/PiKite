@@ -14,8 +14,9 @@ from pikite.core.menu import Menu
 import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
 from pikite.utils.timer import Timer
-from pikite.hardware.camera_controller import CameraController, PreviewStream
 from pikite.hardware.button_controller import ButtonController
+from pikite.hardware.camera.camera_controller import CameraController
+from pikite.hardware.camera.preview_stream import PreviewStream
 from pikite.hardware.display.display_controller import DisplayController
 from pikite.hardware.display.loading_bar import LoadingBar
 from pikite.hardware.display.pre_loader import PreLoader
