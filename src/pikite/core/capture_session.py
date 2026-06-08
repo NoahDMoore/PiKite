@@ -4,15 +4,16 @@ from datetime import datetime
 from pathlib import Path
 
 import pikite.core.constants as CONSTANTS
-import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
-from pikite.utils.timer import Timer
-from pikite.hardware.servo_controller import TiltServo, PanServo
+from pikite.hardware.servos.pan_servo import PanServo
+from pikite.hardware.servos.pan_tilt_pattern import PanTiltPattern
+from pikite.hardware.servos.tilt_servo import TiltServo
 from pikite.system.storage import StorageManager
-from pikite.hardware.servo_controller import PanTiltPattern
+from pikite.utils.logger import get_logger
+from pikite.utils.timer import Timer
 
 # Setup Logger
-logger = logger_module.get_logger(__name__)
+logger = get_logger(__name__)
 
 @dataclass(slots=True)
 class SessionContext:

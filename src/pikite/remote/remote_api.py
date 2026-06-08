@@ -10,7 +10,8 @@ if TYPE_CHECKING:
     from pikite.core.menu import Menu
     from pikite.core.modes.pikite_mode import PiKiteMode
     from pikite.core.settings import Settings
-    from pikite.hardware.servo_controller import PanServo, TiltServo
+    from pikite.hardware.servos.pan_servo import PanServo
+    from pikite.hardware.servos.tilt_servo import TiltServo
     from pikite.remote.remote_server import RemoteServer
     from pikite.system.storage import StorageManager
 

@@ -1,21 +1,7 @@
-"""Classes to control continuous rotation and traditional servos for pan and tilt.
-
-This module provides classes for controlling continuous rotation servos and traditional servos
-for pan and tilt movements. The `PanServo` class is designed for continuous rotation servos, allowing
-for speed and direction control, while the `TiltServo` class is for traditional servos that can be
-positioned at specific angles.
-
-Typical usage example:
-    tilt = TiltServo()
-    pan = PanServo()
-"""
-
 from enum import Enum
-import sys
-
-from rpi_hardware_pwm import HardwarePWM    # type: ignore
 
 from pikite.hardware.encoder_controller import EncoderController
+from pikite.hardware.servos.initialize_pwm import initialize_pwm
 from pikite.utils.logger import get_logger
 from pikite.utils.timer import Timer
 
@@ -25,150 +11,14 @@ logger = get_logger(__name__)
 # Initialize Timer
 timer = Timer()
 
-class TiltServo:
-    """
-    Class to control a traditional servo motor for tilt movements of a camera.
-    
-    This class allows for controlling a traditional servo motor using PWM signals to set the angle of the servo.
-    It supports setting the angle in degrees, where 0 degrees is the minimum position and a specified maximum angle is the maximum position.
-    """
-    def __init__(self, pwm_channel=0, frequency=50, chip=0, max_angle=180, min_pulse_width=500, max_pulse_width=2500, tilt_zero_position_offset: int = 0):
-        """
-        Initializes the TiltServo with the specified parameters.
-        
-        Args:
-            pwm_channel (int): The PWM channel to use (0 or 1). Channel 0 uses GPIO 18/12, and Channel 1 uses GPIO 19/13.
-            frequency (int): The PWM frequency in Hz, default is 50Hz.
-            chip (int): The chip number for the PWM channel, default is 0.
-                    As of linux kernel 6.12, chip=0 is used for all Raspberry Pi models.
-            max_angle (int): Maximum angle in degrees for the servo, default is 180 degrees.
-            min_pulse_width (int): Minimum pulse width in microseconds for the servo at 0 degrees, default is 500us (based on FS08MD servo).
-            max_pulse_width (int): Maximum pulse width in microseconds for the servo at max_angle degrees, default is 2500us (based on FS08MD servo).
-        """
-
-        # Initialize PWM channel, frequency, and chip
-        if pwm_channel in [0, 1]:
-            self.pwm_channel = pwm_channel
-        else:
-            try:
-                raise ValueError("Invalid PWM channel. Use 0 or 1.")
-            except ValueError as e:
-                logger.critical(f"Value Error: {e}.")
-                raise
-        self.frequency = frequency
-        self.chip = chip
-
-        # Initialize the PWM with the specified channel, frequency, and chip
-        self.pwm = initialize_pwm(
-            pwm_channel=self.pwm_channel,
-            frequency=self.frequency,
-            chip=self.chip,
-            retries=2
-        )
-
-        # Calculate the PWM period in microseconds based on the frequency
-        self.period = (1 / self.frequency) * 1000000    # PWM Period in microseconds
-
-        # Set the maximum angle and pulse widths for the servo
-        self.max_angle = max_angle
-        self.min_pulse_width = min_pulse_width
-        self.max_pulse_width = max_pulse_width
-
-        # Apply zero angle offset to angle calculations
-        if not isinstance(tilt_zero_position_offset, int):
-            try:
-                raise ValueError("Zero angle offset must be an integer.")
-            except ValueError as e:
-                logger.error(f"Value Error: {e}. Defaulting zero angle offset to 0.")
-                tilt_zero_position_offset = 0
-        self.tilt_zero_position_offset = tilt_zero_position_offset
-
-        # Calculate the pulse width per degree
-        self.pulse_width_per_degree = (self.max_pulse_width - self.min_pulse_width) / self.max_angle
-
-        # Start the servo motor in the 0 degree position
-        self.angle = 0    # Start the servo motor at 0 degrees
-
-    def __repr__(self):
-        return f"TiltServo(pwm_channel={self.pwm_channel}, frequency={self.frequency}, chip={self.chip})"
-    
-    def __str__(self):
-        return f"TiltServo on PWM channel {self.pwm_channel} with frequency: {self.frequency}Hz, chip: {self.chip}"
-    
-    def __del__(self):
-        """Ensure the PWM is stopped when the object is deleted."""
-        self.stop()
-
-    @property
-    def angle(self) -> int:
-        """
-        Returns the current angle of the servo motor.
-        
-        Returns:
-            int: Current angle in degrees.
-        """
-        return self._angle - self.tilt_zero_position_offset
-
-    @angle.setter
-    def angle(self, angle: int = 0) -> None:
-        """
-        Start the servo motor at a given angle; defaults to 0 degrees.
-        
-        Args:
-            angle (int): Angle in degrees to position the servo, where 0 is the minimum angle and self.max_angle is the maximum angle.
-        
-        Raises:
-            ValueError: If angle is not between 0 and max_angle.
-        """
-        angle += self.tilt_zero_position_offset  # Apply zero angle offset to the input angle
-
-        if 0 <= angle <= self.max_angle:
-            pulse_width = self.min_pulse_width + (angle * self.pulse_width_per_degree)
-            duty_cycle = (pulse_width / self.period) * 100
-            self.pwm.start(duty_cycle)
-            self._angle = angle  # Update the current angle
-        else:
-            try:
-                raise ValueError(f"Angle must be between 0 and {self.max_angle} degrees.")
-            except ValueError as e:
-                logger.error(f"Value Error: {e}. No change made to servo angle.")
-
-    @angle.deleter
-    def angle(self) -> None:
-        """Deletes the current angle setting and stops the servo motor."""
-        del self._angle
-        self.stop()
-
-    def set_angle(self, angle: int, **kwargs) -> None:
-        """
-        Set the servo motor to a specific angle.
-        
-        Args:
-            angle (int): Angle in degrees to position the servo, where 0 is the minimum angle and self.max_angle is the maximum angle.
-        
-        Raises:
-            ValueError: If angle is not between 0 and max_angle.
-        """
-        self.angle = angle  # Use the angle property setter to set the angle
-    
-    def stop(self) -> None:
-        """Stops the servo motor by setting the duty cycle to 0%."""
-        self.pwm.stop()
-
-    def home(self) -> None:
-        """Returns the servo to 0 degrees."""
-        self.angle = 0
-
-
 class DIRECTION(Enum):
     CW = "cw"   # Clockwise
     CCW = "ccw" # Counter-clockwise
 
-
 class PanServo:
     """
     Class to control a continuous rotation servo motor for pan movements of a camera.
-    
+
     This class allows for controlling a continuous rotation servo motor using PWM signals to set the speed and direction of rotation.
     It supports setting the speed as a float between 0.0 (stopped) and 1.0 (full speed), and the direction as either clockwise (CW) or counter-clockwise (CCW).
     """
@@ -214,7 +64,7 @@ class PanServo:
         self.cw_pulse_width = cw_pulse_width
         self.ccw_pulse_width = ccw_pulse_width
         self.stop_pw = stop_pulse_width
-        
+
         self.stop_duty_cycle = self.get_duty_cycle(0.0, DIRECTION.CW)   # Duty cycle for stop position
 
         self.encoder = EncoderController() # Initialize the encoder controller to measure angle of rotation
@@ -225,13 +75,13 @@ class PanServo:
 
         # Start the servo motor in the stop position
         self.start(self.speed, self.direction)  # Start the servo motor with initial speed and direction
-    
+
     def __repr__(self):
         return f"PanServo(pwm_channel={self.pwm_channel}, frequency={self.frequency}, chip={self.chip})"
-    
+
     def __str__(self):
         return f"PanServo on PWM channel {self.pwm_channel} with frequency: {self.frequency}Hz, chip: {self.chip}"
-    
+
     def __del__(self):
         """Ensure the PWM is stopped when the object is deleted."""
         self.stop()
@@ -239,11 +89,11 @@ class PanServo:
     def start(self, speed: float = 0.0, direction: DIRECTION = DIRECTION.CW) -> None:
         """
         Start the servo motor with a given speed and direction; defaults to stop position.
-        
+
         Args:
             speed (float): Speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
             direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
-        
+
         Raises:
             ValueError: If speed is not between 0 and 1
             ValueError: If direction is not DIRECTION.CW or DIRECTION.CCW
@@ -251,15 +101,15 @@ class PanServo:
         self.direction = direction  # Set the initial direction
         self.speed = speed          # Set the initial speed
         self.pwm.start(self.get_duty_cycle(speed, direction))
-    
+
     def change(self, speed: float, direction: DIRECTION) -> None:
         """
         Change the speed and direction of the servo motor.
-        
+
         Args:
             speed (float): Speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
             direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
-        
+
         Raises:
             ValueError: If speed is not between 0 and 1
             ValueError: If direction is not DIRECTION.CW or DIRECTION.CCW
@@ -326,7 +176,7 @@ class PanServo:
             speed (float): Maximum speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
             target_angle (int): Target angle to rotate to, in degrees from 0 to 360
             margin (int): Margin of error for target angle, in degrees
-        
+
         Raises:
             ValueError: If target_angle is not between 0 and 360
             ValueError: If margin is negative
@@ -386,13 +236,13 @@ class PanServo:
             if abs_error <= margin:
                 logger.debug(f"Current angle: {current_angle:.2f}° within margin ({margin}°). Halting.")
                 self.stop()
-                
+
                 timer.wait(0.5)
-                
+
                 double_check_angle = self.encoder.get_smoothed_angle()
                 double_check_error = (target_angle - double_check_angle + 540) % 360 - 180  # Range: [-180, 180]
                 abs_double_check_error = abs(double_check_error)
-                
+
                 if abs_double_check_error <= margin:
                     logger.debug(f"Double-check successful. Final angle: {double_check_angle:.2f}° within margin ({margin}°).")
                     logger.debug(f"Rotation complete. Final angle: {double_check_angle:.2f}°. Target: {target_angle:.2f}°. Error: {double_check_error:.2f}°.")
@@ -412,10 +262,10 @@ class PanServo:
         Args:
             speed (float): Speed of the servo motor, where 0.0 is stopped and 1.0 is full speed
             direction (DIRECTION): Direction of rotation, either DIRECTION.CW or DIRECTION.CCW
-        
+
         Returns:
             float: Duty cycle percentage for the given speed and direction, where 0% is stopped and 100% is full speed in the specified direction.
-        
+
         Raises:
             ValueError: If speed is not between 0 and 1
             ValueError: If direction is not DIRECTION.CW or DIRECTION.CCW
@@ -437,136 +287,3 @@ class PanServo:
             self.speed = 0                  # Update the current speed to 0
             self.direction = DIRECTION.CW   # Reset the direction to CW
             return self.stop_duty_cycle     # Return duty cycle percentage for stop position
-
-def initialize_pwm(pwm_channel: int, frequency: int, chip: int, retries: int = 2) -> HardwarePWM:
-    """
-    Initializes the HardwarePWM with the specified channel, frequency, and chip.
-
-    Args:
-        pwm_channel (int): The PWM channel to use (0 or 1). Channel 0 uses GPIO 18/12, and Channel 1 uses GPIO 19/13.
-        frequency (int): The PWM frequency in Hz.
-        chip (int): The chip number for the PWM channel.
-
-    Returns:
-        HardwarePWM: An instance of the initialized HardwarePWM.
-
-    Raises:
-        ValueError: If pwm_channel is not 0 or 1.
-    """
-    if pwm_channel in [0, 1]:
-        for attempt in range(retries):
-            try:
-                return HardwarePWM(
-                    pwm_channel=pwm_channel,
-                    hz=frequency,
-                    chip=chip
-                )
-            except PermissionError as e:
-                if attempt == retries - 1:
-                    raise
-                timer.wait(0.1)
-    else:
-        try:
-            raise ValueError("Invalid PWM channel. Use 0 or 1.")
-        except ValueError as e:
-            logger.critical(f"Value Error: {e}.")
-            raise
-
-class PanTiltPattern:
-    """
-    Pans and/or Tilts the PiKite rig at set
-    intervals and according to predefined patterns
-    """
-    class PAN_TILT_MODES(str, Enum):
-        """
-        Pan/Tilt modes supported by PiKite. 
-        """
-
-        NONE = "none"
-        PAN_30 = "pan_30"       # Pan in 30 degree increments
-        PAN_45 = "pan_45"       # Pan in 45 degree increments
-        PAN_90 = "pan_90"       # Pan in 90 degree increments
-        TILT_30 = "tilt_30"     # Tilt in 90 degree increments
-        TILT_45 = "tilt_45"     # Tilt in 90 degree increments
-        GRID_180 = "grid_180"   # Pan and Tilt within a 7x4 grid across 180 degrees
-        GRID_360 = "grid_360"   # Pan and Tilt within a 12x4 grid across 360 degrees
-
-    MODE_PARAMETERS = {
-        # pan_step (int): Number of degrees to pan each step
-        # tilt_step (int): Number of degrees to tilt each step
-        # pan_limit (int): Degrees of rotation before reversing direction.
-        #                  Max 360 degrees. Should be divisible by pan_step.
-        # tilt_limit (int): Degrees of tilt before reversing direction.
-        #                   Max 90 degrees. Should be divisible by tilt_step
-
-        PAN_TILT_MODES.NONE: {"pan_step": 0, "tilt_step": 0, "pan_limit": 0, "tilt_limit": 0},
-        PAN_TILT_MODES.PAN_30: {"pan_step": 30, "tilt_step": 0, "pan_limit": 360, "tilt_limit": 0},
-        PAN_TILT_MODES.PAN_45: {"pan_step": 45, "tilt_step": 0, "pan_limit": 360, "tilt_limit": 0},
-        PAN_TILT_MODES.PAN_90: {"pan_step": 90, "tilt_step": 0, "pan_limit": 360, "tilt_limit": 0},
-        PAN_TILT_MODES.TILT_30: {"pan_step": 0, "tilt_step": 30, "pan_limit": 0, "tilt_limit": 90},
-        PAN_TILT_MODES.TILT_45: {"pan_step": 0, "tilt_step": 45, "pan_limit": 0, "tilt_limit": 90},
-        PAN_TILT_MODES.GRID_180: {"pan_step": 30, "tilt_step": 30, "pan_limit": 180, "tilt_limit": 90},
-        PAN_TILT_MODES.GRID_360: {"pan_step": 30, "tilt_step": 30, "pan_limit": 360, "tilt_limit": 90},
-    }
-
-    def __init__(self, mode: PAN_TILT_MODES, pan_servo: PanServo, tilt_servo: TiltServo):
-        self.mode = mode
-        self.pan_servo = pan_servo
-        self.tilt_servo = tilt_servo
-        if self.pan_servo is None or self.tilt_servo is None:
-            raise TypeError("pan_servo must be of type PanServo and tilt_servo must of type TiltServo")
-
-        self.PAN_STEP = PanTiltPattern.MODE_PARAMETERS[self.mode]["pan_step"]
-        self.TILT_STEP = PanTiltPattern.MODE_PARAMETERS[self.mode]["tilt_step"]
-        self.PAN_LIMIT = PanTiltPattern.MODE_PARAMETERS[self.mode]["pan_limit"]
-        self.TILT_LIMIT = PanTiltPattern.MODE_PARAMETERS[self.mode]["tilt_limit"]
-
-        self.current_pan_angle = 0
-        self.target_pan_angle = 0
-
-        self.pan_step_sum = 0
-        self.tilt_step_sum = 0
-
-        self.pan_reverse = False
-        self.tilt_reverse = False
-
-        self.timer = Timer(name=f"{__name__}.{__class__.__name__}")
-
-        self.reset()
-
-    def reset(self):
-        self.pan_servo.rotate_to(speed=0.5, target_angle=0, margin=4)
-        self.current_pan_angle = 0
-        self.tilt_servo.angle = 0
-
-    def step(self):
-        if self.PAN_STEP > 0:
-            if not self.pan_reverse:
-                self.target_pan_angle = (self.current_pan_angle - self.PAN_STEP) % 360
-            else:
-                self.target_pan_angle = (self.current_pan_angle + self.PAN_STEP) % 360
-
-            self.pan_servo.rotate_to(
-                speed=0.5,
-                target_angle=self.target_pan_angle,
-                margin=4
-            )
-
-            self.current_pan_angle = self.target_pan_angle
-            self.pan_step_sum += self.PAN_STEP
-            self.timer.wait(0.5) # Wait for the pan movement to complete before moving the tilt servo
-
-        if self.TILT_STEP > 0 and self.pan_step_sum >= self.PAN_LIMIT:
-            tilt_delta = self.TILT_STEP if not self.tilt_reverse else -self.TILT_STEP
-
-            self.tilt_servo.angle += tilt_delta
-
-            self.tilt_step_sum += self.TILT_STEP
-
-            if self.tilt_step_sum >= self.TILT_LIMIT:
-                self.tilt_step_sum = 0
-                self.tilt_reverse = not self.tilt_reverse
-
-        if self.PAN_STEP > 0 and self.pan_step_sum >= self.PAN_LIMIT:
-            self.pan_step_sum = 0
-            self.pan_reverse = not self.pan_reverse

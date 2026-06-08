@@ -2,18 +2,16 @@ import asyncio
 from typing import Callable
 from inspect import isawaitable
 
+from pikite.core.capture_manager import CaptureManager
+from pikite.core.input_handler import InputHandler, RemoteInput
+from pikite.core.menu import Menu
 from pikite.core.modes.baseline_altitude_mode import BaselineAltitudeMode
 from pikite.core.modes.capture_mode import CaptureMode
 from pikite.core.modes.menu_mode import MenuMode
 from pikite.core.modes.mode_manager import ModeManager
 from pikite.core.modes.pikite_mode import PiKiteMode
 from pikite.core.modes.system_info_mode import SystemInfoMode
-from pikite.core.capture_manager import CaptureManager
-from pikite.core.input_handler import InputHandler, RemoteInput
-from pikite.core.menu import Menu
-import pikite.utils.logger as logger_module
 from pikite.core.settings import Settings
-from pikite.utils.timer import Timer
 from pikite.hardware.button_controller import ButtonController
 from pikite.hardware.camera.camera_controller import CameraController
 from pikite.hardware.camera.preview_stream import PreviewStream
@@ -21,11 +19,14 @@ from pikite.hardware.display.display_controller import DisplayController
 from pikite.hardware.display.loading_bar import LoadingBar
 from pikite.hardware.display.pre_loader import PreLoader
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
-from pikite.hardware.servo_controller import TiltServo, PanServo
+from pikite.hardware.servos.pan_servo import PanServo
+from pikite.hardware.servos.tilt_servo import TiltServo
 from pikite.remote.remote_server import RemoteServer
 from pikite.remote.remote_api import RemoteAPI
 from pikite.system.storage import StorageManager
 import pikite.system.power_management as PowerManagement
+import pikite.utils.logger as logger_module
+from pikite.utils.timer import Timer
 
 # Setup Logger
 logger = logger_module.get_logger(__name__)
