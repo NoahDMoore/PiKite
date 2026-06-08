@@ -183,8 +183,9 @@ class DisplayController:
         bg_color: tuple[int, int, int] = (255, 255, 255),
         fg_color: tuple[int, int, int] = (0, 0, 0)
     ):
-        if "\n" not in text and len(text.split()) > 1:
-            logger.warning("The text string provided was not explicitly multiline. Wrapping text first.")
+        """Print a multiline string to the display."""
+        if "\n" not in text and self._line_overflow(text):
+            logger.warning("The text string provided is too wide for the display and is not explicitly multiline. Wrapping text first.")
             text = self._wrap_text(text)
 
         lcd_image, canvas = self.new_image(color=bg_color)
@@ -200,7 +201,7 @@ class DisplayController:
 
         self.display.image(lcd_image)
 
-    def _wrap_text(self, text: str):
+    def _wrap_text(self, text: str) -> str:
         """Wrap text based on rendered pixel width."""
         words = text.split()
         lines = []
@@ -209,10 +210,7 @@ class DisplayController:
         for word in words:
             test_line = word if not current_line else f"{current_line} {word}"
 
-            bbox = self.FONT30.getbbox(test_line)
-            width = get_image_width(bbox)
-
-            if width <= self.DISPLAY_WIDTH:
+            if not self._line_overflow(test_line):
                 current_line = test_line
             else:
                 if current_line:
@@ -224,6 +222,16 @@ class DisplayController:
             lines.append(current_line)
 
         return "\n".join(lines)
+    
+    def _line_overflow(self, text: str) -> bool:
+        """Returns True if a line of text would overflow the horizontal width of the display."""
+        bbox = self.FONT30.getbbox(text)
+        text_width = get_image_width(bbox)
+
+        if text_width < self.DISPLAY_WIDTH:
+            return False
+        
+        return True
 
     def close(self):
         self.cs.deinit()
