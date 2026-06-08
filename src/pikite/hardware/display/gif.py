@@ -85,7 +85,7 @@ class GIF:
         output = self.image.convert('RGBA')
         if paste != None:
             output.paste(paste, (0,0), paste)
-        self.display_controller.print_message(output)
+        self.display_controller.put(output)
 
     def advance_frame(self, loop=False):
         """

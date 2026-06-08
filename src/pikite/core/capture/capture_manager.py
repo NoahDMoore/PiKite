@@ -156,7 +156,7 @@ class CaptureManager:
 
                 while True:
                     if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
-                        self.display_controller.print_message(f"PiKite Running: {session.runtime_string}")
+                        self.display_controller.put(f"PiKite Running:\n{session.runtime_string}")
                         self.remote_api.tx_session_update(session) # Send session update to remote client
 
                     if self.timer.interval_elapsed(session.altitude_interval, "altitude_interval"):

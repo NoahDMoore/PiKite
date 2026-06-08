@@ -44,17 +44,25 @@ class LoadingBar:
         return self.title_image
 
     @title.setter
-    def title(self, new_title):
+    def title(self, new_title: str):
         """
         Set a new title for the loading bar.
 
         Args:
             new_title (str): The new title to set.
         """
+        if not isinstance(new_title, str):
+            raise TypeError("Title for loading bar must be a string (str).")
+
         self.title_image, canvas = self.display_controller.new_image(alpha=0)
 
-        width = get_image_width(self.display_controller.FONT30.getbbox(new_title))
-        canvas.text(((self.display_controller.DISPLAY_WIDTH-width)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
+        canvas.text(
+            xy = (self.display_controller.DISPLAY_WIDTH / 2, 20),
+            text = new_title,
+            font=self.display_controller.FONT30,
+            fill="black",
+            anchor = "mm"
+        )
 
     def advance(self, amount: int = 5):
         """

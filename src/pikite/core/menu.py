@@ -19,7 +19,7 @@ except Exception:
         """
         Placeholder DisplayController class for type hinting. Replace with actual implementation.
         """
-        def print_message(self, message: str):
+        def put(self, message: str):
             print(f"Display Message: {message}")
 
 from pikite.system.storage import StorageManager
@@ -282,7 +282,7 @@ class Menu:
             logger.warning("No display controller available to print menu message")
             return
         else:
-            self.display_controller.print_message(message)
+            self.display_controller.put(message)
         
         logger.debug(f"Menu Updated: {self.current_element.name}")
 

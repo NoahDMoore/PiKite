@@ -43,7 +43,7 @@ def display_system_info(display_controller: DisplayController):
     add_line(disk_free, "#6BB800")
     add_line(ssid_info, "#2121FF")
 
-    display.print_message(lcd_image)
+    display.put(lcd_image)
 
 def get_primary_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

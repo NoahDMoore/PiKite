@@ -1,13 +1,12 @@
 
 import board        # type: ignore
 import digitalio    # type: ignore
-
-from pikite.system.storage import StorageManager
-import pikite.utils.logger as logger_module
-
-#Mini PiTFT
 from adafruit_rgb_display import st7789             # type: ignore
 from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
+
+from pikite.system.storage import StorageManager, resolve_safe_path
+import pikite.utils.logger as logger_module
 
 # Setup Logger
 logger = logger_module.get_logger(__name__)
@@ -17,7 +16,7 @@ class DisplayController:
     Class to control the Mini PiTFT display using the Adafruit ST7789 library.
 
     This class allows for initializing the display, creating new images, clearing the display,
-    controlling the backlight, and printing messages or images on the display.
+    controlling the backlight, and printing strings or images on the display.
     """
     IMAGE_FILE_TYPES = ['.jpg', '.jpeg', '.gif', '.png', '.bmp', '.tiff']
 
@@ -126,54 +125,104 @@ class DisplayController:
         """Turn off the display backlight."""
         self.backlight.value = False
 
-    def print_message(self, message: str | Image.Image, bg_color: tuple[int, int, int] = (255, 255, 255), fg_color: tuple[int, int, int] = (0, 0, 0)):
+    def put(self, payload: str | Image.Image, bg_color: tuple[int, int, int] = (255, 255, 255), fg_color: tuple[int, int, int] = (0, 0, 0)):
         """
-        Print a message or image on the display. The message can be a string, an image file path, or a PIL Image object.
+        Display an image or string on the lcd display.
         
         Args:
-            message (str or Image.Image): The message to print on the display.
+            payload (str or Image.Image): The string, image file path, or a PIL Image object to put on the display.
             bg_color (tuple): RGB color tuple for the background color. Default is white.
             fg_color (tuple): RGB color tuple for the text color. Default is black.
         """
-        lcd_image, canvas = None, None
-
-        if isinstance(message, Image.Image):
-            # If the message is already an Image object, use it directly
-            lcd_image = message.convert('RGBA')
-        elif any(ele in message for ele in self.IMAGE_FILE_TYPES):
-            # If the message is a file path, load the image
+        # If the payload is already an Image object, use it directly
+        if isinstance(payload, Image.Image):
+            self._put_image(payload)
+            return
+        
+        if not isinstance(payload, str):
+            logger.error(f"Payload for display must be of type PIL.Image.Image or str. The payload provided was of type '{type(payload)}'")
+            return
+        
+        # If the payload is a file name for an image under the static media directory,
+        # convert it to a Path object, open the image, and then display it.
+        if any(ele in payload for ele in self.IMAGE_FILE_TYPES):
             try:
-                lcd_image = Image.open(message)
-                lcd_image = lcd_image.convert('RGBA')
+                file_path = resolve_safe_path(self.MEDIA_DIR, payload)
+                image = Image.open(file_path)
+                self._put_image(image)
+                return
             except Exception as e:
                 logger.error(f"Error loading image: {e}")
                 return
-        elif ":" in message:
-            # Print a two-line message centered on the display
-
-            lcd_image, canvas = self.new_image(color=bg_color)
-
-            header = message.split(": ")[0] + ":"
-            message = message.split(": ")[1]
-
-            height = get_image_height(self.FONT30.getbbox(message))
-
-            header_width = get_image_width(self.FONT30.getbbox(header))
-            message_width = get_image_width(self.FONT30.getbbox(message))
-
-            canvas.text(((self.DISPLAY_WIDTH - header_width) / 2, ((self.DISPLAY_HEIGHT - height) / 2) - (height / 2)), header, font=self.FONT30, fill=fg_color)
-            canvas.text(((self.DISPLAY_WIDTH - message_width) / 2, ((self.DISPLAY_HEIGHT - height) / 2) + (height / 2)), message, font=self.FONT30, fill=fg_color)
-        else:
-            # Print a single line message centered on the display
-
-            lcd_image, canvas = self.new_image(color=bg_color)
-
-            width = get_image_width(self.FONT30.getbbox(message))
-            height = get_image_height(self.FONT30.getbbox(message))
-
-            canvas.text(((self.DISPLAY_WIDTH - width) / 2, (self.DISPLAY_HEIGHT - height) / 2), message, font=self.FONT30, fill=fg_color)
         
+        # Print a multiline string on the display
+        if "\n" in payload:
+            self._put_multiline_text(
+                text = payload,
+                bg_color = bg_color,
+                fg_color = fg_color
+            )
+            return
+        else:
+            self._put_multiline_text(
+                text = self._wrap_text(payload),
+                bg_color = bg_color,
+                fg_color = fg_color
+            )
+            return
+
+    def _put_image(self, image: Image.Image):
+        lcd_image = image.convert('RGBA')
         self.display.image(lcd_image)
+
+    def _put_multiline_text(
+        self,
+        text: str,
+        bg_color: tuple[int, int, int] = (255, 255, 255),
+        fg_color: tuple[int, int, int] = (0, 0, 0)
+    ):
+        if "\n" not in text:
+            logger.warning("The text string provided was no explicitly multiline. Wrapping text first.")
+            text = self._wrap_text(text)
+            return
+
+        lcd_image, canvas = self.new_image(color=bg_color)
+
+        canvas.multiline_text(
+            xy = (self.DISPLAY_WIDTH / 2, self.DISPLAY_HEIGHT / 2), # Horizontal and Vertical Center
+            text = text,
+            font = self.FONT30,
+            fill = fg_color,
+            anchor = "mm",
+            align = "center"
+        )
+
+        self.display.image(lcd_image)
+
+    def _wrap_text(self, text: str):
+        """Wrap text based on rendered pixel width."""
+        words = text.split()
+        lines = []
+        current_line = ""
+
+        for word in words:
+            test_line = word if not current_line else f"{current_line} {word}"
+
+            bbox = self.FONT30.getbbox(test_line)
+            width = get_image_width(bbox)
+
+            if width <= self.DISPLAY_WIDTH:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+
+        # If there is an oprhan word, append it as a new line.
+        if current_line:
+            lines.append(current_line)
+
+        return "\n".join(lines)
 
     def close(self):
         self.cs.deinit()

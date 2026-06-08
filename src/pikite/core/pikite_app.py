@@ -282,8 +282,8 @@ class PiKiteApp:
             logger.info(f"PiKite has run for {self.timer.format_elapsed_time(runtime)}.")
 
         def _cleanup_display_controller():
-            self.display_controller.print_message(
-                message="PiKite Closed",
+            self.display_controller.put(
+                payload="PiKite Closed",
                 bg_color=(0,0,0),
                 fg_color=(255,255,255)
             )
