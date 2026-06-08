@@ -51,8 +51,8 @@ class DisplayController:
             rotation=90,
         )
 
-        self.IMAGE_WIDTH = self.display.height
-        self.IMAGE_HEIGHT = self.display.width
+        self.DISPLAY_WIDTH = self.display.height
+        self.DISPLAY_HEIGHT = self.display.width
 
         self.FONT30 = ImageFont.truetype(FONTS_DIR / "robotobold.ttf", 30)
         self.FONT25 = ImageFont.truetype(FONTS_DIR / "robotobold.ttf", 25)
@@ -71,7 +71,7 @@ class DisplayController:
     
     def __str__(self):
         """Return a string description of the initialized DisplayController."""
-        return "DisplayController for MiniPiTFT display with dimensions {}x{}".format(self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
+        return "DisplayController for MiniPiTFT display with dimensions {}x{}".format(self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT)
     
     @property
     def dimensions(self):
@@ -80,7 +80,7 @@ class DisplayController:
         
         Returns:
             tuple: A tuple containing the width and height of the display."""
-        return (self.IMAGE_WIDTH, self.IMAGE_HEIGHT)
+        return (self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT)
 
     def new_image(self, color: tuple[int, int, int] = (255, 255, 255), alpha: int = 255):
         """
@@ -105,7 +105,7 @@ class DisplayController:
             raise ValueError("Alpha value must be between 0 and 255.")
 
         bg_color = (*color, alpha)
-        lcd_image = Image.new("RGBA", (self.IMAGE_WIDTH, self.IMAGE_HEIGHT), bg_color) # type: ignore
+        lcd_image = Image.new("RGBA", (self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT), bg_color) # type: ignore
         canvas = ImageDraw.Draw(lcd_image)
 
         return lcd_image, canvas
@@ -163,8 +163,8 @@ class DisplayController:
             header_width = get_image_width(self.FONT30.getbbox(header))
             message_width = get_image_width(self.FONT30.getbbox(message))
 
-            canvas.text(((self.IMAGE_WIDTH - header_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) - (height / 2)), header, font=self.FONT30, fill=fg_color)
-            canvas.text(((self.IMAGE_WIDTH - message_width) / 2, ((self.IMAGE_HEIGHT - height) / 2) + (height / 2)), message, font=self.FONT30, fill=fg_color)
+            canvas.text(((self.DISPLAY_WIDTH - header_width) / 2, ((self.DISPLAY_HEIGHT - height) / 2) - (height / 2)), header, font=self.FONT30, fill=fg_color)
+            canvas.text(((self.DISPLAY_WIDTH - message_width) / 2, ((self.DISPLAY_HEIGHT - height) / 2) + (height / 2)), message, font=self.FONT30, fill=fg_color)
         else:
             # Print a single line message centered on the display
 
@@ -173,7 +173,7 @@ class DisplayController:
             width = get_image_width(self.FONT30.getbbox(message))
             height = get_image_height(self.FONT30.getbbox(message))
 
-            canvas.text(((self.IMAGE_WIDTH - width) / 2, (self.IMAGE_HEIGHT - height) / 2), message, font=self.FONT30, fill=fg_color)
+            canvas.text(((self.DISPLAY_WIDTH - width) / 2, (self.DISPLAY_HEIGHT - height) / 2), message, font=self.FONT30, fill=fg_color)
         
         self.display.image(lcd_image)
 
@@ -354,7 +354,7 @@ class LoadingBar:
         self.title_image, canvas = self.display_controller.new_image(alpha=0)
 
         width = get_image_width(self.display_controller.FONT30.getbbox(new_title))
-        canvas.text(((self.display_controller.IMAGE_WIDTH-width)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
+        canvas.text(((self.display_controller.DISPLAY_WIDTH-width)/2,20), new_title, font=self.display_controller.FONT30, fill="black")
 
     def advance(self, amount: int = 5):
         """
