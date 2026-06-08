@@ -4,6 +4,10 @@ from dotenv import load_dotenv, set_key
 from getpass import getpass
 
 from pikite.system.storage import StorageManager
+from pikite.utils.logger import get_logger
+
+# Configer Logger
+logger = get_logger(__name__)
 
 storage_manager = StorageManager()
 
@@ -47,8 +51,12 @@ def get_new_password_hash():
     """
     new_password = getpass("Enter new password: ")
     if new_password != getpass("Confirm new password: "):
-        raise ValueError("Passwords do not match. Aborting.")
-    
+        try:
+            raise ValueError("Passwords do not match. Aborting.")
+        except ValueError as e:
+            logger.exception(e)
+            raise
+
     return hash_password(new_password)
 
 def set_password():
@@ -57,18 +65,27 @@ def set_password():
 
     if current_hash is None:
         confirm = input("No password set. Set new password? (y/n): ")
-        if confirm.lower() == 'n':
-            raise SystemExit("User aborted the password reset.")
-        elif confirm.lower() != 'y':
-            raise ValueError("Invalid response given for confirmation prompt. Expected 'y' or 'n'.")
-        else:
-            new_password_hash = get_new_password_hash()
+
+        try:
+            if confirm.lower() == 'n':
+                raise SystemExit("User aborted the password reset.")
+            elif confirm.lower() != 'y':
+                raise ValueError("Invalid response given for confirmation prompt. Expected 'y' or 'n'.")
+            else:
+                new_password_hash = get_new_password_hash()
+        except Exception as e:
+            logger.exception(e)
+            raise
     else:
         # Verify current password before allowing reset
         entered_password = getpass("Enter current password: ")
         if not verify_password(entered_password, current_hash.encode('utf-8')):
-            raise ValueError("Incorrect password. Aborting.")
-        
+            try:
+                raise ValueError("Incorrect password. Aborting.")
+            except ValueError as e:
+                logger.exception(e)
+                raise
+
         new_password_hash = get_new_password_hash()
 
     # Store hash in .env
