@@ -2,7 +2,7 @@ import asyncio
 from typing import Callable
 from inspect import isawaitable
 
-from pikite.core.capture_manager import CaptureManager
+from pikite.core.capture.capture_manager import CaptureManager
 from pikite.core.input_handler import InputHandler, RemoteInput
 from pikite.core.menu import Menu
 from pikite.core.modes.baseline_altitude_mode import BaselineAltitudeMode

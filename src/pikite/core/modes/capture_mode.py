@@ -1,6 +1,6 @@
-from pikite.core.modes.pikite_mode import BaseMode, PiKiteMode
+from pikite.core.capture.capture_manager import CaptureManager
 from pikite.core.input_handler import InputCommand
-from pikite.core.capture_manager import CaptureManager
+from pikite.core.modes.pikite_mode import BaseMode, PiKiteMode
 
 class CaptureMode(BaseMode):
     def __init__(

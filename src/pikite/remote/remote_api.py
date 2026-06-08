@@ -6,7 +6,7 @@ from pikite.utils.logger import get_logger
 from pikite.utils.timer import Timer
 
 if TYPE_CHECKING:
-    from pikite.core.capture_session import CaptureSession
+    from pikite.core.capture.capture_session import CaptureSession
     from pikite.core.menu import Menu
     from pikite.core.modes.pikite_mode import PiKiteMode
     from pikite.core.settings import Settings

@@ -1,7 +1,7 @@
 import asyncio
 from enum import Enum, auto
 
-from pikite.core.capture_session import SessionContext, CaptureSession
+from pikite.core.capture.capture_session import SessionContext, CaptureSession
 from pikite.core.constants import CAPTURE_MODES
 from pikite.core.input_handler import InputHandler, InputCommand
 from pikite.core.modes.pikite_mode import PiKiteMode
