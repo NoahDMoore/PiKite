@@ -16,6 +16,14 @@ ENV_PATH = str(storage_manager.USER_ROOT / ".env")
 def get_current_password_hash():
     load_dotenv(ENV_PATH, override=True)
     current_hash = os.getenv('PIKITE_PASSWORD_HASH')
+
+    if current_hash is None:
+        try:
+            raise ValueError("Error loading current password hash from env.")
+        except ValueError as e:
+            logger.exception(e)
+            raise
+
     return current_hash
 
 def hash_password(password: str) -> bytes:
