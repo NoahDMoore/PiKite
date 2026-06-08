@@ -14,7 +14,7 @@ class PreLoader(GIF):
         Args:
             display_controller (DisplayController): An instance of DisplayController to display the preloader GIF.
         """
-        self.preloader_gif_path = self.display_controller.MEDIA_DIR / "preloader.gif"
+        self.preloader_gif_path = display_controller.MEDIA_DIR / "preloader.gif"
 
         super().__init__(
             gif_image = Image.open(self.preloader_gif_path),
