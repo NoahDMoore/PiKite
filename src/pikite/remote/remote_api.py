@@ -124,8 +124,8 @@ class RemoteAPI:
     def tx_servo_positions(self):
         self.remote_server.send({
             "type": "pan_tilt_update",
-            "pan_servo": round(self.pan_servo.encoder.get_smoothed_angle()),
-            "tilt_servo": self.tilt_servo.angle
+            "pan_angle": round(self.pan_servo.encoder.get_smoothed_angle()),
+            "tilt_angle": self.tilt_servo.angle
         })
 
 
