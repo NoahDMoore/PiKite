@@ -157,6 +157,7 @@ class DisplayController:
         
         # Print a multiline string on the display
         if "\n" in payload:
+            logger.debug("Attempting to print a multiline string.")
             self._put_multiline_text(
                 text = payload,
                 bg_color = bg_color,
@@ -164,6 +165,7 @@ class DisplayController:
             )
             return
         else:
+            logger.debug("Attempting to print a plain string.")
             self._put_multiline_text(
                 text = self._wrap_text(payload),
                 bg_color = bg_color,
@@ -182,7 +184,7 @@ class DisplayController:
         fg_color: tuple[int, int, int] = (0, 0, 0)
     ):
         if "\n" not in text:
-            logger.warning("The text string provided was no explicitly multiline. Wrapping text first.")
+            logger.warning("The text string provided was not explicitly multiline. Wrapping text first.")
             text = self._wrap_text(text)
             return
 
