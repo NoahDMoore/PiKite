@@ -222,11 +222,11 @@ class PiKiteApp:
     async def run(self):
         logger.info("Starting PiKite Application")
 
+        self.remote_server.start()
+
         # Run Preloader Animation
         preloader = PreLoader(self.display_controller)
         await preloader.run()
-
-        self.remote_server.start()
         
         await asyncio.gather(
             self.remote_input_listener.start_listening(),
