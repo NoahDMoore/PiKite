@@ -10,6 +10,7 @@ ExecStart=/home/YOUR_USERNAME/.local/bin/poetry run python -m pikite
 WorkingDirectory=/home/YOUR_USERNAME/PiKite/
 User=YOUR_USERNAME
 Restart=always
+KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target
