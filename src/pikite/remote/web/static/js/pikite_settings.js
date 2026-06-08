@@ -9,7 +9,7 @@ function loadSettings(settings_update) {
     container.innerHTML = ''; // Clear previous content
 
     // For each section (e.g., camera_settings)
-    Object.entries(settings).forEach(([section, sectionSettings]) => {                
+    Object.entries(settings).forEach(([section, sectionSettings]) => {
         // Create card
         const card = document.createElement('div');
         card.className = 'card';
