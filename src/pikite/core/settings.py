@@ -49,7 +49,7 @@ class Settings:
     def _load_config(self):
         """Load the YAML configuration file into a dictionary."""
         try:
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path, 'r', encoding="utf-8") as f:
                 self.config = yaml.load(f, Loader=yaml.SafeLoader)
                 logger.info(f"Settings loaded successfully from {self.config_path}")
         except Exception as e:
@@ -59,10 +59,10 @@ class Settings:
     def _create_default_config(self):
         """Create a default YAML configuration file from the default settings."""
         try:
-            with open(DEFAULT_CONFIG_FILE, 'r') as f:
+            with open(DEFAULT_CONFIG_FILE, 'r', encoding="utf-8") as f:
                 default_config = yaml.load(f, Loader=yaml.SafeLoader)
                 
-                with open(self.config_path, 'w') as f:
+                with open(self.config_path, 'w', encoding="utf-8") as f:
                     yaml.dump(default_config, f, sort_keys=False)
                 logger.info(f"Default configuration file created at {self.config_path}")
         except FileNotFoundError as e:
@@ -353,7 +353,7 @@ class Settings:
 
         setting["current_value"] = new_value
 
-        with open(self.config_path, 'w') as f:
+        with open(self.config_path, 'w', encoding="utf-8") as f:
             yaml.dump(self.config, f, sort_keys=False)
             logger.info(f"Setting updated: {setting_key} = {new_value}")
         
@@ -398,7 +398,7 @@ class Settings:
 
         _recursively_restore_defaults(self.config)
 
-        with open(self.config_path, 'w') as f:
+        with open(self.config_path, 'w', encoding="utf-8") as f:
             yaml.dump(self.config, f, sort_keys=False)
 
         if read_after:
