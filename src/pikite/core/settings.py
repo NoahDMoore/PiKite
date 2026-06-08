@@ -328,7 +328,7 @@ class Settings:
             setting = self._get_setting_node(setting_key)
         except (KeyError, ValueError) as e:
             logger.error(e)
-            raise e
+            return
         
         current_value = setting.get('current_value')
         setting_data_type = type_mapping.get(setting["data_type"])
@@ -361,6 +361,18 @@ class Settings:
 
         self._notify_change_listeners(setting_key, new_value)
 
+    def update_from_dict(self, settings_to_update: dict[str, str]):
+        """
+        Update multiple settings from key, value pairs in a dictionary.
+        
+        Args:
+            settings_to_update (dict[setting_key, value]): The settings to update.
+        """
+        if not isinstance(settings_to_update, dict):
+            logger.error(f"Error updating settings. Settings must be provided as a dictionary of setting key and value pairs.")
+
+        for key, value in settings_to_update.items():
+            self.set(key, value)
 
     def load_defaults(self, read_after=True):
         """
