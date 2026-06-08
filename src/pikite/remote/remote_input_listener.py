@@ -8,7 +8,6 @@ import json
 # Configure Logger
 logger = get_logger(__name__)
 
-
 class RemoteInputListener:
     def __init__(self, server: RemoteServer, input_handler: InputHandler):
         self.server = server
