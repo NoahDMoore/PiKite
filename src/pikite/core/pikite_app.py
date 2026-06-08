@@ -3,7 +3,7 @@ from typing import Callable
 from inspect import isawaitable
 
 from pikite.core.capture.capture_manager import CaptureManager
-from pikite.core.input_handler import InputHandler, RemoteInput
+from pikite.core.input_handler import InputHandler
 from pikite.core.menu import Menu
 from pikite.core.modes.baseline_altitude_mode import BaselineAltitudeMode
 from pikite.core.modes.capture_mode import CaptureMode
@@ -21,8 +21,9 @@ from pikite.hardware.display.pre_loader import PreLoader
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servos.pan_servo import PanServo
 from pikite.hardware.servos.tilt_servo import TiltServo
-from pikite.remote.remote_server import RemoteServer
 from pikite.remote.remote_api import RemoteAPI
+from pikite.remote.remote_input_listener import RemoteInputListener
+from pikite.remote.remote_server import RemoteServer
 from pikite.system.storage import StorageManager
 import pikite.system.power_management as PowerManagement
 import pikite.utils.logger as logger_module
@@ -82,7 +83,7 @@ class PiKiteApp:
         self.remote_server = RemoteServer(port=5000)
         
         # Initialize Remote Input Handler
-        self.remote_input = RemoteInput(self.remote_server, self.input_handler)
+        self.remote_input_listener = RemoteInputListener(self.remote_server, self.input_handler)
         self.remote_api = RemoteAPI(
             menu=self.menu,
             pan_servo=self.pan_servo,
@@ -228,7 +229,7 @@ class PiKiteApp:
         self.remote_server.start()
         
         await asyncio.gather(
-            self.remote_input.start_listening(),
+            self.remote_input_listener.start_listening(),
             self.preview.stream(),
             self.main_loop()
         )
@@ -294,7 +295,7 @@ class PiKiteApp:
         cleanup_tasks = [
             self.button_controller.close,   # Cleanup Button Controller
             self.preview.close,             # Cleanup Camera Preview Stream
-            self.remote_input.close,        # Cleanup RemoteInput
+            self.remote_input_listener.close,        # Cleanup RemoteInput
             self.remote_server.close,       # Shutdown ControllerServer
             _cleanup_servos,                # Home and Then Stop the Pan and Tilt Servos
             self.camera_controller.close,   # Cleanup Camera Controller
