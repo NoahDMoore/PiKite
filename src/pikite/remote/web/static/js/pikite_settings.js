@@ -22,6 +22,10 @@ function loadSettings(settings_update) {
     var tooltip_elems = document.querySelectorAll('.tooltipped');
     var tooltip_instances = M.Tooltip.init(tooltip_elems, {});
 
+    // Re-initialize range sliders
+    var sliders = document.querySelectorAll('input[type=range]');
+    M.Range.init(sliders);
+
     document.querySelectorAll("[data-setting]").forEach(el => {
         el.addEventListener("change", handleSettingChange);
 
