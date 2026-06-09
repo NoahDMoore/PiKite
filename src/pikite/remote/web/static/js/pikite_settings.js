@@ -18,6 +18,10 @@ function loadSettings(settings_update) {
         settings_select_instances = M.FormSelect.init(document.querySelectorAll('.setting-select'));
     }
 
+    // Initialize Tooltips
+    var tooltip_elems = document.querySelectorAll('.tooltipped');
+    var tooltip_instances = M.Tooltip.init(tooltip_elems, {});
+
     document.querySelectorAll("[data-setting]").forEach(el => {
         el.addEventListener("change", handleSettingChange);
 
