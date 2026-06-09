@@ -79,7 +79,8 @@ class RemoteAPI:
         logger.debug("Sent current settings and menu options to remote clients")
 
     def rx_settings_update(self, args):
-        self.settings.update_from_dict(args.get("settings_to_update", {}))
+        update = args.get("settings_to_update", {})
+        self.settings.update_from_dict(json.loads(update))
         self.tx_settings()  # Send updated settings back to client
 
     def rx_default_settings_request(self, **kwargs):
