@@ -69,12 +69,9 @@ class RemoteAPI:
     # Settings Endpoints
     def tx_settings(self, **kwargs):
         """Fetch current settings and menu options to send to remote clients."""
-        current_settings = self.settings.format_as_dict()
-        menu_settings = self.menu.format_settings_and_options_as_dict()
         payload = {
             "type": "settings_update",
-            "current_settings": current_settings,
-            "menu_settings": menu_settings
+            "settings": self.settings.config
         }
 
         self.remote_server.send(payload)
