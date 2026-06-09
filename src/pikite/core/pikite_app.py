@@ -188,6 +188,7 @@ class PiKiteApp:
 
         if setting_key == "pan_tilt.tilt_zero_position_offset":
             self.tilt_servo.tilt_zero_position_offset = int(new_value)
+            self.tilt_servo.home()
             logger.info(f"Updated tilt servo zero angle offset to {new_value} due to settings change.")
 
     def configure_logger(self):
