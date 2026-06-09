@@ -111,7 +111,7 @@ function buildSettingInput(setting, settingKey) {
     const label = document.createElement('label');
     label.textContent = setting.label;
     label.className = "tooltipped";
-    label.dataset.position = "top";
+    label.dataset.position = "right";
     label.dataset.tooltip = setting.description
     settingsContent.appendChild(label);
 
