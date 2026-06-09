@@ -41,7 +41,7 @@ function recursivelyBuildSettings(group, path="") {
         const isSubsection = (depth > 0)
 
         if (value.type === "settings_group") {
-            console.log("Group:", currentPath);
+            //console.log("Group:", currentPath);
 
             const {groupElement, groupContent} = createGroupElement(
                 currentPath,
@@ -56,7 +56,7 @@ function recursivelyBuildSettings(group, path="") {
             groupElement.appendChild(groupContent);
             fragment.appendChild(groupElement);
         } else if (value.type === "setting") {
-            console.log("Setting:", currentPath);
+            //console.log("Setting:", currentPath);
             const setting = buildSettingInput(value, currentPath)
             fragment.appendChild(setting)
         }
@@ -113,8 +113,9 @@ function buildSettingInput(setting, settingKey) {
     if (options_def === undefined) {
         if (setting.data_type === "bool") {
             input = createMaterializeSwitch(setting, settingKey);
+        } else {
+            console.log("No options provided for setting: " + setting.label);
         }
-        console.log("No options provided for setting: " + setting.label)
     } else if (Array.isArray(options_def)) {
         input = createMaterializeSelect(setting, settingKey);
     } else if (Number.isFinite(options_def.min) && Number.isFinite(options_def.max)) {
