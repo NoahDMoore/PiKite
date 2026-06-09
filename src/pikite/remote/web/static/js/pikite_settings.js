@@ -173,7 +173,9 @@ function createMaterializeRange(setting, settingKey) {
     currentValue = setting.current_value
 
     // Materialize range
-    input = document.createElement('div');
+    input = document.createElement('p');
+    input.className = "range-field";
+    
     const range = document.createElement('input');
     range.className = "range";
     range.setAttribute('type', 'range');
