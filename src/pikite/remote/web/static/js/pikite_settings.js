@@ -3,6 +3,7 @@ const changedSettings = {};
 
 function loadSettings(settings_update) {
     const settings_obj = settings_update.settings;
+    console.log(settings_obj)
 
     const container = document.getElementById('settings-content');
     container.innerHTML = ""; // Clear previous content
