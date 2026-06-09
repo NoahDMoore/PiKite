@@ -5,8 +5,8 @@ function loadSettings(settings_update) {
     const settings_obj = settings_update.settings;
 
     const container = document.getElementById('settings-content');
-    container.innerHTML = ''; // Clear previous content
-    fragment = recursivelyBuildSettings(settings)
+    container.innerHTML = ""; // Clear previous content
+    fragment = recursivelyBuildSettings(settings);
     container.appendChild(fragment);
 
     // Clear global changedSettings object to avoid stale changes after loading new settings
