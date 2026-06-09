@@ -80,7 +80,7 @@ class RemoteAPI:
 
     def rx_settings_update(self, args):
         update = args.get("settings_to_update", {})
-        self.settings.update_from_dict(json.loads(update))
+        self.settings.update_from_dict(update)
         self.tx_settings()  # Send updated settings back to client
 
     def rx_default_settings_request(self, **kwargs):
