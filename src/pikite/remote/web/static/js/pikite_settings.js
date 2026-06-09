@@ -2,7 +2,7 @@ var settings_select_instances = null;
 const changedSettings = {};
 
 function loadSettings(settings_update) {
-    const settings_obj = settings_update.settings;
+    const settings_obj = JSON.parse(settings_update.settings);
     console.log(settings_obj)
 
     const container = document.getElementById('settings-content');
