@@ -105,8 +105,11 @@ function buildSettingInput(setting, settingKey) {
 
     // Label
     const label = document.createElement('label');
-    label.textContent = setting.label
-    settingsContent.appendChild(label)
+    label.textContent = setting.label;
+    label.className = "tooltipped";
+    label.dataset.position = "top";
+    label.dataset.tooltip = setting.description
+    settingsContent.appendChild(label);
 
     const options_def = setting.options
 
@@ -175,7 +178,7 @@ function createMaterializeRange(setting, settingKey) {
     // Materialize range
     input = document.createElement('p');
     input.className = "range-field";
-    
+
     const range = document.createElement('input');
     range.className = "range";
     range.setAttribute('type', 'range');
