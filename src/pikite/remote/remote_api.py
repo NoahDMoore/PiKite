@@ -1,4 +1,5 @@
-from __future__ import annotations 
+from __future__ import annotations
+import json
 from typing import TYPE_CHECKING, Callable
 
 from pikite.core.constants import CAPTURE_MODES
@@ -71,7 +72,7 @@ class RemoteAPI:
         """Fetch current settings and menu options to send to remote clients."""
         payload = {
             "type": "settings_update",
-            "settings": self.settings.config
+            "settings": json.dumps(self.settings.config)
         }
 
         self.remote_server.send(payload)
