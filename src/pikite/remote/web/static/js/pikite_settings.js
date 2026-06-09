@@ -197,6 +197,8 @@ function handleSettingChange(e) {
 
     if (el.type === "checkbox") {
         value = el.checked;
+    } else if (el.type === "range") {
+        value = Number(el.value);
     } else {
         value = el.value;
     }
