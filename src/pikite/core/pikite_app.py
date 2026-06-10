@@ -327,4 +327,8 @@ class PiKiteApp:
 
                     cleanup_progress_bar.advance(advance_amount)
 
+        if cleanup_progress_bar is not None:
+            # Advance remaining space on progress bar.
+            cleanup_progress_bar.advance(100 - cleanup_progress_bar.value)
+    
         logger.info("PiKite clean-up complete. Closing application.")
