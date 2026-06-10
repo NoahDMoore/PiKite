@@ -211,6 +211,10 @@ class PiKiteApp:
             logger_module.unset_stream_handler()
 
     async def main_loop(self):
+        # Run Preloader Animation
+        preloader = PreLoader(self.display_controller)
+        await preloader.run()
+
         self.application_running = True
         try:
             await self.mode_manager.switch_to(PiKiteMode.MENU)
@@ -224,10 +228,6 @@ class PiKiteApp:
         logger.info("Starting PiKite Application")
 
         self.remote_server.start()
-
-        # Run Preloader Animation
-        preloader = PreLoader(self.display_controller)
-        await preloader.run()
         
         await asyncio.gather(
             self.remote_input_listener.start_listening(),
