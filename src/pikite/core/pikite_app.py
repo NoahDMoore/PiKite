@@ -34,6 +34,9 @@ logger = logger_module.get_logger(__name__)
 
 class PiKiteApp:
     def __init__(self):
+        self._bootstrap()
+
+
         # Initialize Display
         self.display_controller = DisplayController()
         initialization_progress_bar = LoadingBar("Loading PiKite", self.display_controller)
@@ -173,6 +176,9 @@ class PiKiteApp:
         self.on_close_callback: Callable[[], None] | None = None
 
         logger.info("PiKite Application Initialized")
+
+    def _bootstrap(self):
+        pass
 
     def _on_setting_change(self, setting_key, new_value):
         logger.info(f"Setting Change Detected: {setting_key} changed to {new_value}.")
