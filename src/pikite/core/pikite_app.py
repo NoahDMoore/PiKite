@@ -170,7 +170,7 @@ class PiKiteApp:
         self.mode_manager.register_mode(self.system_info_mode)
 
         self.application_running = False
-        self.on_close_callback = None
+        self.on_close_callback: Callable[[], None] | None = None
 
         logger.info("PiKite Application Initialized")
 
@@ -199,16 +199,15 @@ class PiKiteApp:
             settings (Settings): Application settings.
         """
         log_level = self.settings.get("logging.log_level", "INFO")
-        logger_module.set_log_level(log_level)
-        logger.info(f"Log level set to {log_level}")
-
-        if self.settings.get("logging.log_to_file", True) is False:
-            logger.info("Logging to file disabled via settings.")
-            logger_module.unset_file_handler()
+        log_to_console = self.settings.get("logging.log_to_console", True)
+        log_to_file = self.settings.get("logging.log_to_file", True)
         
-        if self.settings.get("logging.log_to_console", True) is False:
-            logger.info("Logging to console disabled via settings.")
-            logger_module.unset_stream_handler()
+        logger_module.configure_logger(
+            log_level = log_level,
+            use_console_handler = log_to_console,
+            use_file_handler = log_to_file,
+            log_file = self.storage_manager.LOG_FILE_BASE
+        )
 
     async def main_loop(self):
         # Run Preloader Animation
@@ -237,11 +236,11 @@ class PiKiteApp:
 
         self.on_close()
 
-    def register_on_close_callback(self, callback: Callable):
+    def register_on_close_callback(self, callback: Callable[[], None]):
         self.on_close_callback = callback
 
     def on_close(self):
-        if self.on_close_callback is not None and isinstance(self.on_close_callback, Callable):
+        if callable(self.on_close_callback):
             self.on_close_callback()
 
     def exit(self):

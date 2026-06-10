@@ -1,36 +1,74 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
+from pathlib import Path
 
-from pikite.system.storage import StorageManager
-
-storage = StorageManager()
-LOG_FILE_BASE = storage.LOG_FILE_BASE
-
+# Configure Minimal Logger on Import
 logger = logging.getLogger("PiKite")    # Create a logger for the given name
+logger.addHandler(logging.StreamHandler())
 
-# Set handlers if logger has not already been configured
-if not logger.handlers:
-    logger.setLevel(logging.INFO)   # Default log level
+# Specify Log Format
+LOG_FORMAT = logging.Formatter(
+    fmt="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
 
-    formatter = logging.Formatter(
-        fmt="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
+def configure_logger(
+        log_level: str = "INFO",
+        use_console_handler: bool = True,
+        use_file_handler: bool = False,
+        log_file: Path | None = None
+    ):
+    set_log_level(log_level)
 
-    # Console Handler
+    # Setup Handlers
+    unset_console_handler() # Remove existing handlers
+    unset_file_handler()
+
+    if use_console_handler:
+        register_console_handler()
+
+    if use_file_handler:
+        if log_file is None:
+            logger.error("Cannot register a file handler for the logger. No log file provided.")
+            return
+        register_file_handler(log_file)
+
+def register_console_handler():
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
+    console_handler.setFormatter(LOG_FORMAT)
     logger.addHandler(console_handler)
 
-    # File Handler
+def register_file_handler(log_file: Path):
     file_handler = TimedRotatingFileHandler(
-        filename=LOG_FILE_BASE, # Base log file location/file_name
-        when='midnight',        # Create a new log file at midnight
-        interval=1,             # Create the new log file every night
-        backupCount=30          # Store 30 days of logs
+        filename = log_file,    # Base log file location/file_name
+        when = 'midnight',      # Create a new log file at midnight
+        interval = 1,           # Create the new log file every night
+        backupCount = 30        # Store 30 days of logs
     )
-    file_handler.setFormatter(formatter)
+    file_handler.setFormatter(LOG_FORMAT)
     logger.addHandler(file_handler)
+
+def unset_console_handler() -> None:
+    """
+    Remove the stream handler from the logger to disable console output.
+    """
+    for handler in list(logger.handlers):
+        if type(handler) is logging.StreamHandler:
+            logger.removeHandler(handler)
+            handler.close()
+
+    logger.debug("Console handler removed from logger.")
+
+def unset_file_handler() -> None:
+    """
+    Remove the file handler from the logger to disable file output.
+    """
+    for handler in list(logger.handlers):
+        if isinstance(handler, logging.FileHandler):
+            logger.removeHandler(handler)
+            handler.close()
+            
+    logger.debug("File handler removed from logger.")
 
 def get_logger(name: str) -> logging.Logger:
     """
@@ -57,7 +95,7 @@ def set_log_level(level_name: str) -> None:
         ValueError: If the provided level_name is not a valid logging level.
     """
     level = getattr(logging, level_name.upper(), None)
-    if not level:
+    if level is None:
         try:
             raise ValueError(f"Invalid log level: {level_name}")
         except ValueError as e:
@@ -68,27 +106,7 @@ def set_log_level(level_name: str) -> None:
     for handler in logger.handlers:
         handler.setLevel(level)
 
-def unset_stream_handler() -> None:
-    """
-    Remove the stream handler from the logger to disable console output.
-    """
-    console_handler = next((handler for handler in logger.handlers if isinstance(handler, logging.StreamHandler)), None)
-    if console_handler:
-        logger.removeHandler(console_handler)
-        logger.debug("Stream handler removed from logger.")
-    else:
-        logger.debug("No stream handler found to remove.")
-
-def unset_file_handler() -> None:
-    """
-    Remove the file handler from the logger to disable file output.
-    """
-    file_handler = next((handler for handler in logger.handlers if isinstance(handler, logging.FileHandler)), None)
-    if file_handler:
-        logger.removeHandler(file_handler)
-        logger.debug("File handler removed from logger.")
-    else:
-        logger.debug("No file handler found to remove.")
+    logger.info(f"Log level set to {level_name}")
 
 def register_websocket_handler(server) -> None:
     """
@@ -97,6 +115,9 @@ def register_websocket_handler(server) -> None:
     Args:
         server: The WebSocket server instance to which the handler will send log messages.
     """
+    if any(isinstance(h, WebSocketHandler) for h in logger.handlers):
+        return
+
     websocket_handler = WebSocketHandler(server)
     websocket_handler.setFormatter(logging.Formatter(
         fmt="%(asctime)s [%(levelname)s] [%(name)s]: %(message)s",
