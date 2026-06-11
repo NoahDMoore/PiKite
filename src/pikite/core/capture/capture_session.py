@@ -19,7 +19,6 @@ logger = get_logger(__name__)
 class SessionContext:
     pan_servo: PanServo
     settings: Settings
-    storage_manager: StorageManager
     tilt_servo: TiltServo
     timer: Timer
 
@@ -30,10 +29,10 @@ class CaptureSession:
         Initialization for a PiKiteApp CaptureSession
 
         Args:
-            app (PiKiteApp): The main PiKiteApp application instance.
-            loop (bool): Flag to signal a capture session loop. Default is True.
+            context (SessionContext): Session dependencies
         """
         self.context = context
+        self.storage_manager = StorageManager()
 
         # Mark the start of the capture session for runtime tracking
         self.context.timer.mark("capture_session_start")
@@ -104,7 +103,7 @@ class CaptureSession:
         
     def _get_session_dir(self) -> Path | None:
         try:
-            session_dir = self.context.storage_manager.new_session_dir(self.capture_mode)
+            session_dir = self.storage_manager.new_session_dir(self.capture_mode)
         except ValueError as e:
             logger.warning(e)
             session_dir = None
@@ -112,7 +111,7 @@ class CaptureSession:
 
     def _open_altitude_csv(self) -> tuple:
         """Open a CSV file for logging altitude data."""
-        alt_csv_path = self.context.storage_manager.get_data_file_path()
+        alt_csv_path = self.storage_manager.get_data_file_path()
         alt_csv = open(alt_csv_path, "w", newline="")
         logger.info(f"Logging altitude data to: {alt_csv_path}")
 

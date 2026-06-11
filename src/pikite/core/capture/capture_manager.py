@@ -1,17 +1,15 @@
 import asyncio
 from enum import Enum, auto
+from pathlib import Path
 
 from pikite.core.capture.capture_session import SessionContext, CaptureSession
 from pikite.core.constants import CAPTURE_MODES
-from pikite.core.input_handler import InputHandler, InputCommand
-from pikite.core.modes.pikite_mode import PiKiteMode
 from pikite.core.settings import Settings
 from pikite.hardware.camera.camera_controller import CameraController
 from pikite.hardware.display.display_controller import DisplayController
 from pikite.hardware.pressure_sensor_controller import PressureSensorController
 from pikite.hardware.servos.pan_servo import PanServo
 from pikite.hardware.servos.tilt_servo import TiltServo
-from pikite.remote.remote_server import RemoteServer
 from pikite.remote.remote_api import RemoteAPI
 from pikite.system.storage import StorageManager, get_timestamp
 import pikite.utils.logger as logger_module
@@ -31,45 +29,45 @@ class CaptureManager:
         self,
         camera_controller: CameraController,
         display_controller: DisplayController,
-        input_handler: InputHandler,
         pan_servo: PanServo,
         pressure_sensor: PressureSensorController,
         remote_api: RemoteAPI,
-        remote_server: RemoteServer,
         settings: Settings,
         tilt_servo: TiltServo
     ):
         self.camera_controller = camera_controller
         self.display_controller = display_controller
-        self.input_handler = input_handler
-        self.pan_servo = pan_servo
         self.pressure_sensor = pressure_sensor
         self.remote_api = remote_api
-        self.remote_server = remote_server
-        self.settings = settings
-        self.storage_manager = StorageManager()
         self.tilt_servo = tilt_servo
         self.timer = Timer()
         self.timer.start()
+        self.storage_manager = StorageManager()
         self.state = CaptureState.STOPPED
 
         self.session_context = SessionContext(
-            self.pan_servo,
-            self.settings,
-            self.storage_manager,
-            self.tilt_servo,
-            self.timer,
+            pan_servo = pan_servo,
+            settings = settings,
+            tilt_servo = self.tilt_servo,
+            timer = self.timer,
         )
-    def get_media_path(self, capture_mode, media_extension, session_dir):
-        if media_extension:
-            return self.storage_manager.media_file_path(
-                mode=capture_mode, 
-                extension=media_extension,
-                session_dir=session_dir
-            )
-        return None
+
+        self._current_session: CaptureSession | None = None
+
+    def _register_session(self, session: CaptureSession):
+        if not isinstance(session, CaptureSession):
+            logger.error("Session must be of type CaptureSession")
+            return
+        
+        self._current_session = session
+
+    def get_current_session(self) -> CaptureSession | None:
+        if isinstance(self._current_session, CaptureSession):
+            return self._current_session
+        else:
+            return None
     
-    def capture_photo(self, media_path):
+    def capture_photo(self, media_path: Path):
         """
         Capture a photo and send the file path to remote clients.
         
@@ -79,18 +77,9 @@ class CaptureManager:
         """
         self.camera_controller.capture_image(media_path)
         logger.info(f"Captured photo: {media_path}")
-        self.tx_last_captured_photo(media_path)
+        self.remote_api.tx_last_captured_photo(media_path)
 
-    def tx_last_captured_photo(self, media_path):
-        """Send the obfuscated file path of the last captured photo to remote clients."""
-        file_path = f"/media/{self.storage_manager.PHOTO_OUTPUT_DIR.name}/{media_path.parent.name}/{media_path.name}"
-        file_paths_payload = {
-            "type": "last_captured_photo",
-            "file_path": file_path
-        }
-        self.remote_server.send(file_paths_payload)
-
-    def start_video(self, media_path):
+    def start_video(self, media_path: Path):
         self.camera_controller.start_video(media_path)
         logger.info(f"Started video recording: {media_path}")
 
@@ -106,22 +95,15 @@ class CaptureManager:
 
         logger.debug(f"Logged altitude: {altitude} at {timestamp}")
 
-        self.remote_server.send({
-            "type": "altitude_update",
-            "altitude": altitude,
-            "timestamp": timestamp
-        })
+        self.remote_api.tx_altitude(altitude, timestamp)
 
     async def step_pan_tilt(self, pan_tilt_pattern):
         pan_tilt_pattern.step()
         await asyncio.sleep(0.5) # Small delay to allow servo movement before next step
         logger.debug("Pan/tilt step executed")
 
-        self.remote_server.send({
-            "type": "pan_tilt_update",
-            "pan_angle": pan_tilt_pattern.current_pan_angle,
-            "tilt_angle": self.tilt_servo.angle
-        })
+        pan_angle = pan_tilt_pattern.current_pan_angle
+        self.remote_api.tx_servo_positions(pan_angle)
 
     def request_stop(self):
         if self.state != CaptureState.RUNNING:
@@ -143,16 +125,10 @@ class CaptureManager:
             self.state = CaptureState.RUNNING
 
             with CaptureSession(self.session_context) as session:
+                self._register_session(session)
+
                 # Transmit Initial Session Info
                 self.remote_api.tx_session_info(session)
-
-                # Register Handler for Session Info Requests
-                self._info_handler = {
-                    "mode":PiKiteMode.CAPTURE,
-                    "command":InputCommand.REQUEST_SESSION_INFO,
-                    "callback":lambda: self.remote_api.tx_session_info(session)
-                }
-                self.input_handler.register(**self._info_handler)
 
                 while True:
                     if self.timer.interval_elapsed(1.0, "runtime_and_session_info"):
@@ -221,13 +197,9 @@ class CaptureManager:
             ]:
                 self.timer.named_intervals.pop(key, None)
 
-            # Home the Pan/Tilt Servos
-            self.pan_servo.home()
-            await asyncio.sleep(0.1)
-            self.tilt_servo.home()
-            await asyncio.sleep(0.1)
-
-            # Unregister capture loop specific input handlers
-            self.input_handler.unregister(**self._info_handler)
+            # Home the Pan/Tilt Servos and Reset Session
+            if self._current_session is not None:
+                self._current_session.pan_tilt_pattern.reset()
+                self._current_session = None
 
             self.state = CaptureState.STOPPED

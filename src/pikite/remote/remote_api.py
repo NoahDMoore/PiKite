@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 
 from pikite.core.constants import CAPTURE_MODES
@@ -118,11 +119,13 @@ class RemoteAPI:
         self.timer.wait(0.5)
         self.tx_servo_positions()
 
-    def tx_servo_positions(self):
+    def tx_servo_positions(self, pan_angle: int | None = None):
+        pan_angle = pan_angle if pan_angle is not None else round(self.pan_servo.encoder.get_smoothed_angle())
+        tilt_angle = self.tilt_servo.angle
         self.remote_server.send({
             "type": "pan_tilt_update",
-            "pan_angle": round(self.pan_servo.encoder.get_smoothed_angle()),
-            "tilt_angle": self.tilt_servo.angle
+            "pan_angle": pan_angle,
+            "tilt_angle": tilt_angle
         })
 
 
@@ -138,3 +141,20 @@ class RemoteAPI:
     def tx_session_end(self, session: CaptureSession):
         """Send session end notification to remote clients."""
         self.remote_server.send(session.get_end_payload())
+
+    def tx_last_captured_photo(self, media_path: Path):
+        """Send the obfuscated file path of the last captured photo to remote clients."""
+        file_path = f"/media/{self.storage_manager.PHOTO_OUTPUT_DIR.name}/{media_path.parent.name}/{media_path.name}"
+        file_paths_payload = {
+            "type": "last_captured_photo",
+            "file_path": file_path
+        }
+        self.remote_server.send(file_paths_payload)
+
+    def tx_altitude(self, altitude, timestamp):
+        altitude_payload = {
+            "type": "altitude_update",
+            "altitude": altitude,
+            "timestamp": timestamp
+        }
+        self.remote_server.send(altitude_payload)
