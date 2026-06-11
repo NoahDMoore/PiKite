@@ -21,14 +21,12 @@ logger = get_logger(__name__)
 
 class RemoteAPI:
     def __init__(self,
-        menu: Menu,
         pan_servo: PanServo,
         remote_server: RemoteServer,
         settings: Settings,
         storage_manager: StorageManager,
         tilt_servo: TiltServo
     ):
-        self.menu = menu
         self.pan_servo = pan_servo
         self.remote_server = remote_server
         self.settings = settings
@@ -69,14 +67,14 @@ class RemoteAPI:
 
     # Settings Endpoints
     def tx_settings(self, **kwargs):
-        """Fetch current settings and menu options to send to remote clients."""
+        """Send current settings and options to remote clients."""
         payload = {
             "type": "settings_update",
             "settings": json.dumps(self.settings.config)
         }
 
         self.remote_server.send(payload)
-        logger.debug("Sent current settings and menu options to remote clients")
+        logger.debug("Sent current settings and options to remote clients")
 
     def rx_settings_update(self, args):
         update = args.get("settings_to_update", {})
