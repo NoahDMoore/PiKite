@@ -67,9 +67,9 @@ class PanTiltPattern:
         self.reset()
 
     def reset(self):
-        self.pan_servo.rotate_to(speed=0.5, target_angle=0, margin=4)
+        self.pan_servo.home()
+        self.tilt_servo.home()
         self.current_pan_angle = 0
-        self.tilt_servo.angle = 0
 
     def step(self):
         if self.PAN_STEP > 0:
