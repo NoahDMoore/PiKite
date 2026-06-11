@@ -35,60 +35,67 @@ logger = logger_module.get_logger(__name__)
 class PiKiteApp:
     def __init__(self):
         self._bootstrap()
+        self.on_close_callback: Callable[[], None] | None = None
+        self.application_running = False
 
+        logger.info("PiKite Application Initialized")
 
-        # Initialize Display
+    def _bootstrap(self):        
+        self._init_display()
+        self._initialization_progress_bar.advance(10)
+        self._init_settings_and_utils()
+        self._initialization_progress_bar.advance(20)
+        self._init_hardware()
+        self._initialization_progress_bar.advance(10)
+        self._init_input()
+        self._initialization_progress_bar.advance(20)
+        self._init_remote_system()
+        self._initialization_progress_bar.advance(10)
+        self._init_capture_system()
+        self._initialization_progress_bar.advance(10)
+        self._init_modes()
+        self._initialization_progress_bar.advance(20)
+
+    def _init_display(self):
         self.display_controller = DisplayController()
-        initialization_progress_bar = LoadingBar("Loading PiKite", self.display_controller)
-        initialization_progress_bar.advance(10)
-        
-        # Initialize Timer
+        self._initialization_progress_bar = LoadingBar("Loading PiKite", self.display_controller)
+
+    def _init_settings_and_utils(self):
         self.timer = Timer()
-        self.timer.start()
-        initialization_progress_bar.advance(10)
-
-        # Initialize Storage Manager
         self.storage_manager = StorageManager()
-        initialization_progress_bar.advance(10)
-
-        # Load Settings
         self.settings = Settings()
         self.settings.add_change_listener(self._on_setting_change)
-        initialization_progress_bar.advance(10)
-
-        # Configure Logger from Settings
         self.configure_logger()
-        initialization_progress_bar.advance(10)
 
+    def _init_hardware(self):
         # Initialize Sensors
         self.pressure_sensor = PressureSensorController()
-        initialization_progress_bar.advance(5)
 
-        self.camera_controller = CameraController(self.settings)
-        initialization_progress_bar.advance(5)
-
-        # Initialize Servo Controllers
+        # Initialize Servos
         offset = int(self.settings.get("pan_tilt.tilt_zero_position_offset", 0))
         self.tilt_servo = TiltServo(tilt_zero_position_offset=offset) # Adjust zero angle offset to ensure camera is level when tilt angle is set to 0
-        initialization_progress_bar.advance(5)
-
         self.pan_servo = PanServo()
-        initialization_progress_bar.advance(5)
 
-        # Initialize Input Handler
+    def _init_input(self):
+        # Initialize InputHandler
         self.input_handler = InputHandler()
-        initialization_progress_bar.advance(10)
 
-        # Initialize Menu System
+        # Initialize Buttons
+        self.button_controller = ButtonController(self.input_handler)
+        self.input_handler.add_mode_change_listener(self.button_controller.sync_mode)
+        
+        # Initialize Menu
         self.menu = Menu(self.display_controller, self.settings, self.input_handler) #type: ignore
 
+    def _init_remote_system(self):
         # Initialize Remote Controller Server
         self.remote_server = RemoteServer(port=5000)
         
         # Initialize Remote Input Handler
         self.remote_input_listener = RemoteInputListener(self.remote_server, self.input_handler)
+        
+        # Initialize RemoteAPI and attach it to the server
         self.remote_api = RemoteAPI(
-            menu=self.menu,
             pan_servo=self.pan_servo,
             remote_server=self.remote_server,
             settings=self.settings,
@@ -97,28 +104,25 @@ class PiKiteApp:
         )
         self.remote_server.register_api(self.remote_api)
 
+    def _init_capture_system(self):
+        # Initialize Camera
+        self.camera_controller = CameraController(self.settings)
+
         # Initialize Camera Preview Stream
         self.preview = PreviewStream(self.camera_controller, self.remote_server)
-        initialization_progress_bar.advance(10)
-
-        # Initialize Buttons
-        self.button_controller = ButtonController(self.input_handler)
-        self.input_handler.add_mode_change_listener(self.button_controller.sync_mode)
-        initialization_progress_bar.advance(10)
 
         # Initialize CaptureManager
         self.capture_manager = CaptureManager(
             camera_controller=self.camera_controller,
             display_controller=self.display_controller,
-            input_handler=self.input_handler,
             pan_servo=self.pan_servo,
             pressure_sensor=self.pressure_sensor,
             remote_api=self.remote_api,
-            remote_server=self.remote_server,
             settings=self.settings,
             tilt_servo=self.tilt_servo,
         )
 
+    def _init_modes(self):
         # Initialize Application Modes
         self.mode_manager = ModeManager(
             input_handler=self.input_handler,
@@ -148,7 +152,8 @@ class PiKiteApp:
 
         self.capture_mode = CaptureMode(
             **base_mode_context,
-            capture_manager=self.capture_manager
+            capture_manager=self.capture_manager,
+            remote_api=self.remote_api
         )
 
         self.baseline_altitude_mode = BaselineAltitudeMode(
@@ -171,14 +176,6 @@ class PiKiteApp:
         self.mode_manager.register_mode(self.capture_mode)
         self.mode_manager.register_mode(self.baseline_altitude_mode)
         self.mode_manager.register_mode(self.system_info_mode)
-
-        self.application_running = False
-        self.on_close_callback: Callable[[], None] | None = None
-
-        logger.info("PiKite Application Initialized")
-
-    def _bootstrap(self):
-        pass
 
     def _on_setting_change(self, setting_key, new_value):
         logger.info(f"Setting Change Detected: {setting_key} changed to {new_value}.")
@@ -231,6 +228,7 @@ class PiKiteApp:
 
     async def run(self):
         logger.info("Starting PiKite Application")
+        self.timer.start()
 
         self.remote_server.start()
         
