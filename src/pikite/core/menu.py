@@ -340,6 +340,7 @@ class Menu:
                 self._handle_command()
             case "confirm_input_command":
                 self._handle_command()
+                logger.info(f"Supress: {self.current_element.suppress_menu_update_on_confirmation}")
                 self.return_to_parent(
                     suppress_update = self.current_element.suppress_menu_update_on_confirmation
                 )
