@@ -69,8 +69,8 @@ class PiKiteApp:
             ),
             LifeCycle.LifecycleStep(
                 name = "input",
-                startup = self._init_input,
-                shutdown = self.button_controller.close,
+                startup = self._init_inputs,
+                shutdown = self._cleanup_inputs,
                 weight = 1
             ),
             LifeCycle.LifecycleStep(
@@ -178,7 +178,7 @@ class PiKiteApp:
         self.pan_servo.stop()
         self.tilt_servo.stop()
 
-    def _init_input(self):
+    def _init_inputs(self):
         # Initialize InputHandler
         self.input_handler = InputHandler()
 
@@ -188,6 +188,9 @@ class PiKiteApp:
         
         # Initialize Menu
         self.menu = Menu(self.display_controller, self.settings, self.input_handler) #type: ignore
+
+    def _cleanup_inputs(self):
+        self.button_controller.close()
 
     def _init_remote_system(self):
         # Initialize Remote Controller Server
