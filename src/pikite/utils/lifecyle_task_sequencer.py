@@ -109,7 +109,6 @@ async def run_task_sequence(
                 target_progress = round((completed_weight / total_weight) * 100)
                 advance_amount = target_progress - progress_bar.value
 
-                print(f"PROGRESS UPDATE by {advance_amount}")
                 progress_bar.advance(advance_amount)
 
     if progress_bar is not None and progress_bar.value < 100:
