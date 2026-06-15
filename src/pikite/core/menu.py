@@ -52,7 +52,7 @@ class MenuElement:
         self.value = self.dict.get("value")
         self.setting_key = self.dict.get("setting_key")
         self.requires_confirmation = self.dict.get("requires_confirmation")
-        self.suppress_menu_update = self.dict.get("suppress_menu_update")
+        self.suppress_menu_update_on_confirmation = self.dict.get("suppress_menu_update_on_confirmation", False)
         self.parent = parent
         self.app_settings = app_settings
         self.element_path = element_path
@@ -307,17 +307,16 @@ class Menu:
         self.current_level = self.current_element.submenu
         self.update_menu()
 
-    def return_to_parent(self):
+    def return_to_parent(self, suppress_update: bool = False):
         if self.current_element.parent is None:
             logger.error(f"Cannot return to parent element. Current element '{self.current_element.name}' does not have a parent or is already at the root level.")
             return
         
-        
         parent_level = self._ancestors.pop()
         self.current_level = parent_level
         
-        if self.current_element.suppress_menu_update:
-            logger.info("Menu update was suppressed by menu item.")
+        if suppress_update:
+            logger.debug("Menu update was suppressed by menu item.")
             return
         
         self.update_menu()
@@ -341,7 +340,9 @@ class Menu:
                 self._handle_command()
             case "confirm_input_command":
                 self._handle_command()
-                self.return_to_parent()
+                self.return_to_parent(
+                    suppress_update = self.current_element.suppress_menu_update_on_confirmation
+                )
             case "setting":
                 self._get_options()
             case "setting_option":

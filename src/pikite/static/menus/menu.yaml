@@ -41,18 +41,18 @@ exit_pikite:
       type: input_command
       command: "SHUTDOWN"
       requires_confirmation: true
-      suppress_menu_update: true
+      suppress_menu_update_on_confirmation: true
 
     reboot:
       label: "Reboot"
       type: input_command
       command: "REBOOT"
       requires_confirmation: true
-      suppress_menu_update: true
+      suppress_menu_update_on_confirmation: true
 
     close_application:
       label: "Close App"
       type: input_command
       command: "EXIT"
       requires_confirmation: true
-      suppress_menu_update: true
+      suppress_menu_update_on_confirmation: true
