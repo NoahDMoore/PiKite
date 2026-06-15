@@ -17,6 +17,7 @@ class ModeManager:
         self._modes: Dict[PiKiteMode, BaseMode] = {}
         self._current_mode: BaseMode | None = None
         self._previous_mode: BaseMode | None = None
+        self._shutdown_requested: bool = False
 
     def register_mode(self, mode: BaseMode):
         if mode.mode in self._modes:
@@ -40,6 +41,10 @@ class ModeManager:
         return self.current_mode_type
 
     async def switch_to(self, mode: PiKiteMode):
+        if self._shutdown_requested:
+            logger.info("Mode switch ignored. Shutdown has been requested.")
+            return
+
         new_mode = self._modes[mode]
 
         if self._current_mode is new_mode:
@@ -57,6 +62,10 @@ class ModeManager:
         await self._current_mode.enter()
 
     async def run_current_mode(self):
+        if self._shutdown_requested:
+            logger.info("Cannot run current mode. Shutdown has been reqeusted.")
+            return
+        
         mode = self._current_mode
 
         if mode is None:
@@ -78,5 +87,7 @@ class ModeManager:
 
     def request_exit(self):
         logger.info("Exit requested. Shutting down application.")
+        self._shutdown_requested = True
+
         if self._current_mode is not None:
             self._current_mode.mode_change_requested.set() # Unblock mode if waiting for mode change to allow clean exit.
