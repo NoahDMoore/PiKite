@@ -331,21 +331,28 @@ class PiKiteApp:
 
     async def run(self):
         logger.info("Starting PiKite Application")
-        
+
+        self.timer.start()
+
+        self.remote_server.start()
+
+        remote_task = asyncio.create_task(
+            self.remote_input_listener.start_listening()
+        )
+
+        preview_task = asyncio.create_task(
+            self.preview.stream()
+        )
+
         try:
-            self.timer.start()
-            self.remote_server.start()
-            
-            await asyncio.gather(
-                self.remote_input_listener.start_listening(),
-                self.preview.stream(),
-                self.main_loop()
-            )
+            await self.main_loop()
         finally:
             await self.cleanup()
 
+            await remote_task
+            await preview_task
 
-        self.on_close()
+            self.on_close()
 
     async def cleanup(self):
         # Cleanup at End of Runtime
