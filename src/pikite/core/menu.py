@@ -53,6 +53,7 @@ class MenuElement:
         self.setting_key = self.dict.get("setting_key")
         self.requires_confirmation = self.dict.get("requires_confirmation")
         self.suppress_menu_update_on_confirmation = self.dict.get("suppress_menu_update_on_confirmation", False)
+        logger.info(f"Suppression Set for menu item '{self.name}': {self.suppress_menu_update_on_confirmation}")
         self.parent = parent
         self.app_settings = app_settings
         self.element_path = element_path
