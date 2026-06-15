@@ -50,43 +50,43 @@ class PiKiteApp:
     async def _bootstrap(self):
         self.lifecycle_steps: list[lifecycle_module.LifecycleStep] = [
             lifecycle_module.LifecycleStep(
-                name = "display",
+                name = "Display",
                 startup = None, # Display must be intialized as a pre-requisite before calling lifecycle_module.startup()
                 shutdown = self._cleanup_display,
                 weight = 1
             ),
             lifecycle_module.LifecycleStep(
-                name = "utils",
+                name = "Utils",
                 startup = self._init_settings_and_utils,
                 shutdown = self._cleanup_app_timer,
                 weight = 1
             ),
             lifecycle_module.LifecycleStep(
-                name = "hardware",
+                name = "Hardware",
                 startup = self._init_hardware,
                 shutdown = self._cleanup_servos,
                 weight = 1
             ),
             lifecycle_module.LifecycleStep(
-                name = "input",
+                name = "Input",
                 startup = self._init_inputs,
                 shutdown = self._cleanup_inputs,
                 weight = 1
             ),
             lifecycle_module.LifecycleStep(
-                name = "remote",
+                name = "Remote",
                 startup = self._init_remote_system,
                 shutdown = self._cleanup_remote_system,
                 weight = 1
             ),
             lifecycle_module.LifecycleStep(
-                name = "capture",
+                name = "Capture",
                 startup = self._init_capture_system,
                 shutdown = self._cleanup_capture_system,
                 weight = 1
             ),
             lifecycle_module.LifecycleStep(
-                name = "modes",
+                name = "Modes",
                 startup = self._init_modes,
                 shutdown = None,
                 weight = 1
