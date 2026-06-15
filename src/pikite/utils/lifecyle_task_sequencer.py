@@ -54,7 +54,7 @@ async def shutdown(
         behavior = LifecycleBehavior.SHUTDOWN,
         logger = logger,
         progress_bar = progress_bar,
-        use_dynamic_progress_bar_titles = False,
+        use_dynamic_progress_bar_titles = True,
         hide_last_update = hide_last_update,
     )
 
