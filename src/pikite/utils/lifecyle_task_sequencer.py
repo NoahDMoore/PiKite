@@ -1,3 +1,5 @@
+from __future__ import annotations  # postpones evaluation so types aren't checked at runtime
+
 from dataclasses import dataclass
 from enum import Enum
 from inspect import isawaitable
