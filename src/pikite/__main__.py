@@ -6,14 +6,14 @@ import pikite.utils.logger as logger_module
 # Setup Logger
 logger = logger_module.get_logger(__name__)
 
-def main():
-    app = PiKiteApp()
+async def main():
+    app = await PiKiteApp.create()
 
     try:
-        asyncio.run(app.run())
+        await app.run()
     except KeyboardInterrupt:
         logger.error("Keyboard Interrupt: Exiting PiKite")
     
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

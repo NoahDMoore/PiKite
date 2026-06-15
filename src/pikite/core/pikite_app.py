@@ -27,6 +27,7 @@ from pikite.remote.remote_server import RemoteServer
 from pikite.system.storage import StorageManager
 import pikite.system.power_management as PowerManagement
 import pikite.utils.logger as logger_module
+import pikite.utils.lifecyle_task_sequencer as LifeCycle
 from pikite.utils.timer import Timer
 
 # Setup Logger
@@ -34,31 +35,82 @@ logger = logger_module.get_logger(__name__)
 
 class PiKiteApp:
     def __init__(self):
-        self._bootstrap()
-        self.on_close_callback: Callable[[], None] | None = None
         self.application_running = False
+        self.initialized = False
+        self.on_close_callback: Callable[[], None] | None = None
 
+    @classmethod
+    async def create(cls):
+        self = cls()
+        await self._bootstrap()
+        self.initialized = True
         logger.info("PiKite Application Initialized")
+        return self
 
-    def _bootstrap(self):        
-        self._init_display()
-        self._initialization_progress_bar.advance(10)
-        self._init_settings_and_utils()
-        self._initialization_progress_bar.advance(20)
-        self._init_hardware()
-        self._initialization_progress_bar.advance(10)
-        self._init_input()
-        self._initialization_progress_bar.advance(20)
-        self._init_remote_system()
-        self._initialization_progress_bar.advance(10)
-        self._init_capture_system()
-        self._initialization_progress_bar.advance(10)
-        self._init_modes()
-        self._initialization_progress_bar.advance(20)
+    async def _bootstrap(self):
+        self.lifecycle_steps: list[LifeCycle.LifecycleStep] = [
+            LifeCycle.LifecycleStep(
+                name = "display",
+                startup = self._init_display,
+                shutdown = self._cleanup_display,
+                weight = 1
+            ),
+            LifeCycle.LifecycleStep(
+                name = "utils",
+                startup = self._init_settings_and_utils,
+                shutdown = self._cleanup_app_timer,
+                weight = 1
+            ),
+            LifeCycle.LifecycleStep(
+                name = "hardware",
+                startup = self._init_hardware,
+                shutdown = self._cleanup_servos,
+                weight = 1
+            ),
+            LifeCycle.LifecycleStep(
+                name = "input",
+                startup = self._init_input,
+                shutdown = self.button_controller.close,
+                weight = 1
+            ),
+            LifeCycle.LifecycleStep(
+                name = "remote",
+                startup = self._init_remote_system,
+                shutdown = self._cleanup_remote_system,
+                weight = 1
+            ),
+            LifeCycle.LifecycleStep(
+                name = "capture",
+                startup = self._init_capture_system,
+                shutdown = self._cleanup_capture_system,
+                weight = 1
+            ),
+            LifeCycle.LifecycleStep(
+                name = "modes",
+                startup = self._init_modes,
+                shutdown = None,
+                weight = 1
+            ),
+        ]
+
+        await LifeCycle.startup(
+            lifecycle_steps = self.lifecycle_steps,
+            progress_bar = LoadingBar("Loading PiKite", self.display_controller),
+            parent_logger = logger,
+        )
 
     def _init_display(self):
         self.display_controller = DisplayController()
-        self._initialization_progress_bar = LoadingBar("Loading PiKite", self.display_controller)
+
+    def _cleanup_display(self):
+        self.display_controller.put(
+            payload="PiKite Closed",
+            bg_color=(0,0,0),
+            fg_color=(255,255,255)
+        )
+
+        # Cleanup Display Controller
+        self.display_controller.close()
 
     def _init_settings_and_utils(self):
         self.timer = Timer()
@@ -66,6 +118,45 @@ class PiKiteApp:
         self.settings = Settings()
         self.settings.add_change_listener(self._on_setting_change)
         self.configure_logger()
+
+    def _cleanup_app_timer(self):
+        runtime = self.timer.stop()
+        logger.info(f"PiKite has run for {self.timer.format_elapsed_time(runtime)}.")
+
+    def _on_setting_change(self, setting_key, new_value):
+        logger.info(f"Setting Change Detected: {setting_key} changed to {new_value}.")
+        
+        if setting_key.startswith("logging"):
+            self.configure_logger()
+            logger.info("Logger reconfigured due to logging settings change.")
+
+        if setting_key.startswith("camera"):
+            self.camera_controller.reconfigure_camera()
+            self.timer.wait(0.5) # Small delay to allow camera to reconfigure before use
+            logger.info("Camera controller reconfigured due to camera settings change.")
+
+        if setting_key == "pan_tilt.tilt_zero_position_offset":
+            self.tilt_servo.tilt_zero_position_offset = int(new_value)
+            self.tilt_servo.home()
+            logger.info(f"Updated tilt servo zero angle offset to {new_value} due to settings change.")
+
+    def configure_logger(self):
+        """
+        Configure the logger based on application settings.
+
+        Args:
+            settings (Settings): Application settings.
+        """
+        log_level = self.settings.get("logging.log_level", "INFO")
+        log_to_console = self.settings.get("logging.log_to_console", True)
+        log_to_file = self.settings.get("logging.log_to_file", True)
+        
+        logger_module.configure_logger(
+            log_level = log_level,
+            use_console_handler = log_to_console,
+            use_file_handler = log_to_file,
+            log_file = self.storage_manager.LOG_FILE_BASE
+        )
 
     def _init_hardware(self):
         # Initialize Sensors
@@ -75,6 +166,17 @@ class PiKiteApp:
         offset = int(self.settings.get("pan_tilt.tilt_zero_position_offset", 0))
         self.tilt_servo = TiltServo(tilt_zero_position_offset=offset) # Adjust zero angle offset to ensure camera is level when tilt angle is set to 0
         self.pan_servo = PanServo()
+
+    async def _cleanup_servos(self):
+        # Home the Servos
+        self.pan_servo.home()
+        await asyncio.sleep(0.1)
+        self.tilt_servo.home()
+        await asyncio.sleep(0.1)
+
+        # Stop the Servos
+        self.pan_servo.stop()
+        self.tilt_servo.stop()
 
     def _init_input(self):
         # Initialize InputHandler
@@ -104,6 +206,10 @@ class PiKiteApp:
         )
         self.remote_server.register_api(self.remote_api)
 
+    async def _cleanup_remote_system(self):
+        self.remote_input_listener.close()
+        await self.remote_server.close()
+
     def _init_capture_system(self):
         # Initialize Camera
         self.camera_controller = CameraController(self.settings)
@@ -121,6 +227,10 @@ class PiKiteApp:
             settings=self.settings,
             tilt_servo=self.tilt_servo,
         )
+
+    async def _cleanup_capture_system(self):
+        await self.preview.close()
+        self.camera_controller.close()
 
     def _init_modes(self):
         # Initialize Application Modes
@@ -177,41 +287,28 @@ class PiKiteApp:
         self.mode_manager.register_mode(self.baseline_altitude_mode)
         self.mode_manager.register_mode(self.system_info_mode)
 
-    def _on_setting_change(self, setting_key, new_value):
-        logger.info(f"Setting Change Detected: {setting_key} changed to {new_value}.")
-        
-        if setting_key.startswith("logging"):
-            self.configure_logger()
-            logger.info("Logger reconfigured due to logging settings change.")
+    # On Close Methods
+    def register_on_close_callback(self, callback: Callable[[], None]):
+        self.on_close_callback = callback
 
-        if setting_key.startswith("camera"):
-            self.camera_controller.reconfigure_camera()
-            self.timer.wait(0.5) # Small delay to allow camera to reconfigure before use
-            logger.info("Camera controller reconfigured due to camera settings change.")
+    def on_close(self):
+        if callable(self.on_close_callback):
+            self.on_close_callback()
 
-        if setting_key == "pan_tilt.tilt_zero_position_offset":
-            self.tilt_servo.tilt_zero_position_offset = int(new_value)
-            self.tilt_servo.home()
-            logger.info(f"Updated tilt servo zero angle offset to {new_value} due to settings change.")
+    def exit(self):
+        logger.info("Exit command received. Closing PiKite application.")
+        self.application_running = False
+        self.mode_manager.request_exit()
 
-    def configure_logger(self):
-        """
-        Configure the logger based on application settings.
+    def shutdown(self):
+        self.register_on_close_callback(PowerManagement.shutdown)
+        self.exit()
 
-        Args:
-            settings (Settings): Application settings.
-        """
-        log_level = self.settings.get("logging.log_level", "INFO")
-        log_to_console = self.settings.get("logging.log_to_console", True)
-        log_to_file = self.settings.get("logging.log_to_file", True)
-        
-        logger_module.configure_logger(
-            log_level = log_level,
-            use_console_handler = log_to_console,
-            use_file_handler = log_to_file,
-            log_file = self.storage_manager.LOG_FILE_BASE
-        )
+    def reboot(self):
+        self.register_on_close_callback(PowerManagement.reboot)
+        self.exit()
 
+    # Main Loop
     async def main_loop(self):
         # Run Preloader Animation
         preloader = PreLoader(self.display_controller)
@@ -240,99 +337,14 @@ class PiKiteApp:
 
         self.on_close()
 
-    def register_on_close_callback(self, callback: Callable[[], None]):
-        self.on_close_callback = callback
-
-    def on_close(self):
-        if callable(self.on_close_callback):
-            self.on_close_callback()
-
-    def exit(self):
-        logger.info("Exit command received. Closing PiKite application.")
-        self.application_running = False
-        self.mode_manager.request_exit()
-
-    def shutdown(self):
-        self.register_on_close_callback(PowerManagement.shutdown)
-        self.exit()
-
-    def reboot(self):
-        self.register_on_close_callback(PowerManagement.reboot)
-        self.exit()
-
     async def cleanup(self):
         # Cleanup at End of Runtime
         logger.info("Preparing to close PiKite. Cleaning up...")
 
-        # Create Progress Bar to Display Cleanup Progress
-        try:
-            cleanup_progress_bar = LoadingBar("Closing PiKite", self.display_controller)
-        except TypeError:
-            cleanup_progress_bar = None
-        
-        async def _cleanup_servos():
-            # Home the Servos
-            self.pan_servo.home()
-            await asyncio.sleep(0.1)
-            self.tilt_servo.home()
-            await asyncio.sleep(0.1)
-
-            # Stop the Servos
-            self.pan_servo.stop()
-            self.tilt_servo.stop()
-
-        def _cleanup_timer():
-            runtime = self.timer.stop()
-            logger.info(f"PiKite has run for {self.timer.format_elapsed_time(runtime)}.")
-
-        def _cleanup_display_controller():
-            self.display_controller.put(
-                payload="PiKite Closed",
-                bg_color=(0,0,0),
-                fg_color=(255,255,255)
-            )
-
-            # Cleanup Display Controller
-            self.display_controller.close()
-
-        # Define Cleanup Steps
-        cleanup_tasks = [
-            self.button_controller.close,   # Cleanup Button Controller
-            self.preview.close,             # Cleanup Camera Preview Stream
-            self.remote_input_listener.close,        # Cleanup RemoteInput
-            self.remote_server.close,       # Shutdown ControllerServer
-            _cleanup_servos,                # Home and Then Stop the Pan and Tilt Servos
-            self.camera_controller.close,   # Cleanup Camera Controller
-            _cleanup_timer,                 # Stop the Timer and Log Runtime
-            _cleanup_display_controller     # Cleanup Display Controller
-        ]
-
-        visible_tasks = len(cleanup_tasks) - 1 # Subtract one from cleanup_tasks to account for shutting down the display controller.
-
-        # Call Each Cleanup Task
-        for i, task in enumerate(cleanup_tasks):
-            try:
-                result = task()
-
-                if isawaitable(result):
-                    await result
-            except Exception as e:
-                logger.error(f"Failed to execute cleanup task {task.__name__ if hasattr(task, '__name__') else task}: {e}")
-            finally:
-                if i == visible_tasks: # visible_tasks equals the index of the final task
-                    break # skip since DisplayController has been closed and cannot be updated.
-                
-                # Advance the progress bar
-                if cleanup_progress_bar is not None:
-                    completed_tasks = i + 1
-
-                    target_progress = round((completed_tasks / visible_tasks) * 100)
-                    advance_amount = target_progress - cleanup_progress_bar.value
-
-                    cleanup_progress_bar.advance(advance_amount)
-
-        if cleanup_progress_bar is not None:
-            # Advance remaining space on progress bar.
-            cleanup_progress_bar.advance(100 - cleanup_progress_bar.value)
+        await LifeCycle.shutdown(
+            lifecycle_steps = self.lifecycle_steps,
+            progress_bar = LoadingBar("Closing PiKite", self.display_controller),
+            parent_logger = logger,
+        )
     
         logger.info("PiKite clean-up complete. Closing application.")
