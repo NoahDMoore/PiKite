@@ -27,7 +27,7 @@ from pikite.remote.remote_server import RemoteServer
 from pikite.system.storage import StorageManager
 import pikite.system.power_management as PowerManagement
 import pikite.utils.logger as logger_module
-import pikite.utils.lifecyle_task_sequencer as LifeCycle
+import pikite.utils.lifecyle_task_sequencer as lifecycle_module
 from pikite.utils.timer import Timer
 
 # Setup Logger
@@ -48,44 +48,44 @@ class PiKiteApp:
         return self
 
     async def _bootstrap(self):
-        self.lifecycle_steps: list[LifeCycle.LifecycleStep] = [
-            LifeCycle.LifecycleStep(
+        self.lifecycle_steps: list[lifecycle_module.LifecycleStep] = [
+            lifecycle_module.LifecycleStep(
                 name = "display",
-                startup = self._init_display,
+                startup = None, # Display must be intialized as a pre-requisite before calling lifecycle_module.startup()
                 shutdown = self._cleanup_display,
                 weight = 1
             ),
-            LifeCycle.LifecycleStep(
+            lifecycle_module.LifecycleStep(
                 name = "utils",
                 startup = self._init_settings_and_utils,
                 shutdown = self._cleanup_app_timer,
                 weight = 1
             ),
-            LifeCycle.LifecycleStep(
+            lifecycle_module.LifecycleStep(
                 name = "hardware",
                 startup = self._init_hardware,
                 shutdown = self._cleanup_servos,
                 weight = 1
             ),
-            LifeCycle.LifecycleStep(
+            lifecycle_module.LifecycleStep(
                 name = "input",
                 startup = self._init_inputs,
                 shutdown = self._cleanup_inputs,
                 weight = 1
             ),
-            LifeCycle.LifecycleStep(
+            lifecycle_module.LifecycleStep(
                 name = "remote",
                 startup = self._init_remote_system,
                 shutdown = self._cleanup_remote_system,
                 weight = 1
             ),
-            LifeCycle.LifecycleStep(
+            lifecycle_module.LifecycleStep(
                 name = "capture",
                 startup = self._init_capture_system,
                 shutdown = self._cleanup_capture_system,
                 weight = 1
             ),
-            LifeCycle.LifecycleStep(
+            lifecycle_module.LifecycleStep(
                 name = "modes",
                 startup = self._init_modes,
                 shutdown = None,
@@ -93,7 +93,10 @@ class PiKiteApp:
             ),
         ]
 
-        await LifeCycle.startup(
+        # Initialize DisplayController as a Pre-Requsite
+        self._init_display()
+
+        await lifecycle_module.startup(
             lifecycle_steps = self.lifecycle_steps,
             progress_bar = LoadingBar("Loading PiKite", self.display_controller),
             parent_logger = logger,
@@ -344,7 +347,7 @@ class PiKiteApp:
         # Cleanup at End of Runtime
         logger.info("Preparing to close PiKite. Cleaning up...")
 
-        await LifeCycle.shutdown(
+        await lifecycle_module.shutdown(
             lifecycle_steps = self.lifecycle_steps,
             progress_bar = LoadingBar("Closing PiKite", self.display_controller),
             parent_logger = logger,
