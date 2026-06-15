@@ -52,6 +52,7 @@ class MenuElement:
         self.value = self.dict.get("value")
         self.setting_key = self.dict.get("setting_key")
         self.requires_confirmation = self.dict.get("requires_confirmation")
+        self.suppress_menu_update = self.dict.get("suppress_menu_update")
         self.parent = parent
         self.app_settings = app_settings
         self.element_path = element_path
@@ -311,8 +312,14 @@ class Menu:
             logger.error(f"Cannot return to parent element. Current element '{self.current_element.name}' does not have a parent or is already at the root level.")
             return
         
+        
         parent_level = self._ancestors.pop()
         self.current_level = parent_level
+        
+        if self.current_element.suppress_menu_update:
+            logger.info("Menu update was suppressed by menu item.")
+            return
+        
         self.update_menu()
 
     def reset(self):
