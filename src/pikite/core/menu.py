@@ -316,7 +316,7 @@ class Menu:
         self.current_level = parent_level
         
         if suppress_update:
-            logger.debug("Menu update was suppressed by menu item.")
+            logger.info("Menu update was suppressed by menu item.")
             return
         
         self.update_menu()
