@@ -327,6 +327,8 @@ class PiKiteApp:
         while self.application_running:
             await self.mode_manager.run_current_mode()
 
+        logger.info("EXITING")
+
     async def run(self):
         logger.info("Starting PiKite Application")
         
