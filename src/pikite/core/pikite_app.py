@@ -361,6 +361,7 @@ class PiKiteApp:
         await lifecycle_module.shutdown(
             lifecycle_steps = self.lifecycle_steps,
             progress_bar = LoadingBar("Closing PiKite", self.display_controller),
+            use_dynamic_progress_bar_titles = True,
             hide_last_update = True,
             parent_logger = logger
         )

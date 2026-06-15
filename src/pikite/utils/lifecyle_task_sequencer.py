@@ -24,34 +24,38 @@ class LifecycleStep:
 
 async def startup(
     lifecycle_steps: List[LifecycleStep],
+    parent_logger: Logger | None = None,
     progress_bar: LoadingBar | None = None,
+    use_dynamic_progress_bar_titles: bool = False,
     hide_last_update: bool = False,
-    parent_logger: Logger | None = None
 ):
     logger = parent_logger or get_logger(__name__)
 
     await run_task_sequence(
         lifecycle_steps = lifecycle_steps,
         behavior = LifecycleBehavior.STARTUP,
+        logger = logger,
         progress_bar = progress_bar,
+        use_dynamic_progress_bar_titles = False,
         hide_last_update = hide_last_update,
-        logger = logger
     )
 
 async def shutdown(
     lifecycle_steps: List[LifecycleStep],
+    parent_logger: Logger | None = None,
     progress_bar: LoadingBar | None = None,
+    use_dynamic_progress_bar_titles: bool = True,
     hide_last_update: bool = False,
-    parent_logger: Logger | None = None
 ):
     logger = parent_logger or get_logger(__name__)
 
     await run_task_sequence(
         lifecycle_steps = lifecycle_steps[::-1], # Reverse list of LifecycleSteps for shutdown
         behavior = LifecycleBehavior.SHUTDOWN,
+        logger = logger,
         progress_bar = progress_bar,
+        use_dynamic_progress_bar_titles = False,
         hide_last_update = hide_last_update,
-        logger = logger
     )
 
 async def run_task_sequence(
@@ -59,6 +63,7 @@ async def run_task_sequence(
         behavior: LifecycleBehavior,
         logger: Logger,
         progress_bar: LoadingBar | None = None,
+        use_dynamic_progress_bar_titles: bool = False,
         hide_last_update: bool = False,
     ):
     if not isinstance(behavior, LifecycleBehavior):
@@ -89,6 +94,9 @@ async def run_task_sequence(
             continue
 
         try:
+            if progress_bar is not None and use_dynamic_progress_bar_titles:
+                progress_bar.title = f"Starting {step.name}" if behavior == LifecycleBehavior.STARTUP else f"Closing {step.name}"
+
             result = task()
 
             if isawaitable(result):
