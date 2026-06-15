@@ -321,25 +321,27 @@ class PiKiteApp:
         await preloader.run()
 
         self.application_running = True
-        try:
-            await self.mode_manager.switch_to(PiKiteMode.MENU)
 
-            while self.application_running:
-                await self.mode_manager.run_current_mode()
-        finally:
-            await self.cleanup()
+        await self.mode_manager.switch_to(PiKiteMode.MENU)
+
+        while self.application_running:
+            await self.mode_manager.run_current_mode()
 
     async def run(self):
         logger.info("Starting PiKite Application")
-        self.timer.start()
-
-        self.remote_server.start()
         
-        await asyncio.gather(
-            self.remote_input_listener.start_listening(),
-            self.preview.stream(),
-            self.main_loop()
-        )
+        try:
+            self.timer.start()
+            self.remote_server.start()
+            
+            await asyncio.gather(
+                self.remote_input_listener.start_listening(),
+                self.preview.stream(),
+                self.main_loop()
+            )
+        finally:
+            await self.cleanup()
+
 
         self.on_close()
 
@@ -350,7 +352,8 @@ class PiKiteApp:
         await lifecycle_module.shutdown(
             lifecycle_steps = self.lifecycle_steps,
             progress_bar = LoadingBar("Closing PiKite", self.display_controller),
-            parent_logger = logger,
+            hide_last_update = True,
+            parent_logger = logger
         )
     
         logger.info("PiKite clean-up complete. Closing application.")
