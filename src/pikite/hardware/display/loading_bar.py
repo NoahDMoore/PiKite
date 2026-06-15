@@ -57,7 +57,7 @@ class LoadingBar:
         self.title_image, canvas = self.display_controller.new_image(alpha=0)
 
         canvas.text(
-            xy = (self.display_controller.DISPLAY_WIDTH / 2, 20),
+            xy = (self.display_controller.DISPLAY_WIDTH / 2, 30),
             text = new_title,
             font=self.display_controller.FONT30,
             fill="black",
